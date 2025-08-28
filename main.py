@@ -37,8 +37,23 @@ def ocular_ocr(request):
     from mangum import Mangum
     from flask import Response as FlaskResponse
     
-    # Create Mangum handler for FastAPI (disable lifespan for Cloud Functions)
-    handler = Mangum(app, lifespan="off")
+    # Create Mangum handler for FastAPI with explicit configuration
+    handler = Mangum(
+        app, 
+        lifespan="off",
+        api_gateway_base_path=None,
+        text_mime_types=[
+            "application/json",
+            "application/javascript",
+            "application/xml",
+            "application/vnd.api+json",
+            "text/plain",
+            "text/html",
+            "text/css",
+            "text/javascript",
+            "text/xml",
+        ]
+    )
     
     # Convert Cloud Functions request to Lambda-style event for Mangum
     # Get query string safely
@@ -62,24 +77,36 @@ def ocular_ocr(request):
                 body = base64.b64encode(data).decode('utf-8')
                 is_base64 = True
     
-    # Build Lambda-style event
+    # Build Lambda-style event with proper path handling
+    path = getattr(request, 'path', '/')
+    if path == '':
+        path = '/'
+    
+    # Ensure all required fields are present
     event = {
+        "version": "1.0",
         "httpMethod": request.method,
-        "path": request.path,
-        "queryStringParameters": query_string_params or None,
-        "multiValueQueryStringParameters": None,
-        "headers": dict(request.headers),
-        "multiValueHeaders": None,
+        "path": path,
+        "queryStringParameters": query_string_params or {},
+        "multiValueQueryStringParameters": {},
+        "headers": {k.lower(): v for k, v in dict(request.headers).items()},
+        "multiValueHeaders": {},
         "body": body,
         "isBase64Encoded": is_base64,
         "requestContext": {
             "requestId": "cloud-functions-request",
-            "stage": "prod",
+            "stage": "$default",
             "httpMethod": request.method,
-            "path": request.path,
+            "path": path,
+            "resourcePath": path,
+            "accountId": "123456789012",
+            "apiId": "cloud-functions",
+            "protocol": "HTTP/1.1",
+            "requestTime": "28/Aug/2025:16:21:04 +0000",
+            "requestTimeEpoch": 1724863264,
         },
-        "pathParameters": None,
-        "stageVariables": None,
+        "pathParameters": {},
+        "stageVariables": {},
     }
     
     # Create minimal context
@@ -96,6 +123,12 @@ def ocular_ocr(request):
     context = Context()
     
     try:
+        # Debug logging
+        print(f"Processing request: {request.method} {path}")
+        print(f"Query params: {query_string_params}")
+        print(f"Event path: {event.get('path')}")
+        print(f"Event httpMethod: {event.get('httpMethod')}")
+        
         # Use Mangum to handle the request
         response = handler(event, context)
         
@@ -103,6 +136,9 @@ def ocular_ocr(request):
         headers = response.get("headers", {})
         status_code = response.get("statusCode", 200)
         body = response.get("body", "")
+        
+        print(f"Response status: {status_code}")
+        print(f"Response headers: {headers}")
         
         # Handle base64 encoded responses
         if response.get("isBase64Encoded", False):
@@ -117,6 +153,7 @@ def ocular_ocr(request):
         
     except Exception as e:
         print(f"Error in Cloud Function: {e}")
+        print(f"Event data: {event}")
         import traceback
         traceback.print_exc()
         
