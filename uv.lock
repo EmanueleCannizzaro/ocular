@@ -1157,15 +1157,6 @@ wheels = [
 ]
 
 [[package]]
-name = "jsonschema-extractor"
-version = "2.0.2"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/d8/97/8c7ec239d1ab786af80b2fb121b9806dbad0d0d58ee1e343b6d75924d11a/jsonschema-extractor-2.0.2.tar.gz", hash = "sha256:5eac4ef619eb8b7679571f31ff15d1fab52e1b9ff92d19b3241b0e3ebc357226", size = 12251, upload-time = "2022-10-25T05:11:04.486Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/55/20/351a119c9133fad9034185cab15aecdb6222c806c9b44dbf96536b3b3652/jsonschema_extractor-2.0.2-py3-none-any.whl", hash = "sha256:d87d7d78fd9a28cc4e8862dcc0ea371f511dd130e583861bff8e8cbb71ce82ec", size = 12339, upload-time = "2022-10-25T05:11:03.233Z" },
-]
-
-[[package]]
 name = "jsonschema-specifications"
 version = "2025.4.1"
 source = { registry = "https://pypi.org/simple" }
@@ -1561,7 +1552,6 @@ dependencies = [
     { name = "aiohttp" },
     { name = "fastapi" },
     { name = "jinja2" },
-    { name = "jsonschema-extractor" },
     { name = "logfire" },
     { name = "mistralai" },
     { name = "pdf2image" },
@@ -1605,7 +1595,6 @@ requires-dist = [
     { name = "flake8", marker = "extra == 'dev'", specifier = ">=6.0.0" },
     { name = "httpx", marker = "extra == 'test'", specifier = ">=0.24.0" },
     { name = "jinja2", specifier = ">=3.1.0" },
-    { name = "jsonschema-extractor", specifier = ">=2.0.2" },
     { name = "logfire", specifier = ">=0.30.0" },
     { name = "mistralai", specifier = ">=1.9.9" },
     { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.0.0" },

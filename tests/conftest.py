@@ -11,7 +11,7 @@ from unittest.mock import Mock, AsyncMock
 
 from ocular.core.models import OCRResult
 from ocular.core.enums import ProviderType
-from ocular.settings import OcularSettings
+from ocular.providers.settings import OcularSettings, FileSettings
 from ocular.providers.factory import ProviderFactory
 
 
@@ -111,9 +111,11 @@ def test_settings(temp_dir):
         environment="testing",
         providers__mistral_api_key="test_key",
         providers__enabled_providers=["mistral"],
-        files__max_file_size_mb=10,
-        files__temp_dir=temp_dir / "temp",
-        files__upload_dir=temp_dir / "uploads",
+        files=FileSettings(
+            max_file_size_mb=10,
+            temp_dir=temp_dir / "temp",
+            upload_dir=temp_dir / "uploads",
+        ),
         processing__enable_caching=False,
         web__debug=True
     )
@@ -268,8 +270,7 @@ def mock_aiohttp_session():
     return session
 
 
-@pytest.mark.asyncio
-async def pytest_configure(config):
+def pytest_configure(config):
     """Configure pytest for async testing."""
     pytest.test_mode = True
 
