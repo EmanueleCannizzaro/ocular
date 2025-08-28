@@ -117,17 +117,21 @@ async def debug_info():
         except Exception as e:
             print(f"Error getting provider info: {e}")
     
+    # For Cloud Functions, we need to include the function name in URLs
+    base_url = "/ocular-ocr-service"
+    
     return {
         "message": "Ocular OCR Service",
         "status": "running",
         "processor_available": processor is not None,
         "available_providers": available_providers,
         "endpoints": [
-            "/debug - This debug info",
-            "/health - Health check", 
-            "/process - OCR processing",
-            "/providers - Provider information"
-        ]
+            f"{base_url}/debug - This debug info",
+            f"{base_url}/health - Health check", 
+            f"{base_url}/process - OCR processing",
+            f"{base_url}/providers - Provider information"
+        ],
+        "note": "For Cloud Functions, use full URLs with function name in path"
     }
 
 @app.get("/", response_class=HTMLResponse)
@@ -155,6 +159,7 @@ async def home(request: Request):
     except Exception as e:
         print(f"Template error: {e}")
         # Fall back to simple HTML
+        base_url = "/ocular-ocr-service"
         return HTMLResponse(content=f"""
         <html>
             <body>
@@ -162,9 +167,9 @@ async def home(request: Request):
                 <p>Service is running but templates are not available in this environment.</p>
                 <p>Available endpoints:</p>
                 <ul>
-                    <li><a href="/health">/health</a> - Health check</li>
-                    <li><a href="/debug">/debug</a> - Debug info</li>
-                    <li><a href="/providers">/providers</a> - Provider info</li>
+                    <li><a href="{base_url}/health">{base_url}/health</a> - Health check</li>
+                    <li><a href="{base_url}/debug">{base_url}/debug</a> - Debug info</li>
+                    <li><a href="{base_url}/providers">{base_url}/providers</a> - Provider info</li>
                 </ul>
                 <p>Available providers: {available_providers}</p>
             </body>
