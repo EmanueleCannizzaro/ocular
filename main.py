@@ -39,12 +39,16 @@ def ocular_ocr(request):
     from mangum import Mangum
     from flask import Response as FlaskResponse
     
-    # Check if we're in the main thread and if there's an event loop
+    # Ensure we have a proper event loop for this thread
     try:
         loop = asyncio.get_running_loop()
+        print(f"Found running event loop: {loop}")
     except RuntimeError:
         # No event loop running, we need to create one
-        loop = None
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        print(f"Created new event loop: {loop}")
+        loop = asyncio.get_running_loop()
     
     # Create Mangum handler for FastAPI with explicit configuration
     handler = Mangum(
@@ -166,36 +170,9 @@ def ocular_ocr(request):
             raise
     
     try:
-        # Check if we already have an event loop running
-        if loop is not None:
-            # We're in an async context, run directly
-            response = run_handler()
-        else:
-            # No event loop, create one for this thread
-            import asyncio
-            if threading.current_thread() is threading.main_thread():
-                # Main thread - create and set event loop
-                new_loop = asyncio.new_event_loop()
-                asyncio.set_event_loop(new_loop)
-                try:
-                    response = run_handler()
-                finally:
-                    new_loop.close()
-            else:
-                # Worker thread - run in thread executor
-                import concurrent.futures
-                with concurrent.futures.ThreadPoolExecutor() as executor:
-                    # Create a new event loop for this thread
-                    def run_with_loop():
-                        new_loop = asyncio.new_event_loop()
-                        asyncio.set_event_loop(new_loop)
-                        try:
-                            return run_handler()
-                        finally:
-                            new_loop.close()
-                    
-                    future = executor.submit(run_with_loop)
-                    response = future.result()
+        # We now always have an event loop set for this thread
+        print(f"Running handler with event loop: {asyncio.get_running_loop()}")
+        response = run_handler()
         
         # Convert Mangum response to Flask response
         headers = response.get("headers", {})
