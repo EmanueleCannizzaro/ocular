@@ -1,0 +1,95 @@
+# Google Cloud Functions ignore file
+# Files and directories to exclude from deployment
+
+# Environment files
+.env
+.env.local
+.env.production
+.env.staging
+
+# Development files
+.vscode/
+.idea/
+*.log
+*.tmp
+.DS_Store
+Thumbs.db
+
+# Source control
+.git/
+.gitignore
+README.md
+LICENSE
+docs/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+tests/
+*.test
+test_*.py
+
+# Jupyter Notebooks
+.ipynb_checkpoints
+notebooks/
+
+# Package management
+uv.lock
+package-lock.json
+
+# Examples and documentation
+examples/
+docs/
+
+# Deployment related (keep only what's needed)
+deploy.sh
+cloudbuild.yaml
+
+# Data files
+data/
+
+# Node modules (if any)
+node_modules/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db

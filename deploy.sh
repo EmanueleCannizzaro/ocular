@@ -170,7 +170,7 @@ DEPLOY_ARGS=(
     "--source" "."
     "--entry-point" "ocular_ocr"
     "--runtime" "python311"
-    "--trigger" "http"
+    "--trigger-http"
     "--region" "$REGION"
     "--memory" "$MEMORY"
     "--timeout" "$TIMEOUT"

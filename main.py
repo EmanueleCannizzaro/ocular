@@ -2,7 +2,7 @@
 Google Cloud Functions entry point for Ocular OCR Service.
 
 This module adapts the FastAPI application to run on Google Cloud Functions
-using the Functions Framework.
+using Mangum ASGI adapter for reliable FastAPI integration.
 """
 
 import os
@@ -14,20 +14,19 @@ project_root = Path(__file__).parent
 if str(project_root) not in sys.path:
     sys.path.insert(0, str(project_root))
 
-# Import the FastAPI app
-from app.ocular_app import app
-
 # Import functions framework
 import functions_framework
 
-# Create the Cloud Functions entry point
+# Import the FastAPI app
+from app.ocular_app import app
+
+
 @functions_framework.http
 def ocular_ocr(request):
     """
     Cloud Functions HTTP entry point for Ocular OCR service.
     
-    This function serves as the entry point for Google Cloud Functions,
-    routing all HTTP requests to the FastAPI application.
+    Uses Mangum ASGI adapter for proper FastAPI integration with Cloud Functions.
     
     Args:
         request: The HTTP request object from Cloud Functions
@@ -35,109 +34,102 @@ def ocular_ocr(request):
     Returns:
         HTTP response from the FastAPI application
     """
-    # Import here to avoid issues during deployment
-    from fastapi import Request as FastAPIRequest
-    from starlette.applications import Starlette
-    from starlette.responses import Response
-    import asyncio
-    
-    # Create an ASGI adapter for the Cloud Functions request
-    async def asgi_app(scope, receive, send):
-        """ASGI application adapter for Cloud Functions"""
-        await app(scope, receive, send)
-    
-    # Convert Cloud Functions request to ASGI format
-    import json
-    from urllib.parse import parse_qs, unquote
-    
-    # Build ASGI scope
-    scope = {
-        'type': 'http',
-        'method': request.method,
-        'path': request.path,
-        'query_string': request.query_string.encode() if hasattr(request, 'query_string') else b'',
-        'headers': [
-            [key.lower().encode(), value.encode()]
-            for key, value in request.headers.items()
-        ],
-        'server': ('localhost', 8080),
-        'client': ('127.0.0.1', 0),
-    }
-    
-    # Handle request body
-    body = b''
-    if hasattr(request, 'data'):
-        body = request.data if isinstance(request.data, bytes) else request.data.encode()
-    elif hasattr(request, 'get_data'):
-        body = request.get_data()
-    elif hasattr(request, 'form'):
-        # Handle form data (for file uploads)
-        import io
-        body_io = io.BytesIO()
-        # This is a simplified approach - Cloud Functions handles multipart differently
-        body = body_io.getvalue()
-    
-    # ASGI receive callable
-    async def receive():
-        return {
-            'type': 'http.request',
-            'body': body,
-            'more_body': False,
-        }
-    
-    # ASGI send callable
-    response_data = {}
-    
-    async def send(message):
-        if message['type'] == 'http.response.start':
-            response_data['status'] = message['status']
-            response_data['headers'] = dict(message.get('headers', []))
-        elif message['type'] == 'http.response.body':
-            response_data['body'] = message.get('body', b'')
-    
-    # Run the ASGI app
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    try:
-        loop.run_until_complete(asgi_app(scope, receive, send))
-    finally:
-        loop.close()
-    
-    # Return Cloud Functions compatible response
+    from mangum import Mangum
     from flask import Response as FlaskResponse
     
-    headers = response_data.get('headers', {})
-    return FlaskResponse(
-        response_data.get('body', b''),
-        status=response_data.get('status', 200),
-        headers=headers
-    )
-
-
-# Alternative simpler approach using ASGI adapter
-@functions_framework.http
-def ocular_ocr_simple(request):
-    """
-    Simplified Cloud Functions entry point using ASGI adapter.
+    # Create Mangum handler for FastAPI (disable lifespan for Cloud Functions)
+    handler = Mangum(app, lifespan="off")
     
-    This is an alternative approach that uses an ASGI-to-WSGI adapter
-    for simpler integration with Cloud Functions.
-    """
-    from fastapi.middleware.wsgi import WSGIMiddleware
-    from werkzeug.serving import WSGIRequestHandler
+    # Convert Cloud Functions request to Lambda-style event for Mangum
+    # Get query string safely
+    query_string_params = {}
+    if hasattr(request, 'args') and request.args:
+        query_string_params = dict(request.args)
     
-    # This approach requires additional dependencies and setup
-    # Use the main ocular_ocr function above for standard deployment
-    pass
+    # Handle request body
+    body = None
+    is_base64 = False
+    
+    if hasattr(request, 'get_data'):
+        data = request.get_data()
+        if data:
+            try:
+                # Try to decode as text first
+                body = data.decode('utf-8')
+            except UnicodeDecodeError:
+                # If it fails, it's binary data - encode as base64
+                import base64
+                body = base64.b64encode(data).decode('utf-8')
+                is_base64 = True
+    
+    # Build Lambda-style event
+    event = {
+        "httpMethod": request.method,
+        "path": request.path,
+        "queryStringParameters": query_string_params or None,
+        "multiValueQueryStringParameters": None,
+        "headers": dict(request.headers),
+        "multiValueHeaders": None,
+        "body": body,
+        "isBase64Encoded": is_base64,
+        "requestContext": {
+            "requestId": "cloud-functions-request",
+            "stage": "prod",
+            "httpMethod": request.method,
+            "path": request.path,
+        },
+        "pathParameters": None,
+        "stageVariables": None,
+    }
+    
+    # Create minimal context
+    class Context:
+        def __init__(self):
+            self.aws_request_id = "cloud-functions-request"
+            self.function_name = "ocular-ocr-service"
+            self.memory_limit_in_mb = "2048"
+            self.invoked_function_arn = "arn:aws:lambda:region:account:function:ocular-ocr-service"
+        
+        def get_remaining_time_in_millis(self):
+            return 540000  # 9 minutes
+    
+    context = Context()
+    
+    try:
+        # Use Mangum to handle the request
+        response = handler(event, context)
+        
+        # Convert Mangum response to Flask response
+        headers = response.get("headers", {})
+        status_code = response.get("statusCode", 200)
+        body = response.get("body", "")
+        
+        # Handle base64 encoded responses
+        if response.get("isBase64Encoded", False):
+            import base64
+            body = base64.b64decode(body)
+        
+        return FlaskResponse(
+            body,
+            status=status_code,
+            headers=headers
+        )
+        
+    except Exception as e:
+        print(f"Error in Cloud Function: {e}")
+        import traceback
+        traceback.print_exc()
+        
+        # Return error response
+        return FlaskResponse(
+            f"Internal Server Error: {str(e)}",
+            status=500,
+            headers={"Content-Type": "text/plain"}
+        )
 
 
 # For local testing with functions-framework-python
 if __name__ == "__main__":
-    import functions_framework
-    
-    # Start the functions framework for local development
-    functions_framework._http_view_func_registry["ocular_ocr"] = ocular_ocr
-    
     # Run with: functions-framework --target=ocular_ocr --debug
     print("Cloud Function ready for local testing")
     print("Use: functions-framework --target=ocular_ocr --debug")
