@@ -10,10 +10,28 @@ Ocular is a comprehensive Python package that provides OCR (Optical Character Re
 - ✅ **Fully functional OCR system** with multiple provider support
 - ✅ **Web application** with FastAPI backend and HTML frontend
 - ✅ **Multiple OCR providers** implemented and working
-- ✅ **Configuration management** with environment variable support
+- ✅ **Unified configuration management** with simplified settings architecture
 - ✅ **Comprehensive error handling** and logging system
+- ✅ **Streamlined codebase** with merged configuration classes
 
 ## Development Setup
+
+### Git Workflow
+**IMPORTANT**: Always create a new branch for any new code or changes:
+
+```bash
+# Create and switch to a new branch for your feature/fix
+git checkout -b feature/your-feature-name
+# or
+git checkout -b fix/your-bug-fix
+
+# Make your changes, then commit and push
+git add .
+git commit -m "Add your feature description"
+git push origin feature/your-feature-name
+
+# Create a pull request for review before merging to main
+```
 
 ### Environment Setup
 ```bash
@@ -61,6 +79,7 @@ ocular/
 │   ├── logging.py          # Logging system with Logfire integration
 │   └── validation.py       # Input validation and security
 ├── providers/              # OCR provider implementations
+│   ├── settings.py         # Unified settings with configuration management
 │   ├── base.py            # Abstract base provider class
 │   ├── factory.py         # Provider factory and manager
 │   ├── mistral.py         # Mistral AI vision model provider
@@ -70,9 +89,15 @@ ocular/
 │   ├── azure_document_intelligence.py  # Azure Document Intelligence
 │   ├── olm.py             # OLM OCR provider (RunPod)
 │   └── rolm.py            # RoLM OCR provider (RunPod)
-├── config/                 # Configuration management
-│   └── settings.py        # Pydantic settings with environment support
+├── services/               # Service layer
+│   ├── cache_service.py   # Caching functionality
+│   ├── document_service.py # Document processing services
+│   ├── ocr_service.py     # OCR processing services
+│   ├── processing_service.py # Processing coordination
+│   └── validation_service.py # Request and data validation
+├── config.py              # Configuration imports and legacy support
 ├── client.py              # Legacy client (MistralOCRClient)
+├── parser.py              # Text parsing utilities
 ├── processor.py           # DocumentProcessor
 ├── pydantic_client.py     # PydanticOCRClient
 ├── unified_processor.py   # UnifiedDocumentProcessor (main interface)
@@ -89,7 +114,8 @@ web/                       # Web application
 - ✅ **Factory Pattern**: `ProviderFactory` for creating OCR providers
 - ✅ **Abstract Base Classes**: `BaseOCRProvider` for consistent interface
 - ✅ **Strategy Pattern**: Multiple processing strategies (single, fallback, ensemble, best)
-- ✅ **Configuration Management**: Centralized settings with environment variables
+- ✅ **Unified Configuration**: Single `OcularSettings` class with integrated validation and management
+- ✅ **Service Layer**: Dedicated services for validation, caching, and document processing
 - ✅ **Dependency Injection**: Providers configured through factory
 - ✅ **Error Handling**: Comprehensive exception hierarchy and logging
 - ✅ **Async/Await**: Full async support for API calls and processing
@@ -168,7 +194,9 @@ By default, providers are prioritized as follows:
 - ✅ **Async/await patterns** for all API calls and I/O operations
 - ✅ **Comprehensive logging** with structured data and error tracking
 - ✅ **Modular architecture** with clear separation of concerns
-- ✅ **Configuration management** with environment-based settings
+- ✅ **Unified configuration system** with integrated validation and management
+- ✅ **Service-oriented design** with dedicated service classes
+- ✅ **Simplified imports** with consolidated configuration management
 
 ### Known Limitations
 - **PDF processing**: Currently processes only the first page for Mistral AI
