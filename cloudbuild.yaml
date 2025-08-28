@@ -1,0 +1,73 @@
+# Google Cloud Build configuration for Ocular OCR Service
+# This file automates the deployment of the Ocular app to Cloud Functions
+
+steps:
+  # Step 1: Install dependencies and run tests (optional)
+  - name: 'python:3.11'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        pip install -r requirements.txt
+        # Uncomment to run tests before deployment
+        # python -m pytest tests/ -v
+        echo "Dependencies installed successfully"
+
+  # Step 2: Deploy to Cloud Functions
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args:
+      - 'functions'
+      - 'deploy'
+      - 'ocular-ocr-service'  # Function name
+      - '--source=.'
+      - '--entry-point=ocular_ocr'
+      - '--runtime=python311'
+      - '--trigger=http'
+      - '--allow-unauthenticated'  # Remove if you want authentication
+      - '--region=${_REGION}'
+      - '--memory=2GB'  # Increase memory for OCR processing
+      - '--timeout=540s'  # 9 minutes timeout for large files
+      - '--max-instances=10'  # Limit concurrent instances
+      - '--set-env-vars=ENVIRONMENT=production'
+    env:
+      - 'CLOUDSDK_PYTHON_SITEPACKAGES=1'
+
+  # Step 3: Set up IAM permissions (optional)
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        # Grant Cloud Functions access to required services
+        gcloud projects add-iam-policy-binding ${PROJECT_ID} \
+          --member="serviceAccount:${PROJECT_ID}@appspot.gserviceaccount.com" \
+          --role="roles/storage.objectViewer"
+        
+        # Add other service permissions as needed
+        # Example for Google Vision API:
+        # gcloud projects add-iam-policy-binding ${PROJECT_ID} \
+        #   --member="serviceAccount:${PROJECT_ID}@appspot.gserviceaccount.com" \
+        #   --role="roles/vision.admin"
+
+# Substitution variables (can be overridden during build trigger)
+substitutions:
+  _REGION: 'us-central1'  # Change to your preferred region
+  _FUNCTION_NAME: 'ocular-ocr-service'
+  _MEMORY: '2GB'
+  _TIMEOUT: '540s'
+
+# Options for the build
+options:
+  # Use higher CPU for faster builds
+  machineType: 'E2_HIGHCPU_8'
+  # Enable more detailed logging
+  logging: CLOUD_LOGGING_ONLY
+  
+# Build timeout (30 minutes)
+timeout: '1800s'
+
+# Tags for organizing builds
+tags:
+  - 'ocular-ocr'
+  - 'cloud-functions'
+  - 'production'
