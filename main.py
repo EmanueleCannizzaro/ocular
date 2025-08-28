@@ -43,12 +43,13 @@ def ocular_ocr(request):
     try:
         loop = asyncio.get_running_loop()
         print(f"Found running event loop: {loop}")
+        has_loop = True
     except RuntimeError:
         # No event loop running, we need to create one
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         print(f"Created new event loop: {loop}")
-        loop = asyncio.get_running_loop()
+        has_loop = False
     
     # Create Mangum handler for FastAPI with explicit configuration
     handler = Mangum(
@@ -171,7 +172,7 @@ def ocular_ocr(request):
     
     try:
         # We now always have an event loop set for this thread
-        print(f"Running handler with event loop: {asyncio.get_running_loop()}")
+        print(f"Running handler with event loop: {loop} (existing: {has_loop})")
         response = run_handler()
         
         # Convert Mangum response to Flask response
@@ -201,6 +202,16 @@ def ocular_ocr(request):
             status=500,
             headers={"Content-Type": "text/plain"}
         )
+    
+    finally:
+        # Clean up event loop if we created it
+        if not has_loop and loop and not loop.is_closed():
+            try:
+                # Don't close the loop immediately as it might still be needed
+                # Just let Python garbage collect it
+                pass
+            except Exception as e:
+                print(f"Error cleaning up event loop: {e}")
 
 
 # For local testing with functions-framework-python
