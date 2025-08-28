@@ -51,13 +51,17 @@ uv add azure-ai-documentintelligence  # For Azure Document Intelligence
 
 ### Running the Application
 ```bash
-# Start the web application
+# Start the web application locally
 source .venv/bin/activate
-cd web
-python app.py
-# Or: uvicorn app:app --host 0.0.0.0 --port 8000 --reload
+cd app
+python ocular_app.py
+# Or: uvicorn app.ocular_app:app --host 0.0.0.0 --port 8000 --reload
 
 # The web interface will be available at http://localhost:8000
+
+# For Cloud Functions local testing
+functions-framework --target=ocular_ocr --debug
+# Available at http://localhost:8080
 ```
 
 ### Testing Commands
@@ -102,12 +106,17 @@ ocular/
 ├── pydantic_client.py     # PydanticOCRClient
 ├── unified_processor.py   # UnifiedDocumentProcessor (main interface)
 └── __init__.py            # Package exports
-web/                       # Web application
-├── app.py                 # FastAPI web server
+app/                       # Web application
+├── ocular_app.py          # FastAPI web server
 ├── templates/             # Jinja2 HTML templates
 │   ├── base.html          # Base template
 │   └── upload.html        # File upload interface
-└── static/                # Static assets (CSS, JS)
+└── static/                # Static assets (CSS, JS) - disabled for Cloud Functions
+main.py                    # Google Cloud Functions entry point
+requirements.txt           # Production dependencies
+.github/workflows/         # CI/CD automation
+├── deploy-gcp.yml         # Google Cloud Functions deployment
+.gcloudignore             # Cloud deployment ignore file
 ```
 
 ### Implemented Design Patterns
@@ -204,8 +213,105 @@ By default, providers are prioritized as follows:
 - **Caching**: No built-in caching mechanism (can be added)
 - **Batch processing**: Limited batch processing capabilities
 
+## Deployment
+
+### Google Cloud Functions
+
+The project includes comprehensive Google Cloud Functions support:
+
+#### Files for Cloud Functions:
+- `main.py` - Cloud Functions entry point with Mangum ASGI adapter
+- `requirements.txt` - Production dependencies including `functions-framework` and `mangum`
+- `.gcloudignore` - Deployment exclusions (dev files, tests, static assets)
+- `.github/workflows/deploy-gcp.yml` - Automated CI/CD pipeline
+
+#### Deployment Commands:
+```bash
+# Manual deployment to staging
+gcloud functions deploy ocular-ocr-service-staging \
+  --source . \
+  --entry-point ocular_ocr \
+  --runtime python311 \
+  --trigger-http \
+  --allow-unauthenticated \
+  --region us-central1 \
+  --memory 2GB \
+  --timeout 540s \
+  --set-env-vars MISTRAL_API_KEY=your_key
+
+# Manual deployment to production
+gcloud functions deploy ocular-ocr-service \
+  --source . \
+  --entry-point ocular_ocr \
+  --runtime python311 \
+  --trigger-http \
+  --allow-unauthenticated \
+  --region us-central1 \
+  --memory 2GB \
+  --timeout 540s \
+  --set-env-vars MISTRAL_API_KEY=your_key
+```
+
+#### Automated Deployment:
+The GitHub Actions workflow automatically:
+1. **Runs tests** on every push/PR
+2. **Deploys to staging** on main branch pushes
+3. **Deploys to production** on manual workflow dispatch
+4. **Creates GitHub releases** for production deployments
+
+#### Cloud Functions URL Structure:
+- **Base URL**: `https://region-project.cloudfunctions.net/function-name/`
+- **Health check**: `https://region-project.cloudfunctions.net/function-name/health`
+- **Debug info**: `https://region-project.cloudfunctions.net/function-name/debug`
+- **File processing**: `https://region-project.cloudfunctions.net/function-name/process`
+
+#### Environment Variables for Cloud Functions:
+Set these in the deployment command or Cloud Console:
+```bash
+MISTRAL_API_KEY=your_mistral_key
+ENVIRONMENT=staging  # or production
+# Add other provider keys as needed
+```
+
+#### Local Testing:
+```bash
+# Test with functions framework
+functions-framework --target=ocular_ocr --debug --port=8080
+
+# Test endpoints
+curl http://localhost:8080/health
+curl http://localhost:8080/debug
+```
+
+#### Known Cloud Functions Limitations:
+- **Static files**: Local CSS/JS disabled, using CDN alternatives
+- **File system**: Temporary file handling via `/tmp` directory
+- **Memory**: 2GB limit, suitable for most OCR tasks
+- **Timeout**: 9 minutes maximum execution time
+- **Cold starts**: First request may be slower due to initialization
+
+### Alternative Deployments
+
+#### Local Development Server:
+```bash
+cd app
+uvicorn ocular_app:app --host 0.0.0.0 --port 8000 --reload
+```
+
+#### Docker (if needed):
+```dockerfile
+FROM python:3.11-slim
+COPY . /app
+WORKDIR /app
+RUN pip install -r requirements.txt
+CMD ["uvicorn", "app.ocular_app:app", "--host", "0.0.0.0", "--port", "8000"]
+```
+
 ### Troubleshooting
 - **"No OCR providers available"**: Check `.env` file and API keys
 - **PDF processing fails**: Ensure `pdf2image` is installed (`uv add pdf2image`)
 - **Provider initialization errors**: Check network connectivity and API credentials
 - **Web app not loading**: Verify all dependencies are installed and virtual environment is activated
+- **Cloud Functions 500 errors**: Check environment variables and asyncio event loop handling
+- **Static assets not loading**: Expected in Cloud Functions - CSS/JS served via CDN
+- **URL routing issues**: Ensure endpoints use absolute paths (`/health` not `./health`)

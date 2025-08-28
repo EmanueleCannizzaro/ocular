@@ -64,7 +64,9 @@ app = FastAPI(
 
 # Setup templates and static files
 templates = Jinja2Templates(directory="app/templates")
-app.mount("/static", StaticFiles(directory="app/static"), name="static")
+# Note: Static files mounting disabled for Cloud Functions deployment
+# Static assets should be served via CDN or external hosting
+# app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 # Global processor instance
 processor = None
@@ -118,7 +120,7 @@ async def debug_info():
             print(f"Error getting provider info: {e}")
     
     # For Cloud Functions, we need to include the function name in URLs
-    base_url = "/ocular-ocr-service"
+    base_url = ""
     
     return {
         "message": "Ocular OCR Service",
@@ -126,12 +128,11 @@ async def debug_info():
         "processor_available": processor is not None,
         "available_providers": available_providers,
         "endpoints": [
-            f"{base_url}/debug - This debug info",
-            f"{base_url}/health - Health check", 
-            f"{base_url}/process - OCR processing",
-            f"{base_url}/providers - Provider information"
-        ],
-        "note": "For Cloud Functions, use full URLs with function name in path"
+            "/debug - This debug info",
+            "/health - Health check", 
+            "/process - OCR processing",
+            "/providers - Provider information"
+        ]
     }
 
 @app.get("/", response_class=HTMLResponse)
@@ -159,7 +160,7 @@ async def home(request: Request):
     except Exception as e:
         print(f"Template error: {e}")
         # Fall back to simple HTML
-        base_url = "/ocular-ocr-service"
+        base_url = ""
         return HTMLResponse(content=f"""
         <html>
             <body>
@@ -167,9 +168,9 @@ async def home(request: Request):
                 <p>Service is running but templates are not available in this environment.</p>
                 <p>Available endpoints:</p>
                 <ul>
-                    <li><a href="{base_url}/health">{base_url}/health</a> - Health check</li>
-                    <li><a href="{base_url}/debug">{base_url}/debug</a> - Debug info</li>
-                    <li><a href="{base_url}/providers">{base_url}/providers</a> - Provider info</li>
+                    <li><a href="/health">/health</a> - Health check</li>
+                    <li><a href="/debug">/debug</a> - Debug info</li>
+                    <li><a href="/providers">/providers</a> - Provider info</li>
                 </ul>
                 <p>Available providers: {available_providers}</p>
             </body>
