@@ -87,9 +87,19 @@ def ocular_ocr(request):
                 is_base64 = True
     
     # Build Lambda-style event with proper path handling
+    # Google Cloud Functions passes the full URL path
     path = getattr(request, 'path', '/')
     if path == '':
         path = '/'
+    
+    # Handle relative paths - Cloud Functions might strip the leading slash
+    if not path.startswith('/'):
+        path = '/' + path
+        
+    print(f"Request path: {path}")
+    print(f"Request method: {request.method}")
+    print(f"Request URL: {getattr(request, 'url', 'N/A')}")
+    print(f"Request full_path: {getattr(request, 'full_path', 'N/A')}")
     
     # Ensure all required fields are present
     event = {

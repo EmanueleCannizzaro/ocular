@@ -106,26 +106,70 @@ async def startup_event():
         processor = None
 
 
-@app.get("/", response_class=HTMLResponse)
-async def home(request: Request):
-    """Render the main upload form."""
+@app.get("/debug")
+async def debug_info():
+    """Debug endpoint to show app info."""
     available_providers = []
-    provider_stats = {}
-    
     if processor:
         try:
             await processor._ensure_providers_initialized()
             available_providers = processor.get_available_providers()
-            provider_stats = processor.get_provider_stats()
         except Exception as e:
             print(f"Error getting provider info: {e}")
     
-    return templates.TemplateResponse("upload.html", {
-        "request": request,
+    return {
+        "message": "Ocular OCR Service",
+        "status": "running",
+        "processor_available": processor is not None,
         "available_providers": available_providers,
-        "provider_stats": provider_stats,
-        "strategies": [s.value for s in ProcessingStrategy]
-    })
+        "endpoints": [
+            "/debug - This debug info",
+            "/health - Health check", 
+            "/process - OCR processing",
+            "/providers - Provider information"
+        ]
+    }
+
+@app.get("/", response_class=HTMLResponse)
+async def home(request: Request):
+    """Render the main upload form."""
+    # For Cloud Functions, fall back to simple response if templates fail
+    try:
+        available_providers = []
+        provider_stats = {}
+        
+        if processor:
+            try:
+                await processor._ensure_providers_initialized()
+                available_providers = processor.get_available_providers()
+                provider_stats = processor.get_provider_stats()
+            except Exception as e:
+                print(f"Error getting provider info: {e}")
+        
+        return templates.TemplateResponse("upload.html", {
+            "request": request,
+            "available_providers": available_providers,
+            "provider_stats": provider_stats,
+            "strategies": [s.value for s in ProcessingStrategy]
+        })
+    except Exception as e:
+        print(f"Template error: {e}")
+        # Fall back to simple HTML
+        return HTMLResponse(content=f"""
+        <html>
+            <body>
+                <h1>Ocular OCR Service</h1>
+                <p>Service is running but templates are not available in this environment.</p>
+                <p>Available endpoints:</p>
+                <ul>
+                    <li><a href="/health">/health</a> - Health check</li>
+                    <li><a href="/debug">/debug</a> - Debug info</li>
+                    <li><a href="/providers">/providers</a> - Provider info</li>
+                </ul>
+                <p>Available providers: {available_providers}</p>
+            </body>
+        </html>
+        """, status_code=200)
 
 
 @app.get("/health")
