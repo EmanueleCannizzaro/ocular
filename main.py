@@ -26,7 +26,7 @@ def ocular_ocr(request):
     """
     Cloud Functions HTTP entry point for Ocular OCR service.
     
-    Uses Mangum ASGI adapter for proper FastAPI integration with Cloud Functions.
+    Creates an asyncio event loop and uses Mangum ASGI adapter for FastAPI integration.
     
     Args:
         request: The HTTP request object from Cloud Functions
@@ -34,8 +34,17 @@ def ocular_ocr(request):
     Returns:
         HTTP response from the FastAPI application
     """
+    import asyncio
+    import threading
     from mangum import Mangum
     from flask import Response as FlaskResponse
+    
+    # Check if we're in the main thread and if there's an event loop
+    try:
+        loop = asyncio.get_running_loop()
+    except RuntimeError:
+        # No event loop running, we need to create one
+        loop = None
     
     # Create Mangum handler for FastAPI with explicit configuration
     handler = Mangum(
@@ -122,23 +131,66 @@ def ocular_ocr(request):
     
     context = Context()
     
+    def run_handler():
+        """Run the handler in an async context"""
+        try:
+            # Debug logging
+            print(f"Processing request: {request.method} {path}")
+            print(f"Query params: {query_string_params}")
+            print(f"Event path: {event.get('path')}")
+            print(f"Event httpMethod: {event.get('httpMethod')}")
+            
+            # Use Mangum to handle the request
+            response = handler(event, context)
+            
+            print(f"Response status: {response.get('statusCode', 200)}")
+            print(f"Response headers: {response.get('headers', {})}")
+            
+            return response
+            
+        except Exception as e:
+            print(f"Error in handler: {e}")
+            print(f"Event data: {event}")
+            import traceback
+            traceback.print_exc()
+            raise
+    
     try:
-        # Debug logging
-        print(f"Processing request: {request.method} {path}")
-        print(f"Query params: {query_string_params}")
-        print(f"Event path: {event.get('path')}")
-        print(f"Event httpMethod: {event.get('httpMethod')}")
-        
-        # Use Mangum to handle the request
-        response = handler(event, context)
+        # Check if we already have an event loop running
+        if loop is not None:
+            # We're in an async context, run directly
+            response = run_handler()
+        else:
+            # No event loop, create one for this thread
+            import asyncio
+            if threading.current_thread() is threading.main_thread():
+                # Main thread - create and set event loop
+                new_loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(new_loop)
+                try:
+                    response = run_handler()
+                finally:
+                    new_loop.close()
+            else:
+                # Worker thread - run in thread executor
+                import concurrent.futures
+                with concurrent.futures.ThreadPoolExecutor() as executor:
+                    # Create a new event loop for this thread
+                    def run_with_loop():
+                        new_loop = asyncio.new_event_loop()
+                        asyncio.set_event_loop(new_loop)
+                        try:
+                            return run_handler()
+                        finally:
+                            new_loop.close()
+                    
+                    future = executor.submit(run_with_loop)
+                    response = future.result()
         
         # Convert Mangum response to Flask response
         headers = response.get("headers", {})
         status_code = response.get("statusCode", 200)
         body = response.get("body", "")
-        
-        print(f"Response status: {status_code}")
-        print(f"Response headers: {headers}")
         
         # Handle base64 encoded responses
         if response.get("isBase64Encoded", False):
@@ -153,7 +205,6 @@ def ocular_ocr(request):
         
     except Exception as e:
         print(f"Error in Cloud Function: {e}")
-        print(f"Event data: {event}")
         import traceback
         traceback.print_exc()
         
