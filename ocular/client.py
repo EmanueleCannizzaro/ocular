@@ -251,48 +251,47 @@ class MistralOCRClient:
 
             except Exception as e:
                 print(f"\n❌ An error occurred during OCR processing: {e}")        
-        #     schema_prompt = (
-        #         f"Extract structured data from this image according to this schema: {schema}. "
-        #         + (prompt or "")
-        #         + " Return the data as valid JSON matching the schema exactly."
-        #     )
+    #         schema_prompt = (
+    #             f"Extract structured data from this image according to this schema: {schema}. "
+    #             + (prompt or "")
+    #             + " Return the data as valid JSON matching the schema exactly."
+    #         )
             
-        #     messages = [
-        #         {
-        #             "role": "user",
-        #             "content": [
-        #                 {
-        #                     "type": "text",
-        #                     "text": schema_prompt
-        #                 },
-        #                 {
-        #                     "type": "image_url", 
-        #                     "image_url": f"data:image/jpeg;base64,{encoded_content}"
-        #                 }
-        #             ]
-        #         }
-        #     ]
+    #         messages = [
+    #             {
+    #                 "role": "user",
+    #                 "content": [
+    #                     {
+    #                         "type": "text",
+    #                         "text": schema_prompt
+    #                     },
+    #                     {
+    #                         "type": "image_url", 
+    #                         "image_url": f"data:image/jpeg;base64,{encoded_content}"
+    #                     }
+    #                 ]
+    #             }
+    #         ]
             
-        #     response = await asyncio.to_thread(
-        #         self.client.chat.complete,
-        #         model=self.config.mistral_model,
-        #         messages=messages,
-        #         max_tokens=4000
-        #     )
+    #         response = await asyncio.to_thread(
+    #             self.client.chat.complete,
+    #             model=self.config.mistral_model,
+    #             messages=messages,
+    #             max_tokens=4000
+    #         )
             
-        #     import json
-        #     result_text = response.choices[0].message.content.strip()
+    #         import json
+    #         result_text = response.choices[0].message.content.strip()
             
-        #     # Try to parse as JSON
-        #     try:
-        #         return json.loads(result_text)
-        #     except json.JSONDecodeError:
-        #         # If not valid JSON, return as text
-        #         return {"extracted_text": result_text}
+    #         # Try to parse as JSON
+    #         try:
+    #             return json.loads(result_text)
+    #         except json.JSONDecodeError:
+    #             # If not valid JSON, return as text
+    #             return {"extracted_text": result_text}
                 
         except Exception as e:
             if "api" in str(e).lower():
                 raise APIError(f"Mistral API error: {str(e)}")
             else:
                 raise OCRError(f"Structured data extraction failed: {str(e)}")
-    
