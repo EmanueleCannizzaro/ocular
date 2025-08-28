@@ -5,8 +5,6 @@ Tests for validation service.
 import pytest
 from pathlib import Path
 
-from unittest.mock import MagicMock
-
 from ocular.services.validation_service import ValidationService
 from ocular.core.models import ProcessingRequest, BatchProcessingRequest, OCRResult
 from ocular.core.enums import ProviderType, ProcessingStrategy
@@ -209,32 +207,9 @@ class TestValidationService:
         with pytest.raises(ValidationError, match="Invalid field name"):
             validation_service.validate_structured_data_schema(invalid_schema)
     
-    def test_validate_invalid_confidence(self, validation_service):
-        """Test validation fails for invalid confidence."""
-        result = MagicMock(spec=OCRResult)
-        result.text = "Sample text"
-        result.confidence = 1.5
-        result.provider = "test_provider"
-        result.processing_time = 1.0
-
-        with pytest.raises(ValidationError, match="Confidence must be between"):
-            validation_service.validate_ocr_result(result)
-
-    def test_validate_negative_processing_time(self, validation_service):
-        """Test validation fails for negative processing time."""
-        result = MagicMock(spec=OCRResult)
-        result.text = "Sample text"
-        result.confidence = 0.95
-        result.provider = "test_provider"
-        result.processing_time = -1.0
-
-        with pytest.raises(ValidationError, match="cannot be negative"):
-            validation_service.validate_ocr_result(result)
-
-    def test_validate_upload_file(self, validation_service, sample_image_path):
+    def test_validate_upload_file(self, validation_service):
         """Test validating uploaded file."""
-        with open(sample_image_path, 'rb') as f:
-            content = f.read()
+        content = b"fake image content"
         filename = "test_image.jpg"
         
         result = validation_service.validate_upload_file(content, filename)

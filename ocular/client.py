@@ -18,6 +18,7 @@ import pypdf
 
 from .config import OcularConfig
 from .exceptions import OCRError, APIError, DocumentProcessingError
+from .models import RootModel
 
 
 class MistralOCRClient:
@@ -25,8 +26,7 @@ class MistralOCRClient:
     
     def __init__(self, config: Optional[OcularConfig] = None):
         """Initialize the Mistral OCR client."""
-        # self.config = config or OcularConfig.from_env()
-        # self.client = Mistral(api_key=self.config.mistral_api_key)
+        self.config = config or OcularConfig.from_env()
 
         root_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
