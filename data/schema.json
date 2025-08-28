@@ -1,0 +1,86 @@
+{
+  "investimento_immobiliare": {
+    "riassunto_perizia": "L'immobile oggetto di pignoramento è un appartamento con cantina a Ravenna, con un valore di mercato stimato di circa € 157.726. Viene proposto all'asta a un prezzo base di € 137.317, offrendo un potenziale risparmio del 13%. Le principali criticità includono lievi difformità catastali sanabili (costo stimato € 5.000), un debito condominiale di € 3.573 e l'occupazione da parte del debitore esecutato. Esiste inoltre una potenziale controversia sulla proprietà di una seconda cantina.",
+    "identificativo": "Esecuzione Immobiliare R.G.E. N. 35/2024",
+    "procedura_giudiziaria": {
+      "tribunale": "Tribunale Civile di Ravenna",
+      "atto_pignoramento": {
+        "data": "04.03.2024",
+        "numero_repertorio": "872",
+        "dettagli_trascrizione": {
+          "data": "11.03.2024",
+          "registro_particolare": "3398",
+          "registro_generale": "4550"
+        }
+      }
+    },
+    "descrizione_immobile": {
+      "tipo_proprieta": "Appartamento con cantina",
+      "indirizzo": "Via El Alamein n. 2, Ravenna (RA)",
+      "superficie_commerciale_mq": 104.99,
+      "composizione_interna": "Ingresso, soggiorno, cucina, due camere, bagno, ripostiglio, un balcone e una cantina al piano terra.",
+      "stato_conservazione": {
+        "edificio_condominiale": "Buono, con facciate e tetto ristrutturati nel 2002.",
+        "appartamento": "Presenta lesioni di lieve entità sul soffitto e su un tramezzo. Impianti funzionanti."
+      }
+    },
+    "dati_catastali": {
+      "catasto": "Catasto dei Fabbricati del Comune di Ravenna",
+      "sezione": "RA",
+      "foglio": "103",
+      "particella": "1714",
+      "subalterno": "8",
+      "zona_censuaria": "1",
+      "categoria": "A/4",
+      "classe": "4",
+      "vani": 6,
+      "rendita_catastale_euro": 557.57
+    },
+    "valutazione_economica": {
+      "valore_di_mercato_stimato": {
+        "valore_lordo_euro": 162726.75,
+        "detrazioni_euro": {
+          "sanatoria_catastale_urbanistica": 3000.00,
+          "riparazioni_strutturali_interne": 2000.00
+        },
+        "valore_netto_euro": 157726.75,
+        "note_valutazione": "Il valore di mercato è stato stimato al netto dei costi necessari per sanare le difformità e riparare le lesioni."
+      },
+      "prezzo_base_asta_euro": 137317.74
+    },
+    "oneri_e_rischi": {
+      "stato_occupazione": {
+        "stato": "Occupato dal debitore esecutato.",
+        "implicazioni": "L'acquirente dovrà avviare una procedura di rilascio, che può comportare tempi e costi aggiuntivi."
+      },
+      "costi_occulti": {
+        "costo_sanatoria_riparazioni_euro": 5000.00,
+        "debito_condominiale_pregresso_euro": 3573.98,
+        "nota_condominio": "L'aggiudicatario è solidalmente responsabile per i contributi dell'anno in corso e di quello precedente."
+      },
+      "rischi_legali": {
+        "difformita_riscontrate": [
+          "Modifica di tramezzo tra le due camere da letto.",
+          "Modifica di alcune spalline di porte e muretto.",
+          "Realizzazione di due pilastri nella cantina."
+        ],
+        "controversie": "La perizia segnala una questione di proprietà relativa a una seconda cantina, la cui risoluzione spetta al Giudice."
+      },
+      "ipoteche_iscrizioni": [
+        "Ipoteca volontaria per mutuo fondiario (iscrizione: € 390.441,42)",
+        "Ipoteca volontaria per mutuo (iscrizione: € 91.000,00)",
+        "Ipoteca volontaria/amministrativa/riscossione (iscrizione: € 158.185,20)",
+        "Nota: Tutte le iscrizioni ipotecarie verranno cancellate con il decreto di trasferimento emesso dal Giudice."
+      ]
+    },
+    "analisi_investimento": {
+      "potenziale_convenienza": {
+        "valore_risparmio_euro": 20409.01,
+        "percentuale_risparmio": "13.0%"
+      },
+      "totale_costi_aggiuntivi_stimati": 8573.98,
+      "profilo_rischio": "Medio-Alto",
+      "considerazioni_finali": "L'investimento offre un potenziale di risparmio significativo rispetto al valore di mercato. Tuttavia, i costi per la sanatoria e i debiti pregressi, insieme ai rischi legati all'occupazione dell'immobile e alla potenziale controversia sulla cantina, richiedono una gestione attenta. La convenienza dipenderà dalla capacità dell'acquirente di affrontare queste criticità."
+    }
+  }
+}

@@ -1,0 +1,54 @@
+Metadata-Version: 2.4
+Name: ocular
+Version: 0.1.0
+Summary: A Python package that uses best-in-class OCR LLM for data extraction from PDF files and scanned images
+Author-email: Your Name <your.email@example.com>
+License: MIT
+Project-URL: Homepage, https://github.com/yourusername/ocular
+Project-URL: Repository, https://github.com/yourusername/ocular
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+Requires-Dist: pydantic-ai>=0.0.14
+Requires-Dist: mistralai>=1.9.9
+Requires-Dist: pillow>=9.0.0
+Requires-Dist: pypdf>=3.0.0
+Requires-Dist: pydantic>=2.0.0
+Requires-Dist: pydantic-settings>=2.0.0
+Requires-Dist: python-dotenv>=1.0.0
+Requires-Dist: aiohttp>=3.8.0
+Requires-Dist: requests>=2.28.0
+Requires-Dist: fastapi>=0.104.0
+Requires-Dist: uvicorn[standard]>=0.24.0
+Requires-Dist: jinja2>=3.1.0
+Requires-Dist: python-multipart>=0.0.6
+Requires-Dist: logfire>=0.30.0
+Requires-Dist: pdf2image>=1.17.0
+Provides-Extra: dev
+Requires-Dist: pytest>=7.0; extra == "dev"
+Requires-Dist: pytest-asyncio>=0.21.0; extra == "dev"
+Requires-Dist: black>=23.0.0; extra == "dev"
+Requires-Dist: flake8>=6.0.0; extra == "dev"
+Requires-Dist: mypy>=1.0.0; extra == "dev"
+Requires-Dist: types-Pillow; extra == "dev"
+Requires-Dist: types-requests; extra == "dev"
+Requires-Dist: types-aiofiles; extra == "dev"
+Provides-Extra: test
+Requires-Dist: pytest>=7.0; extra == "test"
+Requires-Dist: pytest-asyncio>=0.21.0; extra == "test"
+Requires-Dist: pytest-mock>=3.10.0; extra == "test"
+Requires-Dist: pytest-cov>=4.0.0; extra == "test"
+Requires-Dist: httpx>=0.24.0; extra == "test"
+Requires-Dist: reportlab>=4.0.0; extra == "test"
+
+# Ocular
+
+Ocular is a python package that use best in class OCR LLM for data extraction from PDF files and scanned images.
+
