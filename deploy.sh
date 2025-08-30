@@ -14,7 +14,7 @@ NC='\033[0m' # No Color
 
 # Default values
 PROJECT_ID=""
-REGION="us-central1"
+REGION="europe-west1"
 FUNCTION_NAME="ocular-ocr-service"
 MEMORY="2GB"
 TIMEOUT="540s"
@@ -48,7 +48,7 @@ Deploy Ocular OCR Service to Google Cloud Functions
 
 OPTIONS:
     -p, --project PROJECT_ID     Google Cloud Project ID (required)
-    -r, --region REGION         Deployment region (default: us-central1)
+    -r, --region REGION         Deployment region (default: europe-west1)
     -n, --name FUNCTION_NAME    Function name (default: ocular-ocr-service)
     -m, --memory MEMORY         Memory allocation (default: 2GB)
     -t, --timeout TIMEOUT       Timeout in seconds (default: 540s)

@@ -5,7 +5,7 @@ Core data models for Ocular OCR system.
 from typing import Optional, List, Dict, Any, Union
 from datetime import datetime
 from pathlib import Path
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
 
 from .enums import ProviderType, ProcessingStrategy, DocumentType, ProcessingStatus
 
@@ -20,7 +20,8 @@ class OCRResult(BaseModel):
     processing_time: Optional[float] = Field(None, ge=0.0, description="Processing time in seconds")
     metadata: Dict[str, Any] = Field(default_factory=dict, description="Additional metadata")
     
-    @validator('confidence')
+    @field_validator('confidence')
+    @classmethod
     def validate_confidence(cls, v):
         if v is not None and not (0.0 <= v <= 1.0):
             raise ValueError('Confidence must be between 0.0 and 1.0')

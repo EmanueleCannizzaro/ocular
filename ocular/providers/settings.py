@@ -7,7 +7,7 @@ import re
 import json
 from typing import Optional, Dict, Any, List
 from pathlib import Path
-from pydantic import Field, validator
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings
 
 from ..core.enums import ProviderType
@@ -82,14 +82,16 @@ class ProviderSettings(BaseSettings):
         env="ENABLED_PROVIDERS"
     )
     
-    @validator('device')
+    @field_validator('device')
+    @classmethod
     def validate_device(cls, v):
         valid_devices = ['auto', 'cpu', 'cuda']
         if v not in valid_devices:
             raise ValueError(f'Device must be one of: {valid_devices}')
         return v
     
-    @validator('enabled_providers', pre=True)
+    @field_validator('enabled_providers', mode='before')
+    @classmethod
     def parse_enabled_providers(cls, v):
         if isinstance(v, str):
             return [p.strip() for p in v.split(',') if p.strip()]
@@ -112,11 +114,13 @@ class FileSettings(BaseSettings):
     temp_dir: Optional[Path] = Field(None, env="TEMP_DIR")
     upload_dir: Optional[Path] = Field(None, env="UPLOAD_DIR")
     
-    @validator('temp_dir', 'upload_dir', pre=True)
+    @field_validator('temp_dir', 'upload_dir', mode='before')
+    @classmethod
     def parse_path(cls, v):
         return Path(v) if v else None
     
-    @validator('allowed_extensions', pre=True)
+    @field_validator('allowed_extensions', mode='before')
+    @classmethod
     def parse_extensions(cls, v):
         if isinstance(v, str):
             return [ext.strip() for ext in v.split(',') if ext.strip()]
@@ -136,7 +140,8 @@ class ProcessingSettings(BaseSettings):
     enable_caching: bool = Field(True, env="ENABLE_CACHING")
     cache_ttl_seconds: int = Field(3600, env="CACHE_TTL_SECONDS")
     
-    @validator('default_strategy')
+    @field_validator('default_strategy')
+    @classmethod
     def validate_strategy(cls, v):
         valid_strategies = ['single', 'fallback', 'ensemble', 'best']
         if v not in valid_strategies:
@@ -164,13 +169,15 @@ class WebSettings(BaseSettings):
     static_dir: Path = Field(Path("web/static"), env="STATIC_DIR")
     template_dir: Path = Field(Path("web/templates"), env="TEMPLATE_DIR")
     
-    @validator('cors_origins', pre=True)
+    @field_validator('cors_origins', mode='before')
+    @classmethod
     def parse_cors_origins(cls, v):
         if isinstance(v, str):
             return [origin.strip() for origin in v.split(',') if origin.strip()]
         return v
     
-    @validator('static_dir', 'template_dir', pre=True)
+    @field_validator('static_dir', 'template_dir', mode='before')
+    @classmethod
     def parse_path(cls, v):
         return Path(v) if isinstance(v, str) else v
     
@@ -191,14 +198,16 @@ class LoggingSettings(BaseSettings):
     max_file_size_mb: int = Field(10, env="LOG_MAX_FILE_SIZE_MB")
     backup_count: int = Field(5, env="LOG_BACKUP_COUNT")
     
-    @validator('level')
+    @field_validator('level')
+    @classmethod
     def validate_level(cls, v):
         valid_levels = ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']
         if v.upper() not in valid_levels:
             raise ValueError(f'Log level must be one of: {valid_levels}')
         return v.upper()
     
-    @validator('file_path', pre=True)
+    @field_validator('file_path', mode='before')
+    @classmethod
     def parse_path(cls, v):
         return Path(v) if v else None
     
@@ -223,7 +232,8 @@ class OcularSettings(BaseSettings, ConfigurationProvider):
     # Runtime configuration
     _runtime_config: Dict[str, Any] = {}
     
-    @validator('environment')
+    @field_validator('environment')
+    @classmethod
     def validate_environment(cls, v):
         valid_envs = ['development', 'production', 'testing']
         if v not in valid_envs:

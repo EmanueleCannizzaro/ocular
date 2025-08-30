@@ -24,7 +24,8 @@ from app.ocular_app import app
 @functions_framework.http
 def ocular_ocr(request):
     """
-    Cloud Functions HTTP entry point for Ocular OCR service.
+    Cloud Functions HTTP entry point that serves the full FastAPI application.
+
     
     Creates an asyncio event loop and uses Mangum ASGI adapter for FastAPI integration.
     
