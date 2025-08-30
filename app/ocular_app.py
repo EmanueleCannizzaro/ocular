@@ -30,16 +30,165 @@ except Exception as e:
 mistral_key = os.getenv("MISTRAL_API_KEY")
 print(f"MISTRAL_API_KEY loaded: {'Yes' if mistral_key else 'No'}")
 
-from fastapi import FastAPI, File, UploadFile, Form, Request, HTTPException
+from fastapi import FastAPI, File, UploadFile, Form, Request, HTTPException, Depends
+from fastapi.security import HTTPBearer
+from clerk_backend_api import Clerk
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, JSONResponse
 from pydantic import BaseModel
+import stripe
 
 from ocular import UnifiedDocumentProcessor, ProcessingStrategy, ProviderType
 from ocular.providers.settings import OcularSettings
 from ocular.exceptions import DocumentProcessingError, ConfigurationError
 
+# Initialize Clerk client
+clerk_secret_key = os.environ.get("CLERK_SECRET_KEY")
+clerk = None
+
+if clerk_secret_key:
+    try:
+        # Initialize Clerk client with the correct parameter for v3.3.0
+        clerk = Clerk(bearer_auth=clerk_secret_key)
+        print("✅ Clerk client initialized successfully")
+    except Exception as e:
+        print(f"❌ Failed to initialize Clerk client: {e}")
+        clerk = None
+else:
+    print("⚠️ CLERK_SECRET_KEY not found - authentication will be disabled")
+
+# Initialize Stripe
+stripe_secret_key = os.environ.get("STRIPE_SECRET_KEY")
+stripe_publishable_key = os.environ.get("STRIPE_PUBLISHABLE_KEY")
+stripe_webhook_secret = os.environ.get("STRIPE_WEBHOOK_SECRET")
+
+if stripe_secret_key:
+    try:
+        stripe.api_key = stripe_secret_key
+        print("✅ Stripe client initialized successfully")
+    except Exception as e:
+        print(f"❌ Failed to initialize Stripe client: {e}")
+        stripe.api_key = None
+else:
+    print("⚠️ STRIPE_SECRET_KEY not found - payments will be disabled")
+
+security = HTTPBearer()
+
+async def get_session(request: Request):
+    """
+    Dependency to verify the Clerk session from the Authorization header.
+    """
+    if not clerk:
+        raise HTTPException(
+            status_code=503, 
+            detail="Authentication service not available. CLERK_SECRET_KEY not configured."
+        )
+    
+    auth_header = request.headers.get("Authorization")
+    if not auth_header or not auth_header.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    
+    token = auth_header.split(" ")[1]
+    
+    try:
+        # Use authenticate_request method for token verification
+        auth_result = clerk.authenticate_request(
+            bearer_token=token
+        )
+        
+        if not auth_result or not hasattr(auth_result, 'session_id'):
+            raise HTTPException(status_code=401, detail="Invalid session")
+            
+        return auth_result
+    except Exception as e:
+        raise HTTPException(status_code=401, detail=f"Authentication failed: {str(e)}")
+
+async def get_optional_session(request: Request):
+    """
+    Optional authentication dependency - returns session if available, None otherwise.
+    """
+    if not clerk:
+        return None
+    
+    auth_header = request.headers.get("Authorization")
+    if not auth_header or not auth_header.startswith("Bearer "):
+        return None
+    
+    token = auth_header.split(" ")[1]
+    
+    try:
+        auth_result = clerk.authenticate_request(
+            bearer_token=token
+        )
+        return auth_result if auth_result and hasattr(auth_result, 'session_id') else None
+    except Exception:
+        return None
+
+async def check_payment_status(user_id: str) -> dict:
+    """Check if user has valid payment or subscription."""
+    if not stripe.api_key:
+        return {"has_payment": True, "type": "free"}  # Allow free usage when Stripe not configured
+    
+    try:
+        # Check for active subscriptions
+        customers = stripe.Customer.list(email=user_id, limit=1)
+        if customers.data:
+            customer = customers.data[0]
+            subscriptions = stripe.Subscription.list(
+                customer=customer.id,
+                status='active',
+                limit=10
+            )
+            
+            if subscriptions.data:
+                return {
+                    "has_payment": True,
+                    "type": "subscription",
+                    "subscription_id": subscriptions.data[0].id,
+                    "status": subscriptions.data[0].status
+                }
+        
+        # Check for recent successful payment intents (last 24 hours)
+        import time
+        recent_payments = stripe.PaymentIntent.list(
+            created={'gte': int(time.time()) - 86400},  # 24 hours ago
+            limit=50
+        )
+        
+        for payment in recent_payments.data:
+            if (payment.status == 'succeeded' and 
+                payment.metadata.get('user_id') == user_id):
+                return {
+                    "has_payment": True,
+                    "type": "one_time",
+                    "payment_intent_id": payment.id,
+                    "amount": payment.amount
+                }
+        
+        return {"has_payment": False, "type": "none"}
+        
+    except Exception as e:
+        print(f"Payment status check failed: {e}")
+        return {"has_payment": False, "type": "error"}
+
+async def require_payment(auth_result = Depends(get_session)):
+    """
+    Dependency that requires either authentication + valid payment or subscription.
+    """
+    user_id = getattr(auth_result, 'user_id', None) if auth_result else None
+    if not user_id:
+        raise HTTPException(status_code=401, detail="Authentication required")
+    
+    payment_status = await check_payment_status(user_id)
+    
+    if not payment_status["has_payment"]:
+        raise HTTPException(
+            status_code=402, 
+            detail="Payment required. Please purchase credits or subscribe to use this service."
+        )
+    
+    return {"auth_result": auth_result, "payment_status": payment_status}
 
 class ProcessingRequest(BaseModel):
     """Request model for OCR processing."""
@@ -54,6 +203,29 @@ class ProcessingResponse(BaseModel):
     results: List[dict]
     errors: List[str] = []
     processing_time: Optional[float] = None
+
+class PaymentIntentRequest(BaseModel):
+    """Request model for creating a payment intent."""
+    amount: int  # Amount in cents
+    currency: str = "usd"
+    description: Optional[str] = None
+    metadata: Optional[dict] = None
+
+class PaymentIntentResponse(BaseModel):
+    """Response model for payment intent creation."""
+    client_secret: str
+    payment_intent_id: str
+    publishable_key: Optional[str] = None
+
+class SubscriptionRequest(BaseModel):
+    """Request model for creating a subscription."""
+    price_id: str
+    payment_method_id: Optional[str] = None
+
+class WebhookEvent(BaseModel):
+    """Model for Stripe webhook events."""
+    type: str
+    data: dict
 
 
 app = FastAPI(
@@ -76,6 +248,13 @@ processor = None
 async def startup_event():
     """Initialize the OCR processor on startup."""
     global processor
+    
+    # Report Clerk authentication status
+    if clerk:
+        print("✅ Clerk authentication enabled")
+    else:
+        print("⚠️ Clerk authentication disabled - protected endpoints will return 503")
+        
     try:
         print("Initializing OCR processor...")
         
@@ -119,18 +298,29 @@ async def debug_info():
         except Exception as e:
             print(f"Error getting provider info: {e}")
     
-    # For Cloud Functions, we need to include the function name in URLs
-    base_url = ""
-    
     return {
         "message": "Ocular OCR Service",
         "status": "running",
         "processor_available": processor is not None,
+        "authentication": {
+            "clerk_enabled": clerk is not None,
+            "protected_endpoints": ["/process", "/batch-process"]
+        },
+        "payments": {
+            "stripe_enabled": stripe.api_key is not None,
+            "webhook_enabled": stripe_webhook_secret is not None,
+            "payment_required_endpoints": ["/process", "/batch-process"]
+        },
         "available_providers": available_providers,
         "endpoints": [
             "/debug - This debug info",
             "/health - Health check", 
-            "/process - OCR processing",
+            "/process - OCR processing (requires auth + payment)",
+            "/batch-process - Batch processing (requires auth + payment)",
+            "/payments/create-intent - Create payment intent",
+            "/payments/create-subscription - Create subscription",
+            "/payments/webhook - Stripe webhook handler",
+            "/payments/config - Payment configuration",
             "/providers - Provider information"
         ]
     }
@@ -201,7 +391,8 @@ async def process_files(
     files: List[UploadFile] = File(...),
     strategy: str = Form("fallback"),
     providers: str = Form("mistral"),
-    prompt: Optional[str] = Form(None)
+    prompt: Optional[str] = Form(None),
+    payment_validation: dict = Depends(require_payment)
 ):
     """Process uploaded files with OCR."""
     if not processor:
@@ -327,7 +518,8 @@ async def get_result(result_id: str):
 @app.post("/batch-process")
 async def batch_process_files(
     files: List[UploadFile] = File(...),
-    request_data: str = Form(...)
+    request_data: str = Form(...),
+    payment_validation: dict = Depends(require_payment)
 ):
     """Batch process multiple files with individual settings."""
     if not processor:
@@ -361,6 +553,32 @@ async def get_providers():
         "provider_stats": provider_stats
     }
 
+@app.get("/auth/status")
+async def auth_status(session = Depends(get_optional_session)):
+    """Check authentication status."""
+    return {
+        "authenticated": session is not None,
+        "clerk_enabled": clerk is not None,
+        "session": session if session else None
+    }
+
+@app.get("/auth/test")
+async def test_auth(auth_result = Depends(get_session)):
+    """Test protected endpoint that requires authentication."""
+    user_id = None
+    session_id = None
+    
+    if auth_result:
+        user_id = getattr(auth_result, 'user_id', None)
+        session_id = getattr(auth_result, 'session_id', None)
+    
+    return {
+        "message": "Authentication successful",
+        "user_id": user_id,
+        "session_id": session_id,
+        "auth_result": str(type(auth_result)) if auth_result else None
+    }
+
 
 @app.get("/download/{result_id}")
 async def download_result(result_id: str, format: str = "json"):
@@ -368,13 +586,168 @@ async def download_result(result_id: str, format: str = "json"):
     # Implementation for downloading results as JSON, CSV, or text
     return {"message": "Download endpoint - implementation pending"}
 
+# Payment Endpoints
+
+@app.post("/payments/create-intent", response_model=PaymentIntentResponse)
+async def create_payment_intent(
+    request: PaymentIntentRequest,
+    auth_result = Depends(get_session)
+):
+    """Create a Stripe payment intent for OCR processing."""
+    if not stripe.api_key:
+        raise HTTPException(
+            status_code=503, 
+            detail="Payment service not available. Stripe not configured."
+        )
+    
+    try:
+        # Add user ID to metadata
+        user_id = getattr(auth_result, 'user_id', None) if auth_result else None
+        metadata = request.metadata or {}
+        if user_id:
+            metadata['user_id'] = user_id
+        
+        # Create payment intent
+        intent = stripe.PaymentIntent.create(
+            amount=request.amount,
+            currency=request.currency,
+            description=request.description or "OCR Processing Service",
+            metadata=metadata,
+            automatic_payment_methods={
+                'enabled': True,
+            },
+        )
+        
+        return PaymentIntentResponse(
+            client_secret=intent.client_secret,
+            payment_intent_id=intent.id,
+            publishable_key=stripe_publishable_key
+        )
+        
+    except stripe.error.StripeError as e:
+        raise HTTPException(status_code=400, detail=f"Stripe error: {str(e)}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Payment creation failed: {str(e)}")
+
+@app.post("/payments/create-subscription")
+async def create_subscription(
+    request: SubscriptionRequest,
+    auth_result = Depends(get_session)
+):
+    """Create a Stripe subscription for unlimited OCR processing."""
+    if not stripe.api_key:
+        raise HTTPException(
+            status_code=503, 
+            detail="Payment service not available. Stripe not configured."
+        )
+    
+    user_id = getattr(auth_result, 'user_id', None) if auth_result else None
+    if not user_id:
+        raise HTTPException(status_code=400, detail="User ID required for subscriptions")
+    
+    try:
+        # Check if customer already exists
+        customers = stripe.Customer.list(
+            email=user_id,  # Assuming user_id is email, adjust as needed
+            limit=1
+        )
+        
+        if customers.data:
+            customer = customers.data[0]
+        else:
+            # Create new customer
+            customer = stripe.Customer.create(
+                email=user_id,
+                metadata={'user_id': user_id}
+            )
+        
+        # Create subscription
+        subscription = stripe.Subscription.create(
+            customer=customer.id,
+            items=[{'price': request.price_id}],
+            payment_behavior='default_incomplete',
+            payment_settings={'payment_method_types': ['card']},
+            expand=['latest_invoice.payment_intent'],
+        )
+        
+        return {
+            "subscription_id": subscription.id,
+            "client_secret": subscription.latest_invoice.payment_intent.client_secret,
+            "customer_id": customer.id,
+            "publishable_key": stripe_publishable_key
+        }
+        
+    except stripe.error.StripeError as e:
+        raise HTTPException(status_code=400, detail=f"Stripe error: {str(e)}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Subscription creation failed: {str(e)}")
+
+@app.post("/payments/webhook")
+async def stripe_webhook(request: Request):
+    """Handle Stripe webhook events."""
+    if not stripe.api_key or not stripe_webhook_secret:
+        raise HTTPException(status_code=503, detail="Webhook service not configured")
+    
+    payload = await request.body()
+    sig_header = request.headers.get('stripe-signature')
+    
+    if not sig_header:
+        raise HTTPException(status_code=400, detail="Missing Stripe signature")
+    
+    try:
+        # Verify webhook signature
+        event = stripe.Webhook.construct_event(
+            payload, sig_header, stripe_webhook_secret
+        )
+    except ValueError:
+        # Invalid payload
+        raise HTTPException(status_code=400, detail="Invalid payload")
+    except stripe.error.SignatureVerificationError:
+        # Invalid signature
+        raise HTTPException(status_code=400, detail="Invalid signature")
+    
+    # Handle the event
+    if event['type'] == 'payment_intent.succeeded':
+        payment_intent = event['data']['object']
+        print(f"Payment succeeded for intent: {payment_intent['id']}")
+        # Add your payment success logic here
+        
+    elif event['type'] == 'payment_intent.payment_failed':
+        payment_intent = event['data']['object']
+        print(f"Payment failed for intent: {payment_intent['id']}")
+        # Add your payment failure logic here
+        
+    elif event['type'] == 'invoice.payment_succeeded':
+        invoice = event['data']['object']
+        print(f"Subscription payment succeeded: {invoice['id']}")
+        # Add your subscription success logic here
+        
+    elif event['type'] == 'customer.subscription.deleted':
+        subscription = event['data']['object']
+        print(f"Subscription cancelled: {subscription['id']}")
+        # Add your subscription cancellation logic here
+    
+    else:
+        print(f"Unhandled event type: {event['type']}")
+    
+    return {"status": "success"}
+
+@app.get("/payments/config")
+async def get_payment_config():
+    """Get payment configuration including publishable key."""
+    return {
+        "stripe_enabled": stripe.api_key is not None,
+        "publishable_key": stripe_publishable_key,
+        "webhook_enabled": stripe_webhook_secret is not None
+    }
+
 
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(
-        "web.app:app",
+        "app.ocular_app:app",
         host="0.0.0.0", 
-        port=8000,
+        port=8001,
         reload=True,
         log_level="info"
     )

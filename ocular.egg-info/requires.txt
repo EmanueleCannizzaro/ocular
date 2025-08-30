@@ -13,6 +13,9 @@ jinja2>=3.1.0
 python-multipart>=0.0.6
 logfire>=0.30.0
 pdf2image>=1.17.0
+python-jose==3.3.0
+clerk-backend-api>=2.1.0
+stripe>=12.5.0
 
 [dev]
 pytest>=7.0
@@ -23,6 +26,7 @@ mypy>=1.0.0
 types-Pillow
 types-requests
 types-aiofiles
+python-jose==3.3.0
 
 [test]
 pytest>=7.0
@@ -31,3 +35,4 @@ pytest-mock>=3.10.0
 pytest-cov>=4.0.0
 httpx>=0.24.0
 reportlab>=4.0.0
+python-jose==3.3.0

@@ -44,6 +44,7 @@ ocular/services/document_service.py
 ocular/services/ocr_service.py
 ocular/services/processing_service.py
 ocular/services/validation_service.py
+tests/test_authentication.py
 tests/test_client.py
 tests/test_pdf_processing.py
 tests/test_providers.py
