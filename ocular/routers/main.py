@@ -210,7 +210,7 @@ async def home(request: Request, tab: Optional[str] = None) -> HTMLResponse:
         context.update(
             {
                 "available_providers": ocr_processor.get_available_providers(),
-                "provider_stats": ocr_processor.get_provider_stats(),
+                "provider_stats": await ocr_processor.get_provider_stats(),
                 "strategies": [strategy.value for strategy in ProcessingStrategy],
             }
         )
