@@ -1,0 +1,17 @@
+# Internationalization (i18n) Dependencies for Ocular OCR
+#
+# Install with: pip install -r requirements-i18n.txt
+# Or with uv: uv add -r requirements-i18n.txt
+
+# Core i18n libraries
+babel>=2.13.0              # String extraction and locale management
+polib>=1.2.0               # PO file manipulation
+
+# Optional: Automated translation with DeepL API
+deepl>=1.16.0              # DeepL translation API client
+
+# Note: gettext is typically pre-installed on Linux/macOS systems
+# If missing, install via package manager:
+#   - Ubuntu/Debian: apt-get install gettext
+#   - macOS: brew install gettext
+#   - Windows: Download from https://mlocati.github.io/articles/gettext-iconv-windows.html

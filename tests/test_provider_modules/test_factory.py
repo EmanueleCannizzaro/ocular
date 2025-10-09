@@ -42,9 +42,9 @@ class TestProviderFactory:
         """Test creating provider with config that causes initialization error."""
         config = {"api_key": None}  # Invalid config
         
-        # Should create provider but may fail during initialization
-        provider = ProviderFactory.create_provider(ProviderType.MISTRAL, config)
-        assert isinstance(provider, MistralProvider)
+        # Should raise ProviderError due to invalid config
+        with pytest.raises(ProviderError, match="Failed to create provider mistral"):
+            ProviderFactory.create_provider(ProviderType.MISTRAL, config)
     
     @pytest.mark.asyncio
     async def test_create_and_initialize_provider(self):

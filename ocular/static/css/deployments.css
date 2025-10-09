@@ -1,0 +1,573 @@
+/* AI Model Deployment Page Styling */
+
+:root {
+    --primary-color: #007bff;
+    --success-color: #28a745;
+    --warning-color: #ffc107;
+    --danger-color: #dc3545;
+    --info-color: #17a2b8;
+    --secondary-color: #6c757d;
+    --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --card-shadow-hover: 0 8px 15px rgba(0, 0, 0, 0.2);
+    --border-radius: 12px;
+    --transition: all 0.3s ease;
+}
+
+/* Metric Cards */
+.metric-card {
+    transition: var(--transition);
+    height: 100%;
+    border-radius: var(--border-radius);
+}
+
+.metric-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--card-shadow-hover);
+}
+
+.metric-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    font-size: 24px;
+    color: white;
+}
+
+.metric-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #212529;
+    margin-bottom: 0.5rem;
+}
+
+.metric-label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Provider Cards */
+.provider-card {
+    border: 2px solid #e9ecef;
+    border-radius: var(--border-radius);
+    padding: 2rem 1.5rem;
+    text-align: center;
+    transition: var(--transition);
+    cursor: pointer;
+    height: 100%;
+    background: white;
+}
+
+.provider-card:hover {
+    border-color: var(--primary-color);
+    box-shadow: var(--card-shadow-hover);
+    transform: translateY(-5px);
+}
+
+.provider-card.selected {
+    border-color: var(--primary-color);
+    background: #e7f3ff;
+}
+
+.provider-logo {
+    margin-bottom: 1rem;
+}
+
+.provider-status {
+    margin-top: 1rem;
+}
+
+/* Model Cards */
+.model-card {
+    border: 1px solid #e9ecef;
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    transition: var(--transition);
+    background: white;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.model-card:hover {
+    box-shadow: var(--card-shadow-hover);
+    transform: translateY(-3px);
+}
+
+.model-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.model-header h6 {
+    margin: 0;
+    font-weight: 600;
+    color: #212529;
+}
+
+.model-details {
+    flex: 1;
+}
+
+.model-specs {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.spec-item {
+    display: flex;
+    align-items: center;
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+.spec-item i {
+    color: var(--primary-color);
+}
+
+/* Deployments Table */
+#deployments-table {
+    margin-bottom: 0;
+}
+
+#deployments-table thead th {
+    background: #f8f9fa;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.5px;
+    border: none;
+    color: #495057;
+    padding: 1rem;
+}
+
+#deployments-table tbody tr {
+    transition: var(--transition);
+}
+
+#deployments-table tbody tr:hover {
+    background: #f8f9fa;
+}
+
+#deployments-table tbody td {
+    vertical-align: middle;
+    padding: 1rem;
+}
+
+.deployment-status-badge {
+    padding: 0.375rem 0.75rem;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.deployment-status-badge.running {
+    background: var(--success-color);
+    color: white;
+}
+
+.deployment-status-badge.deploying {
+    background: var(--info-color);
+    color: white;
+}
+
+.deployment-status-badge.stopped {
+    background: var(--secondary-color);
+    color: white;
+}
+
+.deployment-status-badge.error {
+    background: var(--danger-color);
+    color: white;
+}
+
+.endpoint-url {
+    font-family: 'Courier New', monospace;
+    font-size: 0.85rem;
+    color: var(--primary-color);
+    cursor: pointer;
+}
+
+.endpoint-url:hover {
+    text-decoration: underline;
+}
+
+/* Deployment Templates */
+.list-group-item {
+    transition: var(--transition);
+    border-radius: 8px !important;
+    margin-bottom: 0.5rem;
+}
+
+.list-group-item:hover {
+    background: #f8f9fa;
+    transform: translateX(5px);
+}
+
+.list-group-item h6 {
+    color: #212529;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+/* Deployment Modal */
+.deployment-step {
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: var(--border-radius);
+}
+
+.deployment-step h6 {
+    color: var(--primary-color);
+    font-weight: 600;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--primary-color);
+}
+
+.form-label {
+    font-weight: 500;
+    color: #495057;
+    margin-bottom: 0.5rem;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* Action Buttons */
+.action-btn {
+    padding: 0.25rem 0.75rem;
+    font-size: 0.85rem;
+    border-radius: 6px;
+    margin: 0 0.25rem;
+    transition: var(--transition);
+}
+
+.action-btn:hover {
+    transform: translateY(-2px);
+}
+
+.action-btn-view {
+    background: var(--info-color);
+    color: white;
+    border: none;
+}
+
+.action-btn-view:hover {
+    background: #138496;
+}
+
+.action-btn-stop {
+    background: var(--warning-color);
+    color: #212529;
+    border: none;
+}
+
+.action-btn-stop:hover {
+    background: #e0a800;
+}
+
+.action-btn-delete {
+    background: var(--danger-color);
+    color: white;
+    border: none;
+}
+
+.action-btn-delete:hover {
+    background: #c82333;
+}
+
+.action-btn-restart {
+    background: var(--success-color);
+    color: white;
+    border: none;
+}
+
+.action-btn-restart:hover {
+    background: #218838;
+}
+
+/* Cost Display */
+.cost-display {
+    font-family: 'Courier New', monospace;
+    font-weight: 600;
+    color: var(--success-color);
+}
+
+.cost-display.high {
+    color: var(--danger-color);
+}
+
+.cost-display.medium {
+    color: var(--warning-color);
+}
+
+/* GPU Type Badge */
+.gpu-badge {
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: #e9ecef;
+    color: #495057;
+    font-family: 'Courier New', monospace;
+}
+
+/* Status Indicators */
+.status-indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 0.5rem;
+    animation: pulse 2s infinite;
+}
+
+.status-indicator.running {
+    background: var(--success-color);
+    box-shadow: 0 0 10px var(--success-color);
+}
+
+.status-indicator.deploying {
+    background: var(--info-color);
+    box-shadow: 0 0 10px var(--info-color);
+}
+
+.status-indicator.stopped {
+    background: var(--secondary-color);
+    animation: none;
+}
+
+.status-indicator.error {
+    background: var(--danger-color);
+    box-shadow: 0 0 10px var(--danger-color);
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+/* Deployment Progress */
+.deployment-progress {
+    margin-top: 1rem;
+}
+
+.progress-step {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.5rem;
+    border-radius: 8px;
+    background: #f8f9fa;
+    transition: var(--transition);
+}
+
+.progress-step.active {
+    background: #e7f3ff;
+    border-left: 4px solid var(--primary-color);
+}
+
+.progress-step.completed {
+    background: #d4edda;
+    border-left: 4px solid var(--success-color);
+}
+
+.progress-step.error {
+    background: #f8d7da;
+    border-left: 4px solid var(--danger-color);
+}
+
+.step-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    font-size: 14px;
+}
+
+.progress-step.active .step-icon {
+    background: var(--primary-color);
+    color: white;
+}
+
+.progress-step.completed .step-icon {
+    background: var(--success-color);
+    color: white;
+}
+
+.progress-step.error .step-icon {
+    background: var(--danger-color);
+    color: white;
+}
+
+.step-details {
+    flex: 1;
+}
+
+.step-title {
+    font-weight: 600;
+    color: #212529;
+    margin-bottom: 0.25rem;
+}
+
+.step-description {
+    font-size: 0.85rem;
+    color: #6c757d;
+    margin: 0;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #6c757d;
+}
+
+.empty-state i {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.3;
+}
+
+.empty-state h5 {
+    color: #495057;
+    margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+    margin-bottom: 1.5rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .metric-card {
+        margin-bottom: 1rem;
+    }
+
+    .provider-card {
+        margin-bottom: 1rem;
+    }
+
+    .model-card {
+        margin-bottom: 1rem;
+    }
+
+    .action-btn {
+        margin-bottom: 0.25rem;
+    }
+
+    .deployment-step {
+        padding: 0.75rem;
+    }
+
+    .spec-item {
+        font-size: 0.8rem;
+    }
+}
+
+/* Loading States */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.loading-content {
+    text-align: center;
+}
+
+.loading-spinner {
+    width: 60px;
+    height: 60px;
+    border: 4px solid #e9ecef;
+    border-top-color: var(--primary-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.loading-text {
+    margin-top: 1rem;
+    color: #495057;
+    font-weight: 500;
+}
+
+/* Toast Notifications */
+.toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 10000;
+}
+
+.toast-notification {
+    min-width: 300px;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    box-shadow: var(--card-shadow-hover);
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.toast-notification.success {
+    background: var(--success-color);
+    color: white;
+}
+
+.toast-notification.error {
+    background: var(--danger-color);
+    color: white;
+}
+
+.toast-notification.info {
+    background: var(--info-color);
+    color: white;
+}
+
+.toast-notification.warning {
+    background: var(--warning-color);
+    color: #212529;
+}

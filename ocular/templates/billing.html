@@ -1,0 +1,240 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('Billing & Cost Management') }} - {{ _('Ocular OCR') }}{% endblock %}
+
+{% block content %}
+<div id="billing-page" class="container mt-4">
+    <nav aria-label="{{ _('breadcrumb') }}" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ _('Billing') }}</li>
+        </ol>
+    </nav>
+
+    <div id="alertContainer"></div>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="fas fa-receipt"></i> Billing & Cost Management</h1>
+        <div>
+            <button class="btn btn-primary" onclick="generateMonthlyInvoice()">
+                <i class="fas fa-file-invoice"></i> Generate Invoice
+            </button>
+        </div>
+    </div>
+
+    <!-- Cost Overview -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card cost-card">
+                <div class="card-body">
+                    <h5 class="card-title text-muted">{{ _('Current Month Cost') }}</h5>
+                    <h2 class="mb-0" id="currentMonthCost">{{ _('$0.00') }}</h2>
+                    <small class="text-muted">{{ _('Updated in real-time') }}</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">{{ _('Cost Breakdown') }}</h5>
+                </div>
+                <div class="card-body">
+                    <div id="costBreakdown">
+                        <div class="text-center text-muted">
+                            <div class="spinner-border spinner-border-sm" role="status"></div>
+                            Loading...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabs -->
+    <ul class="nav nav-tabs mb-4" id="billingTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="invoices-tab" data-bs-toggle="tab" data-bs-target="#invoices" type="button">
+                <i class="fas fa-file-invoice"></i> Invoices
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="costs-tab" data-bs-toggle="tab" data-bs-target="#costs" type="button">
+                <i class="fas fa-chart-line"></i> Cost Analysis
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="alerts-tab" data-bs-toggle="tab" data-bs-target="#alerts" type="button">
+                <i class="fas fa-bell"></i> Budget Alerts
+            </button>
+        </li>
+    </ul>
+
+    <!-- Tab Content -->
+    <div class="tab-content" id="billingTabContent">
+        <!-- Invoices Tab -->
+        <div class="tab-pane fade show active" id="invoices" role="tabpanel">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">{{ _('Invoices') }}</h5>
+                    <div>
+                        <select class="form-select form-select-sm" id="invoiceStatusFilter">
+                            <option value="">{{ _('All Status') }}</option>
+                            <option value="paid">{{ _('Paid') }}</option>
+                            <option value="pending">{{ _('Pending') }}</option>
+                            <option value="draft">{{ _('Draft') }}</option>
+                            <option value="failed">{{ _('Failed') }}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Invoice</th>
+                                    <th>Status</th>
+                                    <th>Total</th>
+                                    <th>Paid</th>
+                                    <th>Due</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="invoicesList">
+                                <tr>
+                                    <td colspan="6" class="text-center">
+                                        <div class="spinner-border" role="status"></div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cost Analysis Tab -->
+        <div class="tab-pane fade" id="costs" role="tabpanel">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h5 class="mb-0">{{ _('Cost Distribution') }}</h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="costChart" height="300"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h5 class="mb-0">{{ _('Cost Trends') }}</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted">{{ _('Cost trend analysis coming soon...') }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Budget Alerts Tab -->
+        <div class="tab-pane fade" id="alerts" role="tabpanel">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">{{ _('Budget Alerts') }}</h5>
+                    <div>
+                        <button class="btn btn-sm btn-outline-primary" onclick="checkBudgetAlerts()">
+                            <i class="fas fa-sync"></i> Check Alerts
+                        </button>
+                        <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#createBudgetAlertModal">
+                            <i class="fas fa-plus"></i> Create Alert
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="budgetAlertsList">
+                        <div class="text-center">
+                            <div class="spinner-border" role="status"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Budget Alert Modal -->
+<div class="modal fade" id="createBudgetAlertModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{{ _('Create Budget Alert') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="createBudgetAlertForm">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="alertName" class="form-label">Alert Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="alertName" required
+                               placeholder="{{ _('e.g., Monthly Budget Alert') }}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="thresholdAmount" class="form-label">Threshold Amount (USD) <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="thresholdAmount" min="1" step="0.01" required
+                               placeholder="{{ _('100.00') }}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="alertType" class="form-label">{{ _('Alert Type') }}</label>
+                        <select class="form-select" id="alertType">
+                            <option value="threshold">{{ _('Threshold') }}</option>
+                            <option value="limit">{{ _('Hard Limit') }}</option>
+                            <option value="forecast">{{ _('Forecast') }}</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="periodType" class="form-label">{{ _('Period') }}</label>
+                        <select class="form-select" id="periodType">
+                            <option value="daily">{{ _('Daily') }}</option>
+                            <option value="weekly">{{ _('Weekly') }}</option>
+                            <option value="monthly" selected>{{ _('Monthly') }}</option>
+                            <option value="yearly">{{ _('Yearly') }}</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="notifyEmail" checked>
+                            <label class="form-check-label" for="notifyEmail">{{ _('Email Notifications') }}</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="notifySlack">
+                            <label class="form-check-label" for="notifySlack">{{ _('Slack Notifications') }}</label>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="slackWebhook" class="form-label">{{ _('Slack Webhook URL (optional)') }}</label>
+                        <input type="url" class="form-control" id="slackWebhook"
+                               placeholder="{{ _('https://hooks.slack.com/services/...') }}">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Cancel') }}</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-bell"></i> Create Alert
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{{ url_for('static', path='/js/billing.js') }}"></script>
+{% endblock %}

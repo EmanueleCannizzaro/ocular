@@ -16,6 +16,10 @@ pdf2image>=1.17.0
 python-jose==3.3.0
 clerk-backend-api>=2.1.0
 stripe>=12.5.0
+pytest-asyncio>=1.1.0
+runpod>=1.7.13
+pytesseract>=0.3.13
+sqlalchemy>=2.0.0
 
 [dev]
 pytest>=7.0

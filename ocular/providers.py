@@ -335,16 +335,16 @@ class OCRProviderFactory:
             raise ConfigurationError(f"Unknown OCR provider: {provider}")
     
     @staticmethod
-    def get_available_providers(config: Dict[str, Any]) -> List[OCRProvider]:
+    async def get_available_providers(config: Dict[str, Any]) -> List[OCRProvider]:
         """Get list of available providers based on configuration."""
         available = []
-        
+
         for provider in OCRProvider:
             try:
                 ocr_provider = OCRProviderFactory.create_provider(provider, config)
-                if ocr_provider.is_available():
+                if await ocr_provider.is_available():
                     available.append(provider)
             except Exception:
                 continue
-        
+
         return available

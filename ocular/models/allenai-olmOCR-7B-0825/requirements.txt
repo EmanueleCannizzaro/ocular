@@ -1,0 +1,24 @@
+# PyTorch for GPU acceleration
+torch
+torchvision
+torchaudio
+
+# Core ML and data handling libraries
+einops
+timm
+pillow
+numpy
+boto3
+sentencepiece
+bitsandbytes
+protobuf
+decord
+huggingface_hub
+
+# Transformers libraries from specific git commits for compatibility
+git+https://github.com/huggingface/transformers
+git+https://github.com/huggingface/accelerate
+git+https://github.com/huggingface/diffusers
+
+# The main OCR package
+olmocr

@@ -1,0 +1,340 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('Observability') }}{% endblock %}
+
+{% block head %}
+<link href="{{ url_for('static', path='css/observability.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 my-5">
+    <div class="row">
+        <div class="col-12">
+            <div class="text-center mb-5">
+                <h1 class="display-4 text-primary">
+                    <i class="fas fa-chart-line me-3"></i>
+                    Observability
+                </h1>
+                <p class="lead">{{ _('Monitor deployment health, performance metrics, and system status') }}</p>
+                <nav aria-label="{{ _('breadcrumb') }}">
+                    <ol class="breadcrumb justify-content-center">
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">{{ _('Deployment') }}</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overall Health Status -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm" id="overall-health">
+                <div class="card-body text-center">
+                    <div class="health-indicator" id="health-indicator">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Checking health...</span>
+                        </div>
+                    </div>
+                    <h3 class="mt-3" id="health-status">{{ _('Checking System Health...') }}</h3>
+                    <p class="text-muted mb-0" id="health-description">{{ _('Please wait while we assess all components') }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Key Metrics -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card metric-card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="metric-icon bg-success bg-gradient">
+                        <i class="fas fa-heartbeat"></i>
+                    </div>
+                    <h4 class="metric-value" id="uptime-value">{{ _('--') }}</h4>
+                    <p class="metric-label text-muted mb-0">{{ _('Uptime') }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card metric-card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="metric-icon bg-info bg-gradient">
+                        <i class="fas fa-tachometer-alt"></i>
+                    </div>
+                    <h4 class="metric-value" id="response-time">{{ _('--') }}</h4>
+                    <p class="metric-label text-muted mb-0">{{ _('Avg Response') }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card metric-card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="metric-icon bg-warning bg-gradient">
+                        <i class="fas fa-server"></i>
+                    </div>
+                    <h4 class="metric-value" id="memory-usage">{{ _('--') }}</h4>
+                    <p class="metric-label text-muted mb-0">{{ _('Memory Usage') }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card metric-card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="metric-icon bg-primary bg-gradient">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h4 class="metric-value" id="requests-count">{{ _('--') }}</h4>
+                    <p class="metric-label text-muted mb-0">{{ _('Requests/Hour') }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Deployment Components -->
+    <div class="row">
+        <!-- Application Services -->
+        <div class="col-lg-6 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent border-0">
+                    <h5 class="mb-0">
+                        <i class="fas fa-cogs me-2"></i>
+                        Application Services
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div id="app-services">
+                        <div class="service-loading text-center py-4">
+                            <div class="spinner-border spinner-border-sm text-primary me-2"></div>
+                            Loading services...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Infrastructure -->
+        <div class="col-lg-6 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent border-0">
+                    <h5 class="mb-0">
+                        <i class="fas fa-cloud me-2"></i>
+                        Infrastructure
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div id="infrastructure">
+                        <div class="service-loading text-center py-4">
+                            <div class="spinner-border spinner-border-sm text-primary me-2"></div>
+                            Loading infrastructure...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Deployment History -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-history me-2"></i>
+                        Deployment History
+                    </h5>
+                    <button class="btn btn-outline-primary btn-sm" id="refresh-history">
+                        <i class="fas fa-sync-alt me-1"></i> Refresh
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div id="deployment-history">
+                        <div class="text-center py-4">
+                            <div class="spinner-border spinner-border-sm text-primary me-2"></div>
+                            Loading deployment history...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Environment Details -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent border-0">
+                    <h5 class="mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Environment Details
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div id="environment-details">
+                        <div class="detail-item">
+                            <span class="detail-label">Environment:</span>
+                            <span class="detail-value" id="env-name">--</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Version:</span>
+                            <span class="detail-value" id="app-version">--</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Build:</span>
+                            <span class="detail-value" id="build-number">--</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Platform:</span>
+                            <span class="detail-value" id="platform-info">--</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Last Deploy:</span>
+                            <span class="detail-value" id="last-deploy">--</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Configuration Status -->
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent border-0">
+                    <h5 class="mb-0">
+                        <i class="fas fa-sliders-h me-2"></i>
+                        Configuration Status
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div id="config-status">
+                        <div class="text-center py-4">
+                            <div class="spinner-border spinner-border-sm text-primary me-2"></div>
+                            Loading configuration...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Health Checks -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-stethoscope me-2"></i>
+                        Health Checks
+                    </h5>
+                    <button class="btn btn-outline-success btn-sm" id="run-health-checks">
+                        <i class="fas fa-play me-1"></i> Run Checks
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div id="health-checks">
+                        <!-- Health check items will be dynamically inserted -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resource Usage -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent border-0">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-area me-2"></i>
+                        Resource Usage
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="resource-meter">
+                                <div class="resource-label">CPU Usage</div>
+                                <div class="progress mb-2">
+                                    <div class="progress-bar bg-info" role="progressbar" id="cpu-progress" style="width: 0%"></div>
+                                </div>
+                                <div class="resource-value" id="cpu-value">0%</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="resource-meter">
+                                <div class="resource-label">Memory Usage</div>
+                                <div class="progress mb-2">
+                                    <div class="progress-bar bg-warning" role="progressbar" id="memory-progress" style="width: 0%"></div>
+                                </div>
+                                <div class="resource-value" id="memory-value">0%</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="resource-meter">
+                                <div class="resource-label">Disk Usage</div>
+                                <div class="progress mb-2">
+                                    <div class="progress-bar bg-danger" role="progressbar" id="disk-progress" style="width: 0%"></div>
+                                </div>
+                                <div class="resource-value" id="disk-value">0%</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Logs -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-file-alt me-2"></i>
+                        Recent Logs
+                    </h5>
+                    <div class="btn-group btn-group-sm">
+                        <button class="btn btn-outline-secondary" id="auto-refresh-logs">
+                            <i class="fas fa-sync-alt me-1"></i> Auto Refresh
+                        </button>
+                        <button class="btn btn-outline-primary" id="download-logs">
+                            <i class="fas fa-download me-1"></i> Download
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="log-viewer" id="log-viewer">
+                        <div class="text-center py-4">
+                            <div class="spinner-border spinner-border-sm text-primary me-2"></div>
+                            Loading recent logs...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Deployment Action Modal -->
+<div class="modal fade" id="deploymentModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deploymentModalTitle">{{ _('Deployment Action') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="deploymentModalBody">
+                <!-- Content will be dynamically inserted -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Close') }}</button>
+                <button type="button" class="btn btn-primary" id="executeAction">{{ _('Execute') }}</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', path='js/observability.js') }}"></script>
+{% endblock %}

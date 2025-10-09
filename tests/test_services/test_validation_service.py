@@ -4,6 +4,7 @@ Tests for validation service.
 
 import pytest
 from pathlib import Path
+from pydantic import ValidationError as PydanticValidationError
 
 from ocular.services.validation_service import ValidationService
 from ocular.core.models import ProcessingRequest, BatchProcessingRequest, OCRResult
@@ -106,13 +107,11 @@ class TestValidationService:
     @pytest.mark.asyncio
     async def test_validate_empty_batch(self, validation_service):
         """Test validation fails for empty batch."""
-        request = BatchProcessingRequest(
-            file_paths=[],
-            providers=[ProviderType.MISTRAL]
-        )
-        
-        with pytest.raises(ValidationError, match="At least one file path"):
-            await validation_service.validate_batch_request(request)
+        with pytest.raises(PydanticValidationError, match="List should have at least 1 item"):
+            BatchProcessingRequest(
+                file_paths=[],
+                providers=[ProviderType.MISTRAL]
+            )
     
     @pytest.mark.asyncio
     async def test_validate_large_batch(self, validation_service, sample_image_path):
@@ -131,14 +130,12 @@ class TestValidationService:
     @pytest.mark.asyncio
     async def test_validate_invalid_concurrent_limit(self, validation_service, sample_image_path):
         """Test validation fails for invalid concurrency limit."""
-        request = BatchProcessingRequest(
-            file_paths=[sample_image_path],
-            providers=[ProviderType.MISTRAL],
-            max_concurrent=15  # Exceeds limit of 10
-        )
-        
-        with pytest.raises(ValidationError, match="max_concurrent must be between"):
-            await validation_service.validate_batch_request(request)
+        with pytest.raises(PydanticValidationError, match="Input should be less than or equal to 10"):
+            BatchProcessingRequest(
+                file_paths=[sample_image_path],
+                providers=[ProviderType.MISTRAL],
+                max_concurrent=15  # Exceeds limit of 10
+            )
     
     def test_validate_ocr_result(self, validation_service):
         """Test validating OCR result."""
@@ -154,25 +151,21 @@ class TestValidationService:
     
     def test_validate_invalid_confidence(self, validation_service):
         """Test validation fails for invalid confidence."""
-        result = OCRResult(
-            text="Sample text",
-            confidence=1.5,  # Invalid - over 1.0
-            provider="test_provider"
-        )
-        
-        with pytest.raises(ValidationError, match="Confidence must be between"):
-            validation_service.validate_ocr_result(result)
+        with pytest.raises(PydanticValidationError, match="Input should be less than or equal to 1"):
+            OCRResult(
+                text="Sample text",
+                confidence=1.5,  # Invalid - over 1.0
+                provider="test_provider"
+            )
     
     def test_validate_negative_processing_time(self, validation_service):
         """Test validation fails for negative processing time."""
-        result = OCRResult(
-            text="Sample text",
-            provider="test_provider",
-            processing_time=-1.0  # Invalid - negative
-        )
-        
-        with pytest.raises(ValidationError, match="cannot be negative"):
-            validation_service.validate_ocr_result(result)
+        with pytest.raises(PydanticValidationError, match="Input should be greater than or equal to 0"):
+            OCRResult(
+                text="Sample text",
+                provider="test_provider",
+                processing_time=-1.0  # Invalid - negative
+            )
     
     def test_validate_structured_data_schema(self, validation_service):
         """Test validating structured data schema."""
@@ -209,8 +202,13 @@ class TestValidationService:
     
     def test_validate_upload_file(self, validation_service):
         """Test validating uploaded file."""
-        content = b"fake image content"
-        filename = "test_image.jpg"
+        # Valid PNG file header (minimal PNG)
+        content = (
+            b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01'
+            b'\x08\x02\x00\x00\x00\x90wS\xde\x00\x00\x00\x0cIDATx\x9cc```\x00\x00'
+            b'\x00\x04\x00\x01\xdd\x8d\xb4\x1c\x00\x00\x00\x00IEND\xaeB`\x82'
+        )
+        filename = "test_image.png"
         
         result = validation_service.validate_upload_file(content, filename)
         assert result is True

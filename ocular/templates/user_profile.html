@@ -1,0 +1,211 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('User Profile') }}{% endblock %}
+
+{% block content %}
+<div id="user-profile-page" class="container mt-4">
+    <nav aria-label="{{ _('breadcrumb') }}" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ _('User Profile') }}</li>
+        </ol>
+    </nav>
+
+    <div id="alertContainer"></div>
+
+    <h1 class="mb-4">
+        <i class="fas fa-user-circle"></i> User Profile
+    </h1>
+
+    <div class="row">
+        <!-- Profile Section -->
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <div class="avatar-container">
+                        <img id="userAvatar" src="https://via.placeholder.com/100" alt="User Avatar">
+                    </div>
+                    <h4 id="userEmail">{{ _('user@example.com') }}</h4>
+                    <p class="text-muted mb-1">
+                        <strong>Role:</strong> <span id="userRole" class="badge bg-primary">User</span>
+                    </p>
+                    <p class="text-muted">
+                        <strong>Plan:</strong> <span id="subscriptionTier" class="badge bg-success">Free</span>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Quota Information -->
+            <div class="card mt-3 quota-card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-chart-pie"></i> API Usage</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>Used:</span>
+                            <strong><span id="quotaUsed">0</span> / <span id="quotaLimit">1,000</span></strong>
+                        </div>
+                        <div class="progress" style="height: 20px;">
+                            <div id="quotaProgressBar" class="progress-bar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+                    <p class="mb-0 text-muted small">
+                        <i class="fas fa-info-circle"></i> Remaining: <strong><span id="quotaRemaining">1,000</span></strong> API calls
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Details & API Keys -->
+        <div class="col-md-8">
+            <!-- Profile Form -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-user-edit"></i> Profile Information</h5>
+                </div>
+                <div class="card-body">
+                    <form id="profileUpdateForm">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="firstName" class="form-label">{{ _('First Name') }}</label>
+                                <input type="text" class="form-control" id="firstName" name="firstName">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="lastName" class="form-label">{{ _('Last Name') }}</label>
+                                <input type="text" class="form-control" id="lastName" name="lastName">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="username" class="form-label">{{ _('Username') }}</label>
+                            <input type="text" class="form-control" id="username" name="username">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="email" class="form-label">{{ _('Email Address') }}</label>
+                            <input type="email" class="form-control" id="email" name="email" readonly>
+                            <small class="text-muted">{{ _('Email cannot be changed here. Manage through your authentication provider.') }}</small>
+                        </div>
+
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- API Keys Section -->
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-key"></i> API Keys</h5>
+                    <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#createAPIKeyModal">
+                        <i class="fas fa-plus"></i> Create API Key
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div id="apiKeysList">
+                        <!-- API keys will be loaded here -->
+                        <div class="text-center text-muted py-4">
+                            <div class="spinner-border" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create API Key Modal -->
+<div class="modal fade" id="createAPIKeyModal" tabindex="-1" aria-labelledby="createAPIKeyModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createAPIKeyModalLabel">{{ _('Create New API Key') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Close') }}"></button>
+            </div>
+            <form id="createAPIKeyForm">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="keyName" class="form-label">Key Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="keyName" name="keyName" required
+                               placeholder="{{ _('e.g., Production API Key') }}">
+                        <small class="text-muted">{{ _('Choose a descriptive name to identify this key') }}</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">{{ _('Permissions') }}</label>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="scopes" value="model:read" id="scopeModelRead" checked>
+                                    <label class="form-check-label" for="scopeModelRead">{{ _('Read Models') }}</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="scopes" value="model:create" id="scopeModelCreate">
+                                    <label class="form-check-label" for="scopeModelCreate">{{ _('Create Models') }}</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="scopes" value="deployment:read" id="scopeDeploymentRead" checked>
+                                    <label class="form-check-label" for="scopeDeploymentRead">{{ _('Read Deployments') }}</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="scopes" value="deployment:create" id="scopeDeploymentCreate">
+                                    <label class="form-check-label" for="scopeDeploymentCreate">{{ _('Create Deployments') }}</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="scopes" value="deployment:start" id="scopeDeploymentStart">
+                                    <label class="form-check-label" for="scopeDeploymentStart">{{ _('Start Deployments') }}</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="scopes" value="deployment:stop" id="scopeDeploymentStop">
+                                    <label class="form-check-label" for="scopeDeploymentStop">{{ _('Stop Deployments') }}</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="scopes" value="analytics:read" id="scopeAnalyticsRead">
+                                    <label class="form-check-label" for="scopeAnalyticsRead">{{ _('Read Analytics') }}</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="expiresInDays" class="form-label">{{ _('Expiration (days)') }}</label>
+                            <input type="number" class="form-control" id="expiresInDays" name="expiresInDays" min="1" max="365"
+                                   placeholder="{{ _('Never expires (leave empty)') }}">
+                            <small class="text-muted">{{ _('Optional: Number of days until key expires') }}</small>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="rateLimitPerMinute" class="form-label">{{ _('Rate Limit (per minute)') }}</label>
+                            <input type="number" class="form-control" id="rateLimitPerMinute" name="rateLimitPerMinute" min="1"
+                                   placeholder="{{ _('No limit (leave empty)') }}">
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>Important:</strong> You will only see the API key once. Make sure to copy and store it securely.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Cancel') }}</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-key"></i> Create API Key
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', path='/js/user-settings.js') }}"></script>
+{% endblock %}

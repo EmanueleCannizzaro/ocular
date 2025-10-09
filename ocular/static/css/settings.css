@@ -1,0 +1,186 @@
+/* Settings Page Styles */
+
+.provider-config {
+    padding: 1rem 0;
+}
+
+.provider-header {
+    border-bottom: 2px solid #e9ecef;
+    padding-bottom: 1rem;
+}
+
+.provider-header h4 {
+    margin-bottom: 0.5rem;
+    color: #212529;
+}
+
+.provider-status {
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.provider-status h6 {
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    color: #495057;
+}
+
+.status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.status-indicator .badge {
+    font-size: 0.875rem;
+    padding: 0.5rem 0.75rem;
+}
+
+#provider-status-overview {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.provider-status-card {
+    padding: 1rem;
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 0.5rem;
+    text-align: center;
+}
+
+.provider-status-card h6 {
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+    color: #6c757d;
+}
+
+.provider-status-card .status {
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.provider-status-card .status.configured {
+    color: #198754;
+}
+
+.provider-status-card .status.not-configured {
+    color: #dc3545;
+}
+
+.provider-checkboxes {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.provider-checkboxes .form-check {
+    padding-left: 1.75rem;
+}
+
+/* Tab Styling */
+.nav-tabs .nav-link {
+    color: #6c757d;
+    border: none;
+    border-bottom: 3px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.nav-tabs .nav-link:hover {
+    border-bottom-color: #0d6efd;
+    color: #0d6efd;
+}
+
+.nav-tabs .nav-link.active {
+    color: #0d6efd;
+    background: transparent;
+    border-bottom-color: #0d6efd;
+    font-weight: 600;
+}
+
+/* Form Enhancements */
+.form-label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.form-text {
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+.input-group .btn {
+    border-left: none;
+}
+
+.input-group .form-control:focus + .btn {
+    border-color: #86b7fe;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.tab-pane {
+    animation: fadeIn 0.3s ease;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    #provider-status-overview {
+        grid-template-columns: 1fr;
+    }
+    
+    .d-flex.gap-2 {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .d-flex.gap-2 button {
+        width: 100%;
+    }
+}
+
+/* Alert Styling */
+.alert {
+    border-radius: 0.5rem;
+}
+
+.alert i {
+    vertical-align: middle;
+}
+
+/* Card Header */
+.card-header {
+    background: #fff;
+    border-bottom: 2px solid #e9ecef;
+}
+
+/* Badge Colors */
+.badge.bg-success {
+    background-color: #198754 !important;
+}
+
+.badge.bg-warning {
+    background-color: #ffc107 !important;
+    color: #000;
+}
+
+.badge.bg-danger {
+    background-color: #dc3545 !important;
+}
+
+.badge.bg-secondary {
+    background-color: #6c757d !important;
+}

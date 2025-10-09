@@ -1,0 +1,165 @@
+# RunPod Configuration for OLMocr vLLM Serverless Deployment
+# This file configures the deployment of AllenAI's OLMocr model using vLLM on RunPod serverless
+
+[project]
+# Project metadata
+name = "olmocr-vllm-serverless"
+description = "OLMocr document OCR model deployed with vLLM for fast inference"
+version = "1.0.0"
+
+# Base image configuration
+# Using RunPod's official vLLM image for optimal performance
+base_image = "runpod/worker-vllm:stable"
+
+# Python version and dependencies
+python_version = "3.11"
+requirements = [
+    "vllm>=0.4.0",
+    "transformers>=4.35.0",
+    "torch>=2.1.0",
+    "pillow>=10.0.0",
+    "huggingface-hub>=0.19.0"
+]
+
+[serverless]
+# Serverless configuration
+# GPU requirements for OLMocr-7B model
+gpu_types = ["NVIDIA L40S", "NVIDIA A100", "NVIDIA H100"]
+min_vcpus = 8
+min_memory_gb = 32
+min_gpu_memory_gb = 20
+
+# Scaling configuration
+min_workers = 0
+max_workers = 3
+idle_timeout = 5
+max_concurrency = 100
+
+# Container configuration
+container_disk_size_gb = 50
+container_registry_auth_id = ""
+
+[build]
+# Build configuration
+dockerfile_path = "Dockerfile"
+context_path = "."
+ignore_file = ".runpodignore"
+
+# Environment variables for vLLM and OLMocr
+[env]
+# Model configuration
+MODEL_NAME = "allenai/olmOCR-7B-0225-preview"
+MODEL_REVISION = "main"
+BASE_PATH = "/runpod-volume"
+
+# vLLM configuration
+VLLM_ENGINE_ARGS = "--model=allenai/olmOCR-7B-0225-preview --max-model-len=4096 --gpu-memory-utilization=0.9 --dtype=bfloat16 --trust-remote-code"
+WORKER_CUDA_VERSION = "12.1.0"
+
+# OpenAI API compatibility
+OPENAI_API_BASE = "/v1"
+OPENAI_SERVE_CHAT = "true"
+OPENAI_SERVE_COMPLETIONS = "true"
+
+# Hugging Face configuration (required for model download)
+HF_TOKEN = "${HF_TOKEN}"
+HF_HOME = "/runpod-volume/hf_cache"
+TRANSFORMERS_CACHE = "/runpod-volume/transformers_cache"
+
+# Performance optimization
+MAX_CONCURRENT_REQUESTS = "256"
+MAX_SEQ_LEN = "4096"
+MAX_BATCH_SIZE = "32"
+SWAP_SPACE = "16"
+
+# Logging configuration
+LOG_LEVEL = "INFO"
+RUNPOD_DEBUG = "false"
+
+# Security and networking
+RUNPOD_WEBHOOK_GET_JOB_TIMEOUT = "600"
+RUNPOD_WEBHOOK_POST_OUTPUT_TIMEOUT = "60"
+
+[deployment]
+# Deployment settings
+endpoint_name = "olmocr-vllm-endpoint"
+regions = ["US-OR-1", "US-TX-1", "EU-RO-1"]
+
+# Resource allocation
+gpu_count = 1
+cpu_count = 8
+memory_gb = 32
+
+# Network configuration
+network_storage = true
+volume_size_gb = 100
+volume_mount_path = "/runpod-volume"
+
+# Health check configuration
+[health_check]
+enabled = true
+endpoint = "/health"
+timeout_seconds = 30
+interval_seconds = 60
+
+# Worker template configuration
+[worker]
+# Runtime configuration
+max_job_timeout = 600
+max_idle_time = 300
+
+# Custom handler configuration (if using custom worker)
+handler_path = "src/handler.py"
+handler_function = "handler"
+
+# Input/output configuration
+[input_schema]
+# JSON schema for input validation
+type = "object"
+properties = {
+    model = { type = "string", default = "allenai/olmOCR-7B-0225-preview" },
+    messages = { type = "array" },
+    max_tokens = { type = "integer", default = 4096 },
+    temperature = { type = "number", default = 0.1 },
+    top_p = { type = "number", default = 0.9 },
+    stream = { type = "boolean", default = false }
+}
+required = ["messages"]
+
+[output_schema]
+# JSON schema for output validation
+type = "object"
+properties = {
+    choices = { type = "array" },
+    usage = { type = "object" },
+    model = { type = "string" }
+}
+
+# Advanced configuration
+[advanced]
+# Docker build options
+docker_build_args = [
+    "--build-arg CUDA_VERSION=12.1",
+    "--build-arg PYTHON_VERSION=3.11"
+]
+
+# Custom runtime options
+runtime_env = {
+    PYTHONPATH = "/workspace",
+    CUDA_VISIBLE_DEVICES = "0",
+    PYTORCH_CUDA_ALLOC_CONF = "max_split_size_mb:512"
+}
+
+# Monitoring and observability
+[monitoring]
+enable_metrics = true
+enable_logging = true
+log_retention_days = 7
+
+# Auto-scaling configuration
+[autoscaling]
+target_utilization = 70
+scale_up_delay = 30
+scale_down_delay = 300
+min_replicas = 0
+max_replicas = 10

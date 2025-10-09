@@ -1,0 +1,171 @@
+# DigitalOcean App Platform Configuration for OLMocr vLLM
+# Supports GPU instances for AI model deployment
+
+name: olmocr-vllm-app
+region: nyc
+
+services:
+  - name: olmocr-api
+    source_dir: /
+
+    # GitHub repository configuration
+    git:
+      repo_clone_url: https://github.com/your-username/olmocr-deployment.git
+      branch: main
+
+    # Or use GitLab
+    # gitlab:
+    #   repo: your-username/olmocr-deployment
+    #   branch: main
+
+    # Build configuration
+    build_command: |
+      pip install --upgrade pip
+      pip install -r requirements.txt
+
+    # Run configuration
+    run_command: python app.py
+
+    # Resource configuration with GPU
+    instance_count: 1
+    instance_size_slug: gpu-h100-1x  # gpu-rtx6000-1x, gpu-h100-1x
+
+    # HTTP configuration
+    http_port: 8080
+    routes:
+      - path: /
+        preserve_path_prefix: true
+
+    # Health check
+    health_check:
+      http_path: /health
+      initial_delay_seconds: 60
+      period_seconds: 30
+      timeout_seconds: 10
+      success_threshold: 1
+      failure_threshold: 3
+
+    # Environment variables
+    envs:
+      - key: MODEL_NAME
+        value: allenai/olmOCR-7B-0225-preview
+        type: SECRET
+
+      - key: GPU_MEMORY_UTILIZATION
+        value: "0.9"
+        type: SECRET
+
+      - key: DTYPE
+        value: bfloat16
+        type: SECRET
+
+      - key: TRUST_REMOTE_CODE
+        value: "true"
+        type: SECRET
+
+      - key: MAX_MODEL_LEN
+        value: "4096"
+        type: SECRET
+
+      - key: PORT
+        value: "8080"
+        type: SECRET
+
+      - key: ENVIRONMENT
+        value: production
+        type: SECRET
+
+      # HuggingFace token (set via DigitalOcean control panel)
+      - key: HF_TOKEN
+        scope: RUN_TIME
+        type: SECRET
+
+      # DigitalOcean Spaces configuration (optional for model caching)
+      - key: DO_SPACES_ENDPOINT
+        value: https://nyc3.digitaloceanspaces.com
+        type: SECRET
+
+      - key: DO_SPACES_BUCKET
+        value: olmocr-models
+        type: SECRET
+
+      - key: DO_SPACES_ACCESS_KEY
+        scope: RUN_TIME
+        type: SECRET
+
+      - key: DO_SPACES_SECRET_KEY
+        scope: RUN_TIME
+        type: SECRET
+
+    # Auto-scaling configuration
+    autoscaling:
+      min_instance_count: 0
+      max_instance_count: 3
+      metrics:
+        cpu:
+          percent: 80
+        memory:
+          percent: 80
+
+# Database configuration (optional - for caching)
+databases:
+  - name: cache-redis
+    engine: REDIS
+    version: "7"
+    size: db-s-1vcpu-1gb
+    num_nodes: 1
+    production: true
+
+# Static sites (if you have a frontend)
+static_sites:
+  - name: olmocr-frontend
+    source_dir: /frontend
+    github:
+      repo: your-username/olmocr-deployment
+      branch: main
+    build_command: |
+      npm install
+      npm run build
+    output_dir: /dist
+    index_document: index.html
+    error_document: 404.html
+    routes:
+      - path: /ui
+
+# Domain configuration
+domains:
+  - domain: olmocr-api.yourdomain.com
+    type: PRIMARY
+    minimum_tls_version: "1.2"
+
+# Jobs (optional - for model preloading or maintenance)
+jobs:
+  - name: model-preload
+    source_dir: /
+    github:
+      repo: your-username/olmocr-deployment
+      branch: main
+    run_command: python scripts/preload_model.py
+    instance_count: 1
+    instance_size_slug: gpu-h100-1x
+    kind: PRE_DEPLOY
+
+# Alerts (optional)
+alerts:
+  - rule: CPU_UTILIZATION
+    description: High CPU usage
+    operator: GREATER_THAN
+    value: 85
+    window: 5m
+    disabled: false
+
+  - rule: MEM_UTILIZATION
+    description: High memory usage
+    operator: GREATER_THAN
+    value: 90
+    window: 5m
+    disabled: false
+
+# Features
+features:
+  - buildpack-stack=ubuntu-22

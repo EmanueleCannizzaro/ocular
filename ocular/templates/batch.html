@@ -1,0 +1,383 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('Batch Processing') }} - {{ _('Ocular OCR') }}{% endblock %}
+
+{% block content %}
+<div id="batch-processing-page" class="container-fluid py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <h1 class="h3 mb-1">
+                        <i class="fas fa-tasks me-2 text-primary"></i>
+                        {{ _('Batch Processing & Job Queue') }}
+                    </h1>
+                    <p class="text-muted mb-0">{{ _('Manage batch OCR jobs and scheduled processing') }}</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <button id="create-batch-btn" class="btn btn-primary">
+                        <i class="fas fa-plus me-1"></i>
+                        {{ _('New Batch Job') }}
+                    </button>
+                    <button id="create-schedule-btn" class="btn btn-success">
+                        <i class="fas fa-calendar-plus me-1"></i>
+                        {{ _('New Schedule') }}
+                    </button>
+                    <button id="refresh-btn" class="btn btn-outline-secondary">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="stat-card success">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-uppercase mb-1" style="opacity: 0.9;">{{ _('Active Jobs') }}</h6>
+                        <h2 class="mb-0" id="active-jobs-count">0</h2>
+                    </div>
+                    <i class="fas fa-play-circle fa-2x" style="opacity: 0.5;"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card warning">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-uppercase mb-1" style="opacity: 0.9;">{{ _('Queued Jobs') }}</h6>
+                        <h2 class="mb-0" id="queued-jobs-count">0</h2>
+                    </div>
+                    <i class="fas fa-hourglass-half fa-2x" style="opacity: 0.5;"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card info">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-uppercase mb-1" style="opacity: 0.9;">{{ _('Schedules') }}</h6>
+                        <h2 class="mb-0" id="schedules-count">0</h2>
+                    </div>
+                    <i class="fas fa-calendar-alt fa-2x" style="opacity: 0.5;"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card primary">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-uppercase mb-1" style="opacity: 0.9;">{{ _('Files Processed') }}</h6>
+                        <h2 class="mb-0" id="files-processed-count">0</h2>
+                    </div>
+                    <i class="fas fa-file-alt fa-2x" style="opacity: 0.5;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabs -->
+    <ul class="nav nav-tabs" id="batchTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="jobs-tab" data-bs-toggle="tab" data-bs-target="#jobs" type="button" role="tab">
+                <i class="fas fa-tasks me-1"></i>
+                {{ _('Batch Jobs') }}
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="schedules-tab" data-bs-toggle="tab" data-bs-target="#schedules" type="button" role="tab">
+                <i class="fas fa-calendar-alt me-1"></i>
+                {{ _('Schedules') }}
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="queue-tab" data-bs-toggle="tab" data-bs-target="#queue" type="button" role="tab">
+                <i class="fas fa-list-ol me-1"></i>
+                {{ _('Queue View') }}
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="batchTabContent">
+        <!-- Batch Jobs Tab -->
+        <div class="tab-pane fade show active" id="jobs" role="tabpanel">
+            <div class="row">
+                <!-- Filters -->
+                <div class="col-12 mb-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-3">
+                                    <select class="form-select" id="status-filter">
+                                        <option value="">{{ _('All Statuses') }}</option>
+                                        <option value="PENDING">{{ _('Pending') }}</option>
+                                        <option value="QUEUED">{{ _('Queued') }}</option>
+                                        <option value="PROCESSING">{{ _('Processing') }}</option>
+                                        <option value="COMPLETED">{{ _('Completed') }}</option>
+                                        <option value="FAILED">{{ _('Failed') }}</option>
+                                        <option value="CANCELLED">{{ _('Cancelled') }}</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <select class="form-select" id="priority-filter">
+                                        <option value="">{{ _('All Priorities') }}</option>
+                                        <option value="URGENT">{{ _('Urgent') }}</option>
+                                        <option value="HIGH">{{ _('High') }}</option>
+                                        <option value="NORMAL">{{ _('Normal') }}</option>
+                                        <option value="LOW">{{ _('Low') }}</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <input type="text" class="form-control" id="search-jobs" placeholder="{{ _('Search jobs...') }}">
+                                </div>
+                                <div class="col-md-3">
+                                    <button class="btn btn-outline-secondary w-100" id="clear-filters-btn">
+                                        <i class="fas fa-times me-1"></i>
+                                        {{ _('Clear Filters') }}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Jobs List -->
+                <div class="col-12">
+                    <div id="jobs-container" class="row g-3">
+                        <!-- Jobs will be loaded here dynamically -->
+                        <div class="col-12 text-center py-5">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">{{ _('Loading...') }}</span>
+                            </div>
+                            <p class="mt-3 text-muted">{{ _('Loading batch jobs...') }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Schedules Tab -->
+        <div class="tab-pane fade" id="schedules" role="tabpanel">
+            <div id="schedules-container" class="row g-3">
+                <!-- Schedules will be loaded here dynamically -->
+                <div class="col-12 text-center py-5">
+                    <div class="spinner-border text-success" role="status">
+                        <span class="visually-hidden">{{ _('Loading...') }}</span>
+                    </div>
+                    <p class="mt-3 text-muted">{{ _('Loading schedules...') }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Queue View Tab -->
+        <div class="tab-pane fade" id="queue" role="tabpanel">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-stream me-2"></i>
+                        {{ _('Processing Queue') }}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div id="queue-container">
+                        <!-- Queue items will be loaded here -->
+                        <div class="text-center py-4">
+                            <p class="text-muted">{{ _('Queue is empty') }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Batch Job Modal -->
+<div class="modal fade" id="createBatchModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-plus-circle me-2"></i>
+                    {{ _('Create Batch Job') }}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="create-batch-form">
+                    <div class="mb-3">
+                        <label for="batch-job-name" class="form-label">{{ _('Job Name') }}</label>
+                        <input type="text" class="form-control" id="batch-job-name" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="batch-files" class="form-label">{{ _('Files') }}</label>
+                        <input type="file" class="form-control" id="batch-files" multiple accept=".pdf,.png,.jpg,.jpeg,.bmp,.tiff,.webp" required>
+                        <div class="form-text">{{ _('Select multiple files to process') }}</div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="batch-provider" class="form-label">{{ _('OCR Provider') }}</label>
+                            <select class="form-select" id="batch-provider">
+                                <option value="mistral">{{ _('Mistral AI') }}</option>
+                                <option value="google_vision">{{ _('Google Vision') }}</option>
+                                <option value="aws_textract">{{ _('AWS Textract') }}</option>
+                                <option value="tesseract">{{ _('Tesseract') }}</option>
+                                <option value="olm_ocr">{{ _('OLM OCR') }}</option>
+                                <option value="rolm_ocr">{{ _('RoLM OCR') }}</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="batch-strategy" class="form-label">{{ _('Processing Strategy') }}</label>
+                            <select class="form-select" id="batch-strategy">
+                                <option value="single">{{ _('Single Provider') }}</option>
+                                <option value="fallback">{{ _('Fallback Chain') }}</option>
+                                <option value="ensemble">{{ _('Ensemble') }}</option>
+                                <option value="best">{{ _('Best Quality') }}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="batch-priority" class="form-label">{{ _('Priority') }}</label>
+                            <select class="form-select" id="batch-priority">
+                                <option value="URGENT">{{ _('Urgent') }}</option>
+                                <option value="HIGH">{{ _('High') }}</option>
+                                <option value="NORMAL" selected>{{ _('Normal') }}</option>
+                                <option value="LOW">{{ _('Low') }}</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="batch-size" class="form-label">{{ _('Batch Size (Concurrent Files)') }}</label>
+                            <input type="number" class="form-control" id="batch-size" value="5" min="1" max="20">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="batch-retry" checked>
+                            <label class="form-check-label" for="batch-retry">
+                                {{ _('Retry failed files (up to 3 attempts)') }}
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Cancel') }}</button>
+                <button type="button" class="btn btn-primary" id="submit-batch-btn">
+                    <i class="fas fa-play me-1"></i>
+                    {{ _('Create and Start') }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Schedule Modal -->
+<div class="modal fade" id="createScheduleModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-calendar-plus me-2"></i>
+                    {{ _('Create Scheduled Job') }}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="create-schedule-form">
+                    <div class="mb-3">
+                        <label for="schedule-name" class="form-label">{{ _('Schedule Name') }}</label>
+                        <input type="text" class="form-control" id="schedule-name" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="schedule-type" class="form-label">{{ _('Schedule Type') }}</label>
+                        <select class="form-select" id="schedule-type">
+                            <option value="ONCE">{{ _('Run Once') }}</option>
+                            <option value="HOURLY">{{ _('Hourly') }}</option>
+                            <option value="DAILY" selected>{{ _('Daily') }}</option>
+                            <option value="WEEKLY">{{ _('Weekly') }}</option>
+                            <option value="MONTHLY">{{ _('Monthly') }}</option>
+                            <option value="CRON">{{ _('CRON Expression') }}</option>
+                        </select>
+                    </div>
+
+                    <div id="schedule-config-container" class="mb-3">
+                        <!-- Dynamic schedule configuration will be inserted here -->
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="schedule-source-path" class="form-label">{{ _('Source Path') }}</label>
+                        <input type="text" class="form-control" id="schedule-source-path" placeholder="/data/incoming/*.pdf" required>
+                        <div class="form-text">{{ _('File pattern or directory to process') }}</div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="schedule-provider" class="form-label">{{ _('OCR Provider') }}</label>
+                            <select class="form-select" id="schedule-provider">
+                                <option value="mistral">{{ _('Mistral AI') }}</option>
+                                <option value="google_vision">{{ _('Google Vision') }}</option>
+                                <option value="aws_textract">{{ _('AWS Textract') }}</option>
+                                <option value="tesseract">{{ _('Tesseract') }}</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="schedule-strategy" class="form-label">{{ _('Processing Strategy') }}</label>
+                            <select class="form-select" id="schedule-strategy">
+                                <option value="single">{{ _('Single Provider') }}</option>
+                                <option value="fallback">{{ _('Fallback Chain') }}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="schedule-enabled" checked>
+                            <label class="form-check-label" for="schedule-enabled">
+                                {{ _('Enable schedule immediately') }}
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Cancel') }}</button>
+                <button type="button" class="btn btn-success" id="submit-schedule-btn">
+                    <i class="fas fa-save me-1"></i>
+                    {{ _('Create Schedule') }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Job Details Modal -->
+<div class="modal fade" id="jobDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="job-details-title">
+                    <i class="fas fa-info-circle me-2"></i>
+                    {{ _('Job Details') }}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="job-details-body">
+                <!-- Job details will be loaded here -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', path='js/batch.js') }}"></script>
+{% endblock %}

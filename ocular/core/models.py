@@ -5,7 +5,7 @@ Core data models for Ocular OCR system.
 from typing import Optional, List, Dict, Any, Union
 from datetime import datetime
 from pathlib import Path
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, ConfigDict
 
 from .enums import ProviderType, ProcessingStrategy, DocumentType, ProcessingStatus
 
@@ -19,13 +19,6 @@ class OCRResult(BaseModel):
     provider: str = Field(..., description="Provider that generated this result")
     processing_time: Optional[float] = Field(None, ge=0.0, description="Processing time in seconds")
     metadata: Dict[str, Any] = Field(default_factory=dict, description="Additional metadata")
-    
-    @field_validator('confidence')
-    @classmethod
-    def validate_confidence(cls, v):
-        if v is not None and not (0.0 <= v <= 1.0):
-            raise ValueError('Confidence must be between 0.0 and 1.0')
-        return v
 
 
 class ProcessingRequest(BaseModel):
@@ -36,9 +29,6 @@ class ProcessingRequest(BaseModel):
     providers: List[ProviderType] = Field(default=[ProviderType.MISTRAL], description="OCR providers to use")
     prompt: Optional[str] = Field(None, description="Custom processing prompt")
     options: Dict[str, Any] = Field(default_factory=dict, description="Additional processing options")
-    
-    class Config:
-        use_enum_values = True
 
 
 class ProcessingResult(BaseModel):
@@ -60,13 +50,10 @@ class ProcessingResult(BaseModel):
     
     # Error information
     errors: List[str] = Field(default_factory=list, description="Any errors that occurred")
-    
-    class Config:
-        use_enum_values = True
-        json_encoders = {
-            Path: str,
-            datetime: lambda v: v.isoformat()
-        }
+
+    model_config = ConfigDict(
+        use_enum_values=False,
+    )
     
     def get_text(self) -> str:
         """Get the primary extracted text."""
@@ -147,20 +134,22 @@ class ProviderConfig(BaseModel):
     enabled: bool = Field(True, description="Whether provider is enabled")
     priority: int = Field(1, description="Provider priority (lower = higher priority)")
     config: Dict[str, Any] = Field(default_factory=dict, description="Provider-specific configuration")
-    
-    class Config:
-        use_enum_values = True
+
+    model_config = ConfigDict(
+        use_enum_values=True,
+    )
 
 
 class BatchProcessingRequest(BaseModel):
     """Request for batch processing of multiple documents."""
     
-    file_paths: List[Path] = Field(..., min_items=1, description="Paths to documents to process")
+    file_paths: List[Path] = Field(..., min_length=1, description="Paths to documents to process")
     strategy: ProcessingStrategy = Field(ProcessingStrategy.FALLBACK, description="Processing strategy")
     providers: List[ProviderType] = Field(default=[ProviderType.MISTRAL], description="OCR providers to use")
     prompt: Optional[str] = Field(None, description="Custom processing prompt")
     max_concurrent: int = Field(3, ge=1, le=10, description="Maximum concurrent processing")
     options: Dict[str, Any] = Field(default_factory=dict, description="Additional processing options")
-    
-    class Config:
-        use_enum_values = True
+
+    model_config = ConfigDict(
+        use_enum_values=True,
+    )

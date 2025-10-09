@@ -8,7 +8,7 @@ import json
 from typing import Optional, Dict, Any, List
 from pathlib import Path
 from pydantic import Field, field_validator
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from ..core.enums import ProviderType
 from ..core.exceptions import ValidationError, ConfigurationError
@@ -19,48 +19,48 @@ class ProviderSettings(BaseSettings):
     """Settings for OCR providers."""
     
     # Mistral AI settings
-    mistral_api_key: Optional[str] = Field(None, env="MISTRAL_API_KEY")
-    mistral_model: str = Field("pixtral-12b-2409", env="MISTRAL_MODEL")
-    mistral_timeout: int = Field(30, env="MISTRAL_TIMEOUT")
-    mistral_max_retries: int = Field(3, env="MISTRAL_MAX_RETRIES")
+    mistral_api_key: Optional[str] = Field(None, alias="MISTRAL_API_KEY")
+    mistral_model: str = Field("pixtral-12b-2409", alias="MISTRAL_MODEL")
+    mistral_timeout: int = Field(30, alias="MISTRAL_TIMEOUT")
+    mistral_max_retries: int = Field(3, alias="MISTRAL_MAX_RETRIES")
     
     # RunPod OLM OCR settings
-    olm_api_endpoint: Optional[str] = Field(None, env="OLM_API_ENDPOINT")
-    olm_api_key: Optional[str] = Field(None, env="OLM_API_KEY")
-    olm_model_name: str = Field("allenai/OLMo-7B-0724-hf", env="OLM_MODEL_NAME")
-    olm_timeout: int = Field(60, env="OLM_TIMEOUT")
+    olm_api_endpoint: Optional[str] = Field(None, alias="OLM_API_ENDPOINT")
+    olm_api_key: Optional[str] = Field(None, alias="OLM_API_KEY")
+    olm_model_name: str = Field("allenai/OLMo-7B-0724-hf", alias="OLM_MODEL_NAME")
+    olm_timeout: int = Field(60, alias="OLM_TIMEOUT")
     
     # RunPod RoLM OCR settings
-    rolm_api_endpoint: Optional[str] = Field(None, env="ROLM_API_ENDPOINT")
-    rolm_api_key: Optional[str] = Field(None, env="ROLM_API_KEY")
-    rolm_model_name: str = Field("microsoft/trocr-large-printed", env="ROLM_MODEL_NAME")
-    rolm_timeout: int = Field(60, env="ROLM_TIMEOUT")
+    rolm_api_endpoint: Optional[str] = Field(None, alias="ROLM_API_ENDPOINT")
+    rolm_api_key: Optional[str] = Field(None, alias="ROLM_API_KEY")
+    rolm_model_name: str = Field("microsoft/trocr-large-printed", alias="ROLM_MODEL_NAME")
+    rolm_timeout: int = Field(60, alias="ROLM_TIMEOUT")
     
     # Google Cloud Vision API settings
-    google_credentials_path: Optional[str] = Field(None, env="GOOGLE_APPLICATION_CREDENTIALS")
-    google_project_id: Optional[str] = Field(None, env="GOOGLE_PROJECT_ID")
-    google_timeout: int = Field(30, env="GOOGLE_TIMEOUT")
+    google_credentials_path: Optional[str] = Field(None, alias="GOOGLE_APPLICATION_CREDENTIALS")
+    google_project_id: Optional[str] = Field(None, alias="GOOGLE_PROJECT_ID")
+    google_timeout: int = Field(30, alias="GOOGLE_TIMEOUT")
     
     # AWS Textract settings
-    aws_region: str = Field("us-east-1", env="AWS_REGION")
-    aws_access_key_id: Optional[str] = Field(None, env="AWS_ACCESS_KEY_ID")
-    aws_secret_access_key: Optional[str] = Field(None, env="AWS_SECRET_ACCESS_KEY")
-    aws_session_token: Optional[str] = Field(None, env="AWS_SESSION_TOKEN")
-    aws_timeout: int = Field(60, env="AWS_TIMEOUT")
+    aws_region: str = Field("us-east-1", alias="AWS_REGION")
+    aws_access_key_id: Optional[str] = Field(None, alias="AWS_ACCESS_KEY_ID")
+    aws_secret_access_key: Optional[str] = Field(None, alias="AWS_SECRET_ACCESS_KEY")
+    aws_session_token: Optional[str] = Field(None, alias="AWS_SESSION_TOKEN")
+    aws_timeout: int = Field(60, alias="AWS_TIMEOUT")
     
     # Tesseract OCR settings
-    tesseract_language: str = Field("eng", env="TESSERACT_LANGUAGE")
-    tesseract_dpi: int = Field(300, env="TESSERACT_DPI")
-    tesseract_timeout: int = Field(30, env="TESSERACT_TIMEOUT")
-    tesseract_cmd: Optional[str] = Field(None, env="TESSERACT_CMD")
+    tesseract_language: str = Field("eng", alias="TESSERACT_LANGUAGE")
+    tesseract_dpi: int = Field(300, alias="TESSERACT_DPI")
+    tesseract_timeout: int = Field(30, alias="TESSERACT_TIMEOUT")
+    tesseract_cmd: Optional[str] = Field(None, alias="TESSERACT_CMD")
     
     # Azure Document Intelligence settings
-    azure_doc_intel_endpoint: Optional[str] = Field(None, env="AZURE_DOC_INTEL_ENDPOINT")
-    azure_doc_intel_api_key: Optional[str] = Field(None, env="AZURE_DOC_INTEL_API_KEY")
-    azure_doc_intel_timeout: int = Field(120, env="AZURE_DOC_INTEL_TIMEOUT")
+    azure_doc_intel_endpoint: Optional[str] = Field(None, alias="AZURE_DOC_INTEL_ENDPOINT")
+    azure_doc_intel_api_key: Optional[str] = Field(None, alias="AZURE_DOC_INTEL_API_KEY")
+    azure_doc_intel_timeout: int = Field(120, alias="AZURE_DOC_INTEL_TIMEOUT")
     
     # Local model settings (deprecated but kept for backward compatibility)
-    device: str = Field("auto", env="DEVICE")  # auto, cpu, cuda
+    device: str = Field("auto", alias="DEVICE")  # auto, cpu, cuda
     
     # Provider priorities
     provider_priorities: Dict[str, int] = Field(
@@ -73,13 +73,13 @@ class ProviderSettings(BaseSettings):
             "olm_ocr": 6, 
             "rolm_ocr": 7
         },
-        env="PROVIDER_PRIORITIES"
+        alias="PROVIDER_PRIORITIES"
     )
     
     # Enabled providers
     enabled_providers: List[str] = Field(
         default=["mistral", "tesseract"],
-        env="ENABLED_PROVIDERS"
+        alias="ENABLED_PROVIDERS"
     )
     
     @field_validator('device')
@@ -96,23 +96,26 @@ class ProviderSettings(BaseSettings):
         if isinstance(v, str):
             return [p.strip() for p in v.split(',') if p.strip()]
         return v
-    
-    class Config:
-        env_prefix = ""  # No prefix for provider settings to use direct env vars
-        case_sensitive = False
-        extra = "ignore"
+
+    model_config = SettingsConfigDict(
+        env_prefix="",  # No prefix for provider settings to use direct env vars
+        case_sensitive=False,
+        extra="ignore",
+        env_file=".env",
+        env_file_encoding="utf-8",
+    )
 
 
 class FileSettings(BaseSettings):
     """Settings for file handling."""
     
-    max_file_size_mb: int = Field(10, env="MAX_FILE_SIZE_MB")
+    max_file_size_mb: int = Field(10, alias="MAX_FILE_SIZE_MB")
     allowed_extensions: List[str] = Field(
         default=[".pdf", ".jpg", ".jpeg", ".png", ".bmp", ".tiff", ".webp"],
-        env="ALLOWED_EXTENSIONS"
+        alias="ALLOWED_EXTENSIONS"
     )
-    temp_dir: Optional[Path] = Field(None, env="TEMP_DIR")
-    upload_dir: Optional[Path] = Field(None, env="UPLOAD_DIR")
+    temp_dir: Optional[Path] = Field(None, alias="TEMP_DIR")
+    upload_dir: Optional[Path] = Field(None, alias="UPLOAD_DIR")
     
     @field_validator('temp_dir', 'upload_dir', mode='before')
     @classmethod
@@ -125,20 +128,23 @@ class FileSettings(BaseSettings):
         if isinstance(v, str):
             return [ext.strip() for ext in v.split(',') if ext.strip()]
         return v
-    
-    class Config:
-        env_prefix = "OCULAR_FILE_"
-        extra = "ignore"
+
+    model_config = SettingsConfigDict(
+        env_prefix="OCULAR_FILE_",
+        extra="ignore",
+        env_file=".env",
+        env_file_encoding="utf-8",
+    )
 
 
 class ProcessingSettings(BaseSettings):
     """Settings for processing behavior."""
     
-    default_strategy: str = Field("fallback", env="DEFAULT_STRATEGY")
-    max_concurrent_requests: int = Field(5, env="MAX_CONCURRENT_REQUESTS")
-    request_timeout_seconds: int = Field(300, env="REQUEST_TIMEOUT_SECONDS")
-    enable_caching: bool = Field(True, env="ENABLE_CACHING")
-    cache_ttl_seconds: int = Field(3600, env="CACHE_TTL_SECONDS")
+    default_strategy: str = Field("fallback", alias="DEFAULT_STRATEGY")
+    max_concurrent_requests: int = Field(5, alias="MAX_CONCURRENT_REQUESTS")
+    request_timeout_seconds: int = Field(300, alias="REQUEST_TIMEOUT_SECONDS")
+    enable_caching: bool = Field(True, alias="ENABLE_CACHING")
+    cache_ttl_seconds: int = Field(3600, alias="CACHE_TTL_SECONDS")
     
     @field_validator('default_strategy')
     @classmethod
@@ -147,27 +153,30 @@ class ProcessingSettings(BaseSettings):
         if v not in valid_strategies:
             raise ValueError(f'Strategy must be one of: {valid_strategies}')
         return v
-    
-    class Config:
-        env_prefix = "OCULAR_PROCESSING_"
-        extra = "ignore"
+
+    model_config = SettingsConfigDict(
+        env_prefix="OCULAR_PROCESSING_",
+        extra="ignore",
+        env_file=".env",
+        env_file_encoding="utf-8",
+    )
 
 
 class WebSettings(BaseSettings):
     """Settings for web application."""
     
-    host: str = Field("0.0.0.0", env="HOST")
-    port: int = Field(8000, env="PORT")
-    debug: bool = Field(False, env="DEBUG")
-    reload: bool = Field(False, env="RELOAD")
+    host: str = Field("0.0.0.0", alias="HOST")
+    port: int = Field(8000, alias="PORT")
+    debug: bool = Field(False, alias="DEBUG")
+    reload: bool = Field(False, alias="RELOAD")
     
     # Security settings
-    cors_origins: List[str] = Field(default=["*"], env="CORS_ORIGINS")
-    max_request_size_mb: int = Field(50, env="MAX_REQUEST_SIZE_MB")
+    cors_origins: List[str] = Field(default=["*"], alias="CORS_ORIGINS")
+    max_request_size_mb: int = Field(50, alias="MAX_REQUEST_SIZE_MB")
     
     # Static files
-    static_dir: Path = Field(Path("web/static"), env="STATIC_DIR")
-    template_dir: Path = Field(Path("web/templates"), env="TEMPLATE_DIR")
+    static_dir: Path = Field(default=Path("web/static"), alias="STATIC_DIR")
+    template_dir: Path = Field(default=Path("web/templates"), alias="TEMPLATE_DIR")
     
     @field_validator('cors_origins', mode='before')
     @classmethod
@@ -180,23 +189,26 @@ class WebSettings(BaseSettings):
     @classmethod
     def parse_path(cls, v):
         return Path(v) if isinstance(v, str) else v
-    
-    class Config:
-        env_prefix = "OCULAR_WEB_"
-        extra = "ignore"
+
+    model_config = SettingsConfigDict(
+        env_prefix="OCULAR_WEB_",
+        extra="ignore",
+        env_file=".env",
+        env_file_encoding="utf-8",
+    )
 
 
 class LoggingSettings(BaseSettings):
     """Settings for logging."""
     
-    level: str = Field("INFO", env="LOG_LEVEL")
+    level: str = Field(default="INFO", alias="LOG_LEVEL")
     format: str = Field(
-        "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-        env="LOG_FORMAT"
+        default="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        alias="LOG_FORMAT"
     )
-    file_path: Optional[Path] = Field(None, env="LOG_FILE")
-    max_file_size_mb: int = Field(10, env="LOG_MAX_FILE_SIZE_MB")
-    backup_count: int = Field(5, env="LOG_BACKUP_COUNT")
+    file_path: Optional[Path] = Field(None, alias="LOG_FILE")
+    max_file_size_mb: int = Field(10, alias="LOG_MAX_FILE_SIZE_MB")
+    backup_count: int = Field(5, alias="LOG_BACKUP_COUNT")
     
     @field_validator('level')
     @classmethod
@@ -210,17 +222,20 @@ class LoggingSettings(BaseSettings):
     @classmethod
     def parse_path(cls, v):
         return Path(v) if v else None
-    
-    class Config:
-        env_prefix = "OCULAR_LOG_"
-        extra = "ignore"
+
+    model_config = SettingsConfigDict(
+        env_prefix="OCULAR_LOG_",
+        extra="ignore",
+        env_file=".env",
+        env_file_encoding="utf-8",
+    )
 
 
 class OcularSettings(BaseSettings, ConfigurationProvider):
     """Main settings class combining all configuration with validation and management."""
     
     # Environment
-    environment: str = Field("development", env="ENVIRONMENT")
+    environment: str = Field("development", alias="ENVIRONMENT")
     
     # Sub-configurations
     providers: ProviderSettings = Field(default_factory=ProviderSettings)
@@ -677,9 +692,10 @@ class OcularSettings(BaseSettings, ConfigurationProvider):
             valid_origins.append(origin)
         
         return valid_origins
-    
-    class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
-        case_sensitive = False
-        extra = "ignore"
+
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        case_sensitive=False,
+        extra="ignore",
+    )

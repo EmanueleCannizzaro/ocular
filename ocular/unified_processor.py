@@ -9,11 +9,10 @@ from enum import Enum
 import time
 
 from .providers import BaseOCRProvider, ProviderFactory
-from .providers.settings import OcularSettings
+from .settings import get_settings, Settings
 from .core.models import OCRResult
 from .core.enums import ProviderType, ProcessingStrategy
-from .config import OcularConfig
-from .exceptions import DocumentProcessingError, ConfigurationError
+from .core.exceptions import DocumentProcessingError, ConfigurationError
 
 
 class UnifiedProcessingResult:
@@ -95,30 +94,67 @@ class UnifiedProcessingResult:
 class UnifiedDocumentProcessor:
     """Unified document processor supporting multiple OCR providers."""
     
-    def __init__(self, config: Optional[Union[OcularConfig, OcularSettings]] = None):
+    def __init__(self, settings: Optional[Settings] = None):
         """Initialize the unified processor."""
-        # Use OcularSettings as default since it's more comprehensive
-        if config is None:
-            self.config = OcularSettings()
+        # Use new settings system
+        if settings is None:
+            self.settings = get_settings()
         else:
-            self.config = config
+            self.settings = settings
         self.providers: Dict[ProviderType, BaseOCRProvider] = {}
         self._configs = self._prepare_provider_configs()
     
     def _prepare_provider_configs(self) -> Dict[ProviderType, Dict[str, Any]]:
         """Prepare configuration for each provider type."""
         configs = {}
-        
-        # Use get_provider_config method from OcularSettings
+
+        # Use new settings system to prepare provider configs
         for provider_type in ProviderType:
             try:
-                provider_config = self.config.get_provider_config(provider_type)
+                provider_config = self._get_provider_config(provider_type)
                 if provider_config and self._is_provider_config_valid(provider_type, provider_config):
                     configs[provider_type] = provider_config
             except Exception as e:
                 print(f"Warning: Could not get config for {provider_type.value}: {e}")
-        
+
         return configs
+
+    def _get_provider_config(self, provider_type: ProviderType) -> Dict[str, Any]:
+        """Get configuration for a specific provider type."""
+        if provider_type == ProviderType.MISTRAL:
+            return {
+                "api_key": self.settings.ocr_providers.mistral_api_key,
+                "model": self.settings.ocr_providers.mistral_model,
+            }
+        elif provider_type == ProviderType.GOOGLE_VISION:
+            return {
+                "credentials_path": self.settings.ocr_providers.google_application_credentials,
+                "project_id": self.settings.ocr_providers.google_project_id,
+            }
+        elif provider_type == ProviderType.AWS_TEXTRACT:
+            return {
+                "aws_access_key_id": self.settings.ocr_providers.aws_access_key_id,
+                "aws_secret_access_key": self.settings.ocr_providers.aws_secret_access_key,
+                "region": self.settings.ocr_providers.aws_region,
+            }
+        elif provider_type == ProviderType.AZURE_DOCUMENT_INTELLIGENCE:
+            return {
+                "endpoint": self.settings.ocr_providers.azure_doc_intel_endpoint,
+                "api_key": self.settings.ocr_providers.azure_doc_intel_api_key,
+            }
+        elif provider_type == ProviderType.TESSERACT:
+            return {
+                "language": self.settings.ocr_providers.tesseract_language,
+                "dpi": self.settings.ocr_providers.tesseract_dpi,
+            }
+        elif provider_type == ProviderType.OLM_OCR:
+            return {
+                "api_endpoint": self.settings.olmocr.runpod_url,
+                "api_key": self.settings.olmocr.runpod_api_key,
+                "model_name": self.settings.olmocr.model_name,
+            }
+        # Note: RoLM OCR would need its own settings section if implemented
+        return {}
     
     def _is_provider_config_valid(self, provider_type: ProviderType, config: Dict[str, Any]) -> bool:
         """Check if provider configuration is valid."""
@@ -342,15 +378,15 @@ class UnifiedDocumentProcessor:
         tasks = [process_with_semaphore(fp) for fp in file_paths]
         return await asyncio.gather(*tasks, return_exceptions=True)
     
-    def get_provider_stats(self) -> Dict[str, Dict[str, Any]]:
+    async def get_provider_stats(self) -> Dict[str, Dict[str, Any]]:
         """Get statistics about available providers."""
         stats = {}
-        
+
         for provider_type, provider in self.providers.items():
             stats[provider_type.value] = {
                 "name": provider.provider_name,
-                "available": provider.is_available(),
+                "available": await provider.is_available(),
                 "type": "API" if provider_type == ProviderType.MISTRAL else "Local"
             }
-        
+
         return stats

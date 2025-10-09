@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="{{ request.state.language if request.state.language is defined else 'en' }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ _('Ocular OCR Service') }}{% endblock %}</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="/static/css/base.css" rel="stylesheet">
+
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <!-- Top Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-eye me-2"></i>
+                {{ _('Ocular OCR Service') if _ is defined else 'Ocular OCR' }}
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <!-- Language Selector -->
+                    <li class="nav-item me-3">
+                        <select class="form-select form-select-sm language-selector" id="language-selector">
+                            {% set current_lang = request.state.language if request.state.language is defined else 'en' %}
+                            <option value="en" {% if current_lang == 'en' %}selected{% endif %}>🇬🇧 English</option>
+                            <option value="it" {% if current_lang == 'it' %}selected{% endif %}>🇮🇹 Italiano</option>
+                            <option value="es" {% if current_lang == 'es' %}selected{% endif %}>🇪🇸 Español</option>
+                            <option value="fr" {% if current_lang == 'fr' %}selected{% endif %}>🇫🇷 Français</option>
+                            <option value="de" {% if current_lang == 'de' %}selected{% endif %}>🇩🇪 Deutsch</option>
+                            <option value="ja" {% if current_lang == 'ja' %}selected{% endif %}>🇯🇵 日本語</option>
+                            <option value="zh_CN" {% if current_lang == 'zh_CN' %}selected{% endif %}>🇨🇳 简体中文</option>
+                        </select>
+                    </li>
+
+                    <!-- Notifications -->
+                    <li class="nav-item dropdown me-2">
+                        <a class="nav-link position-relative" href="#" id="notificationsDropdown" role="button" data-bs-toggle="dropdown" onclick="markNotificationsAsRead()">
+                            <i class="fas fa-bell"></i>
+                            <span id="notification-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem; display: none;">
+                                0
+                            </span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationsDropdown" style="min-width: 320px; max-height: 400px; overflow-y: auto;">
+                            <li><h6 class="dropdown-header">{{ _('Notifications') }}</h6></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <div id="notifications-list">
+                                <li class="text-center py-3">
+                                    <small class="text-muted">{{ _('Loading notifications...') }}</small>
+                                </li>
+                            </div>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-center" href="/notifications"><small>{{ _('View all') }}</small></a></li>
+                        </ul>
+                    </li>
+
+                    <!-- User Menu -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userMenuDropdown" role="button" data-bs-toggle="dropdown">
+                            {% if session and session.user %}
+                            <img src="{{ session.user.profile_image_url or 'https://ui-avatars.com/api/?name=' + (session.user.first_name or 'User') + '&background=0d6efd&color=fff&size=32' }}"
+                                 class="rounded-circle me-2" alt="{{ session.user.first_name or 'User' }}" width="32" height="32">
+                            <span class="d-none d-md-inline">{{ session.user.first_name or 'User' }}</span>
+                            {% else %}
+                            <img src="https://ui-avatars.com/api/?name=Guest&background=6c757d&color=fff&size=32"
+                                 class="rounded-circle me-2" alt="Guest" width="32" height="32">
+                            <span class="d-none d-md-inline">{{ _('Guest') }}</span>
+                            {% endif %}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end user-menu" aria-labelledby="userMenuDropdown">
+                            {% if session and session.user %}
+                            <li><h6 class="dropdown-header">{{ session.user.email_addresses[0].email_address if session.user.email_addresses else 'user@example.com' }}</h6></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item" href="/user-profile">
+                                    <i class="fas fa-user-circle me-2"></i> {{ _('Profile') }}
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="/billing">
+                                    <i class="fas fa-credit-card me-2"></i> {{ _('Billing') }}
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item" href="#" onclick="handleLogout(); return false;">
+                                    <i class="fas fa-sign-out-alt me-2"></i> {{ _('Logout') }}
+                                </a>
+                            </li>
+                            {% else %}
+                            <li>
+                                <a class="dropdown-item" href="/api/auth/login">
+                                    <i class="fas fa-sign-in-alt me-2"></i> {{ _('Login') }}
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="/api/auth/register">
+                                    <i class="fas fa-user-plus me-2"></i> {{ _('Sign Up') }}
+                                </a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <nav class="sidebar-nav">
+            <!-- Core Features -->
+            <div class="sidebar-section">{{ _('Core Features') }}</div>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">
+                        <i class="fas fa-upload"></i> {{ _('Upload') }}
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/batch">
+                        <i class="fas fa-tasks"></i> {{ _('Batch Processing') }}
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/document-history">
+                        <i class="fas fa-history"></i> {{ _('Document History') }}
+                    </a>
+                </li>
+            </ul>
+
+            <!-- Infrastructure -->
+            <div class="sidebar-section">{{ _('Infrastructure') }}</div>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" href="/deployments">
+                        <i class="fas fa-rocket"></i> {{ _('Deployments') }}
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/models">
+                        <i class="fas fa-cube"></i> {{ _('Models') }}
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/providers">
+                        <i class="fas fa-cloud"></i> {{ _('Providers') }}
+                    </a>
+                </li>
+            </ul>
+
+            <!-- Analytics & Monitoring -->
+            <div class="sidebar-section">{{ _('Analytics & Monitoring') }}</div>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" href="/analytics">
+                        <i class="fas fa-chart-line"></i> {{ _('Analytics') }}
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/observability">
+                        <i class="fas fa-eye"></i> {{ _('Observability') }}
+                    </a>
+                </li>
+            </ul>
+
+            <!-- System -->
+            <div class="sidebar-section">{{ _('System') }}</div>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" href="/settings">
+                        <i class="fas fa-sliders-h"></i> {{ _('Settings') }}
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <!-- Sidebar Toggle Button -->
+    <button class="btn btn-primary sidebar-toggle" id="sidebarToggle" type="button">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Main Content Area -->
+    <div class="main-content" id="mainContent">
+        <div class="container-fluid p-4">
+            {% if messages is defined and messages %}
+                <div class="mb-3">
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.category or 'info' }} alert-dismissible fade show" role="alert">
+                            {{ message.text or message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+
+    <footer class="bg-light py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="mb-0 text-muted">
+                        &copy; 2024 {{ _('Ocular OCR Service') }}.
+                        {{ _('Powered by Mistral AI, OLM OCR, and RoLM OCR') }}.
+                    </p>
+                </div>
+                <div class="col-md-6 text-end">
+                    <small class="text-muted">
+                        {{ _('Version') }} 0.1.0
+                    </small>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Font Awesome -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous"></script>
+
+    <!-- Chart.js for graphs -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+    <!-- Custom JS -->
+    <script src="/static/js/base.js"></script>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

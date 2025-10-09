@@ -6,6 +6,20 @@ Ocular: A Python package for OCR and data extraction using Mistral AI.
 import os
 from pathlib import Path
 
+from ocular.config import OcularConfig
+from ocular.core.enums import ProcessingStrategy, ProviderType
+from ocular.deployment.mistralocr import MistralOCRClient
+from ocular.exceptions import OcularError, OCRError, ConfigurationError
+from ocular.processor import DocumentProcessor
+from ocular.providers import ProviderFactory
+from ocular.pydantic_client import PydanticOCRClient
+from ocular.unified_processor import UnifiedDocumentProcessor
+
+
+# Backward compatibility alias
+OCRProvider = ProviderType
+
+
 def _load_env_on_import():
     """Load environment variables on package import."""
     try:
@@ -33,17 +47,6 @@ def _load_env_on_import():
 
 # Load environment variables
 _load_env_on_import()
-
-from .client import MistralOCRClient
-from .processor import DocumentProcessor
-from .pydantic_client import PydanticOCRClient
-from .unified_processor import UnifiedDocumentProcessor
-from .core.enums import ProcessingStrategy, ProviderType
-# Backward compatibility alias
-OCRProvider = ProviderType
-from .providers import ProviderFactory
-from .config import OcularConfig
-from .exceptions import OcularError, OCRError, ConfigurationError
 
 __version__ = "0.1.0"
 __all__ = [

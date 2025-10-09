@@ -1,0 +1,1170 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('Settings') }} - {{ _('Ocular OCR Service') }}{% endblock %}
+
+{% block head %}
+<link href="{{ url_for('static', path='css/settings.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <h1 class="h3 mb-1">
+                        <i class="fas fa-cog me-2 text-primary"></i>
+                        Settings & Configuration
+                    </h1>
+                    <p class="text-muted mb-0">{{ _('Manage all Ocular OCR system settings and configuration') }}</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <button id="save-all-btn" class="btn btn-success">
+                        <i class="fas fa-save me-1"></i>
+                        Save All Changes
+                    </button>
+                    <button id="reset-btn" class="btn btn-outline-secondary">
+                        <i class="fas fa-undo me-1"></i>
+                        Reset
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Configuration Status Overview -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div id="config-overview" class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-dashboard me-2"></i>
+                        Configuration Overview
+                    </h5>
+                    <div class="row" id="provider-status-overview">
+                        <!-- Status cards populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Tabs -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <ul class="nav nav-tabs card-header-tabs" id="settingsTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="application-tab" data-bs-toggle="tab" data-bs-target="#application" type="button" role="tab">
+                                <i class="fas fa-cogs me-1"></i>
+                                Application
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="database-tab" data-bs-toggle="tab" data-bs-target="#database" type="button" role="tab">
+                                <i class="fas fa-database me-1"></i>
+                                Database
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="auth-tab" data-bs-toggle="tab" data-bs-target="#auth" type="button" role="tab">
+                                <i class="fas fa-user-lock me-1"></i>
+                                Authentication
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="payments-tab" data-bs-toggle="tab" data-bs-target="#payments" type="button" role="tab">
+                                <i class="fas fa-credit-card me-1"></i>
+                                Payments
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="ai-models-tab" data-bs-toggle="tab" data-bs-target="#ai-models" type="button" role="tab">
+                                <i class="fas fa-robot me-1"></i>
+                                AI Models
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="cloud-providers-tab" data-bs-toggle="tab" data-bs-target="#cloud-providers" type="button" role="tab">
+                                <i class="fas fa-cloud me-1"></i>
+                                Cloud Providers
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="logging-tab" data-bs-toggle="tab" data-bs-target="#logging" type="button" role="tab">
+                                <i class="fas fa-file-alt me-1"></i>
+                                Logging
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="security-tab" data-bs-toggle="tab" data-bs-target="#security" type="button" role="tab">
+                                <i class="fas fa-shield-alt me-1"></i>
+                                Security
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="cache-tab" data-bs-toggle="tab" data-bs-target="#cache" type="button" role="tab">
+                                <i class="fas fa-bolt me-1"></i>
+                                Cache
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="card-body">
+                    <div class="tab-content" id="settingsTabContent">
+
+                        <!-- Application Settings Tab -->
+                        <div class="tab-pane fade show active" id="application" role="tabpanel">
+                            <div class="provider-config">
+                                <div class="provider-header mb-4">
+                                    <h4><i class="fas fa-cogs me-2"></i>Application Settings</h4>
+                                    <p class="text-muted">{{ _('Main application configuration and behavior') }}</p>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h6 class="text-secondary mb-3">{{ _('Basic Configuration') }}</h6>
+
+                                        <div class="mb-3">
+                                            <label for="app-title" class="form-label">{{ _('Application Title') }}</label>
+                                            <input type="text" class="form-control" id="app-title" placeholder="{{ _('Ocular OCR Service') }}">
+                                            <div class="form-text">Display name for the application</div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="app-description" class="form-label">{{ _('Description') }}</label>
+                                            <textarea class="form-control" id="app-description" rows="2" placeholder="{{ _('Extract text and data from PDFs and images') }}"></textarea>
+                                            <div class="form-text">Application description</div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="app-version" class="form-label">{{ _('Version') }}</label>
+                                            <input type="text" class="form-control" id="app-version" placeholder="{{ _('0.1.0') }}">
+                                            <div class="form-text">Application version number</div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="app-environment" class="form-label">{{ _('Environment') }}</label>
+                                            <select class="form-select" id="app-environment">
+                                                <option value="development">{{ _('Development') }}</option>
+                                                <option value="staging">{{ _('Staging') }}</option>
+                                                <option value="production">{{ _('Production') }}</option>
+                                                <option value="testing">{{ _('Testing') }}</option>
+                                            </select>
+                                            <div class="form-text">Current deployment environment</div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="app-debug" class="form-label">{{ _('Debug Mode') }}</label>
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" id="app-debug">
+                                                <label class="form-check-label" for="app-debug">{{ _('Enable debug mode') }}</label>
+                                            </div>
+                                            <div class="form-text">⚠️ Disable in production</div>
+                                        </div>
+
+                                        <h6 class="text-secondary mb-3 mt-4">{{ _('Server Configuration') }}</h6>
+
+                                        <div class="mb-3">
+                                            <label for="app-host" class="form-label">{{ _('Host') }}</label>
+                                            <input type="text" class="form-control" id="app-host" placeholder="{{ _('0.0.0.0') }}">
+                                            <div class="form-text">Server bind address</div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="app-port" class="form-label">{{ _('Port') }}</label>
+                                            <input type="number" class="form-control" id="app-port" value="8000" min="1" max="65535">
+                                            <div class="form-text">Server port number</div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="app-workers" class="form-label">{{ _('Workers') }}</label>
+                                            <input type="number" class="form-control" id="app-workers" value="1" min="1" max="32">
+                                            <div class="form-text">Number of worker processes</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <h6 class="text-secondary mb-3">{{ _('File Processing') }}</h6>
+
+                                        <div class="mb-3">
+                                            <label for="app-max-file-size" class="form-label">{{ _('Max File Size (MB)') }}</label>
+                                            <input type="number" class="form-control" id="app-max-file-size" value="50" min="1" max="500">
+                                            <div class="form-text">Maximum upload file size</div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="app-max-files" class="form-label">{{ _('Max Files Per Request') }}</label>
+                                            <input type="number" class="form-control" id="app-max-files" value="10" min="1" max="100">
+                                            <div class="form-text">Maximum files in batch upload</div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="app-supported-formats" class="form-label">{{ _('Supported Formats') }}</label>
+                                            <input type="text" class="form-control" id="app-supported-formats" placeholder="{{ _('pdf,png,jpg,jpeg,bmp,tiff,webp') }}">
+                                            <div class="form-text">Comma-separated file extensions</div>
+                                        </div>
+
+                                        <h6 class="text-secondary mb-3 mt-4">{{ _('Processing Configuration') }}</h6>
+
+                                        <div class="mb-3">
+                                            <label for="app-default-strategy" class="form-label">{{ _('Default Processing Strategy') }}</label>
+                                            <select class="form-select" id="app-default-strategy">
+                                                <option value="single">{{ _('Single Provider') }}</option>
+                                                <option value="fallback">{{ _('Fallback Chain') }}</option>
+                                                <option value="ensemble">{{ _('Ensemble') }}</option>
+                                                <option value="best">{{ _('Best Quality') }}</option>
+                                            </select>
+                                            <div class="form-text">Default OCR processing strategy</div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="app-default-providers" class="form-label">{{ _('Default Providers') }}</label>
+                                            <input type="text" class="form-control" id="app-default-providers" placeholder="{{ _('mistral,google_vision') }}">
+                                            <div class="form-text">Comma-separated provider list</div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="app-max-concurrent" class="form-label">{{ _('Max Concurrent Requests') }}</label>
+                                            <input type="number" class="form-control" id="app-max-concurrent" value="10" min="1" max="100">
+                                            <div class="form-text">Maximum concurrent OCR requests</div>
+                                        </div>
+
+                                        <h6 class="text-secondary mb-3 mt-4">{{ _('Static Files') }}</h6>
+
+                                        <div class="mb-3">
+                                            <label for="app-templates-dir" class="form-label">{{ _('Templates Directory') }}</label>
+                                            <input type="text" class="form-control" id="app-templates-dir" placeholder="{{ _('templates') }}">
+                                            <div class="form-text">Path to Jinja2 templates</div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="app-static-dir" class="form-label">{{ _('Static Files Directory') }}</label>
+                                            <input type="text" class="form-control" id="app-static-dir" placeholder="{{ _('static') }}">
+                                            <div class="form-text">Path to static assets (CSS, JS)</div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="app-enable-static" class="form-label">{{ _('Enable Static Files') }}</label>
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" id="app-enable-static" checked>
+                                                <label class="form-check-label" for="app-enable-static">{{ _('Serve static files') }}</label>
+                                            </div>
+                                            <div class="form-text">Disable for Cloud Functions</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Database Settings Tab -->
+                        <div class="tab-pane fade" id="database" role="tabpanel">
+                            <div class="provider-config">
+                                <div class="provider-header mb-4">
+                                    <h4><i class="fas fa-database me-2"></i>Database Configuration</h4>
+                                    <p class="text-muted">{{ _('Database connection and pool settings') }}</p>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="db-url" class="form-label">{{ _('Database URL') }}</label>
+                                            <input type="text" class="form-control" id="db-url" placeholder="{{ _('sqlite:///./ocular_deployments.db') }}">
+                                            <div class="form-text">SQLAlchemy database connection string</div>
+                                        </div>
+
+                                        <div class="alert alert-info">
+                                            <strong>Examples:</strong><br>
+                                            SQLite: <code>sqlite:///./ocular.db</code><br>
+                                            PostgreSQL: <code>postgresql://user:pass@localhost:5432/db</code><br>
+                                            MySQL: <code>mysql+pymysql://user:pass@localhost:3306/db</code>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="db-pool-size" class="form-label">{{ _('Connection Pool Size') }}</label>
+                                            <input type="number" class="form-control" id="db-pool-size" value="5" min="1" max="100">
+                                            <div class="form-text">Number of persistent connections</div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="db-max-overflow" class="form-label">{{ _('Max Overflow') }}</label>
+                                            <input type="number" class="form-control" id="db-max-overflow" value="10" min="0" max="100">
+                                            <div class="form-text">Additional connections beyond pool size</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Authentication Settings Tab -->
+                        <div class="tab-pane fade" id="auth" role="tabpanel">
+                            <div class="provider-config">
+                                <div class="provider-header mb-4">
+                                    <h4><i class="fas fa-user-lock me-2"></i>Authentication Configuration</h4>
+                                    <p class="text-muted">{{ _('User authentication and authorization settings') }}</p>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h6 class="text-secondary mb-3">{{ _('Clerk Authentication') }}</h6>
+
+                                        <div class="mb-3">
+                                            <label for="clerk-secret-key" class="form-label">{{ _('Clerk Secret Key') }}</label>
+                                            <div class="input-group">
+                                                <input type="password" class="form-control" id="clerk-secret-key" placeholder="{{ _('sk_...') }}">
+                                                <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('clerk-secret-key')">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                            </div>
+                                            <div class="form-text">Clerk backend secret key</div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="clerk-publishable-key" class="form-label">{{ _('Clerk Publishable Key') }}</label>
+                                            <input type="text" class="form-control" id="clerk-publishable-key" placeholder="{{ _('pk_...') }}">
+                                            <div class="form-text">Clerk frontend publishable key</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <h6 class="text-secondary mb-3">{{ _('JWT Configuration') }}</h6>
+
+                                        <div class="mb-3">
+                                            <label for="jwt-secret-key" class="form-label">{{ _('JWT Secret Key') }}</label>
+                                            <div class="input-group">
+                                                <input type="password" class="form-control" id="jwt-secret-key" placeholder="{{ _('your-jwt-secret') }}">
+                                                <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('jwt-secret-key')">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                            </div>
+                                            <div class="form-text">Secret key for JWT token signing</div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="session-timeout" class="form-label">{{ _('Session Timeout (minutes)') }}</label>
+                                            <input type="number" class="form-control" id="session-timeout" value="60" min="5" max="1440">
+                                            <div class="form-text">User session timeout duration</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Payment Settings Tab -->
+                        <div class="tab-pane fade" id="payments" role="tabpanel">
+                            <div class="provider-config">
+                                <div class="provider-header mb-4">
+                                    <h4><i class="fas fa-credit-card me-2"></i>Payment Processing Configuration</h4>
+                                    <p class="text-muted">{{ _('Stripe payment integration settings') }}</p>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="stripe-secret-key" class="form-label">{{ _('Stripe Secret Key') }}</label>
+                                            <div class="input-group">
+                                                <input type="password" class="form-control" id="stripe-secret-key" placeholder="{{ _('sk_...') }}">
+                                                <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('stripe-secret-key')">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                            </div>
+                                            <div class="form-text">Stripe backend secret key</div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="stripe-publishable-key" class="form-label">{{ _('Stripe Publishable Key') }}</label>
+                                            <input type="text" class="form-control" id="stripe-publishable-key" placeholder="{{ _('pk_...') }}">
+                                            <div class="form-text">Stripe frontend publishable key</div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="stripe-webhook-secret" class="form-label">{{ _('Stripe Webhook Secret') }}</label>
+                                            <div class="input-group">
+                                                <input type="password" class="form-control" id="stripe-webhook-secret" placeholder="{{ _('whsec_...') }}">
+                                                <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('stripe-webhook-secret')">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                            </div>
+                                            <div class="form-text">Webhook endpoint signing secret</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="alert alert-info">
+                                            <h6><i class="fas fa-info-circle me-1"></i> Stripe Setup</h6>
+                                            <ol class="mb-0 ps-3">
+                                                <li>Create account at <a href="https://dashboard.stripe.com/register" target="_blank">stripe.com</a></li>
+                                                <li>Get API keys from Dashboard &gt; Developers &gt; API Keys</li>
+                                                <li>Set up webhook endpoint for payment events</li>
+                                                <li>Copy webhook signing secret</li>
+                                            </ol>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- AI Models Settings Tab -->
+                        <div class="tab-pane fade" id="ai-models" role="tabpanel">
+                            <div class="provider-config">
+                                <div class="provider-header mb-4">
+                                    <h4><i class="fas fa-robot me-2"></i>AI Models Configuration</h4>
+                                    <p class="text-muted">{{ _('Configure deployed AI models on cloud GPU providers (RunPod, Vast.ai, DeepInfra)') }}</p>
+                                </div>
+
+                                <!-- Global Provider Configuration -->
+                                <div class="card mb-4">
+                                    <div class="card-header bg-light">
+                                        <h5 class="mb-0">
+                                            <i class="fas fa-server me-2 text-secondary"></i>
+                                            Cloud Provider Configuration
+                                        </h5>
+                                        <small class="text-muted">{{ _('Infrastructure settings for all AI model deployments') }}</small>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <label for="olmocr-provider" class="form-label">{{ _('Primary Cloud Provider') }}</label>
+                                            <select class="form-select" id="olmocr-provider" onchange="toggleOLMocrProvider()">
+                                                <option value="runpod">{{ _('RunPod (Serverless GPU)') }}</option>
+                                                <option value="vastai">{{ _('Vast.ai (Cost-effective GPU)') }}</option>
+                                                <option value="deepinfra">{{ _('DeepInfra (Managed API)') }}</option>
+                                            </select>
+                                            <div class="form-text">Select your preferred cloud GPU infrastructure provider</div>
+                                        </div>
+
+                                        <!-- RunPod Config -->
+                                        <div id="runpod-config">
+                                            <h6 class="text-secondary mb-3 mt-4"><i class="fas fa-cog me-2"></i>RunPod Configuration</h6>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="mb-3">
+                                                        <label for="runpod-endpoint-id" class="form-label">{{ _('Endpoint ID') }}</label>
+                                                        <input type="text" class="form-control" id="runpod-endpoint-id" placeholder="{{ _('your-endpoint-id') }}">
+                                                        <div class="form-text">RunPod serverless endpoint ID</div>
+                                                    </div>
+
+                                                    <div class="mb-3">
+                                                        <label for="runpod-api-key" class="form-label">{{ _('API Key') }}</label>
+                                                        <div class="input-group">
+                                                            <input type="password" class="form-control" id="runpod-api-key" placeholder="{{ _('Enter RunPod API key') }}">
+                                                            <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('runpod-api-key')">
+                                                                <i class="fas fa-eye"></i>
+                                                            </button>
+                                                        </div>
+                                                        <div class="form-text">Get from RunPod Settings > API Keys</div>
+                                                    </div>
+
+                                                    <div class="mb-3">
+                                                        <label for="runpod-region" class="form-label">{{ _('Region') }}</label>
+                                                        <select class="form-select" id="runpod-region">
+                                                            <option value="eur-is-1">{{ _('EUR-IS-1 (Iceland)') }}</option>
+                                                            <option value="us-ca-1">{{ _('US-CA-1 (California)') }}</option>
+                                                            <option value="us-tx-1">{{ _('US-TX-1 (Texas)') }}</option>
+                                                        </select>
+                                                        <div class="form-text">RunPod data center region</div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <h6 class="text-secondary mb-3">{{ _('S3 Storage') }}</h6>
+
+                                                    <div class="mb-3">
+                                                        <label for="runpod-access-key-id" class="form-label">{{ _('Access Key ID') }}</label>
+                                                        <input type="text" class="form-control" id="runpod-access-key-id" placeholder="{{ _('user_...') }}">
+                                                        <div class="form-text">RunPod S3 access key</div>
+                                                    </div>
+
+                                                    <div class="mb-3">
+                                                        <label for="runpod-secret-access-key" class="form-label">{{ _('Secret Access Key') }}</label>
+                                                        <div class="input-group">
+                                                            <input type="password" class="form-control" id="runpod-secret-access-key" placeholder="{{ _('rps_...') }}">
+                                                            <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('runpod-secret-access-key')">
+                                                                <i class="fas fa-eye"></i>
+                                                            </button>
+                                                        </div>
+                                                        <div class="form-text">RunPod S3 secret key</div>
+                                                    </div>
+
+                                                    <div class="mb-3">
+                                                        <label for="runpod-bucket-endpoint" class="form-label">{{ _('Bucket Endpoint URL') }}</label>
+                                                        <input type="url" class="form-control" id="runpod-bucket-endpoint" placeholder="{{ _('https://s3api-eur-is-1.runpod.io/') }}">
+                                                        <div class="form-text">S3-compatible storage endpoint</div>
+                                                    </div>
+
+                                                    <div class="mb-3">
+                                                        <label for="runpod-network-volume-id" class="form-label">{{ _('Network Volume ID') }}</label>
+                                                        <input type="text" class="form-control" id="runpod-network-volume-id" placeholder="{{ _('volume-id') }}">
+                                                        <div class="form-text">Network volume for model storage</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Vast.ai Config -->
+                                        <div id="vastai-config" style="display: none;">
+                                            <h6 class="text-secondary mb-3 mt-4"><i class="fas fa-cog me-2"></i>Vast.ai Configuration</h6>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="mb-3">
+                                                        <label for="vastai-instance-id" class="form-label">{{ _('Instance ID') }}</label>
+                                                        <input type="text" class="form-control" id="vastai-instance-id" placeholder="{{ _('instance-12345') }}">
+                                                        <div class="form-text">Your Vast.ai instance ID</div>
+                                                    </div>
+
+                                                    <div class="mb-3">
+                                                        <label for="vastai-api-key" class="form-label">{{ _('API Key') }}</label>
+                                                        <div class="input-group">
+                                                            <input type="password" class="form-control" id="vastai-api-key" placeholder="{{ _('Enter Vast.ai API key') }}">
+                                                            <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('vastai-api-key')">
+                                                                <i class="fas fa-eye"></i>
+                                                            </button>
+                                                        </div>
+                                                        <div class="form-text">Vast.ai API authentication key</div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="mb-3">
+                                                        <label for="vastai-endpoint-url" class="form-label">{{ _('Endpoint URL') }}</label>
+                                                        <input type="url" class="form-control" id="vastai-endpoint-url" placeholder="{{ _('https://your-instance.vast.ai:port') }}">
+                                                        <div class="form-text">Full URL to your Vast.ai endpoint</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- DeepInfra Config -->
+                                        <div id="deepinfra-config" style="display: none;">
+                                            <h6 class="text-secondary mb-3 mt-4"><i class="fas fa-cog me-2"></i>DeepInfra Configuration</h6>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="mb-3">
+                                                        <label for="deepinfra-api-key" class="form-label">{{ _('API Key') }}</label>
+                                                        <div class="input-group">
+                                                            <input type="password" class="form-control" id="deepinfra-api-key" placeholder="{{ _('Enter DeepInfra token') }}">
+                                                            <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('deepinfra-api-key')">
+                                                                <i class="fas fa-eye"></i>
+                                                            </button>
+                                                        </div>
+                                                        <div class="form-text">DeepInfra API token</div>
+                                                    </div>
+
+                                                    <div class="mb-3">
+                                                        <label for="deepinfra-model" class="form-label">{{ _('Model') }}</label>
+                                                        <input type="text" class="form-control" id="deepinfra-model" placeholder="{{ _('allenai/olmOCR-7B-0825') }}">
+                                                        <div class="form-text">Model identifier on DeepInfra</div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="mb-3">
+                                                        <label for="deepinfra-base-url" class="form-label">{{ _('Base URL') }}</label>
+                                                        <input type="url" class="form-control" id="deepinfra-base-url" placeholder="{{ _('https://api.deepinfra.com/v1/openai') }}">
+                                                        <div class="form-text">DeepInfra API base URL</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- OLMocr Model Configuration -->
+                                <div class="card mb-4">
+                                    <div class="card-header bg-light">
+                                        <h5 class="mb-0">
+                                            <i class="fas fa-file-alt me-2 text-primary"></i>
+                                            OLMocr (AllenAI OCR Model)
+                                        </h5>
+                                        <small class="text-muted">{{ _('State-of-the-art OCR model from AllenAI - allenai/olmOCR-7B') }}</small>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="alert alert-info mb-3">
+                                            <i class="fas fa-info-circle me-1"></i>
+                                            <strong>About OLMocr:</strong> Advanced OCR model trained on diverse document types. Excellent for extracting text from complex layouts, handwritten documents, and multilingual content.
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label for="olmocr-model-name" class="form-label">{{ _('Model Identifier') }}</label>
+                                                    <input type="text" class="form-control" id="olmocr-model-name" placeholder="{{ _('allenai/olmOCR-7B-0225-preview') }}">
+                                                    <div class="form-text">HuggingFace model identifier</div>
+                                                </div>
+
+                                                <div class="mb-3">
+                                                    <label for="olmocr-max-file-size" class="form-label">{{ _('Max File Size (MB)') }}</label>
+                                                    <input type="number" class="form-control" id="olmocr-max-file-size" value="50" min="1" max="500">
+                                                    <div class="form-text">Maximum file size for processing</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label for="olmocr-timeout" class="form-label">{{ _('Timeout (seconds)') }}</label>
+                                                    <input type="number" class="form-control" id="olmocr-timeout" value="300" min="30" max="600">
+                                                    <div class="form-text">Request timeout duration</div>
+                                                </div>
+
+                                                <div class="mb-3">
+                                                    <label for="olmocr-allowed-extensions" class="form-label">{{ _('Allowed Extensions') }}</label>
+                                                    <input type="text" class="form-control" id="olmocr-allowed-extensions" placeholder="{{ _('.pdf,.png,.jpg,.jpeg') }}">
+                                                    <div class="form-text">Comma-separated file extensions</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="mt-2">
+                                            <button class="btn btn-primary" onclick="testProvider('olmocr')">
+                                                <i class="fas fa-play me-1"></i>
+                                                Test OLMocr
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- RoLMocr Model Configuration -->
+                                <div class="card mb-4">
+                                    <div class="card-header bg-light">
+                                        <h5 class="mb-0">
+                                            <i class="fas fa-language me-2 text-success"></i>
+                                            RoLMocr (Rotated OCR Model)
+                                        </h5>
+                                        <small class="text-muted">{{ _('Specialized for rotated and skewed document processing') }}</small>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="alert alert-success mb-3">
+                                            <i class="fas fa-info-circle me-1"></i>
+                                            <strong>About RoLMocr:</strong> Optimized for documents with rotation, skew, or non-standard orientations. Handles mobile captures and scanned documents with varying angles.
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label for="rolmocr-model-name" class="form-label">{{ _('Model Identifier') }}</label>
+                                                    <input type="text" class="form-control" id="rolmocr-model-name" placeholder="{{ _('custom/rolmocr-model') }}">
+                                                    <div class="form-text">Model identifier for RoLMocr</div>
+                                                </div>
+
+                                                <div class="mb-3">
+                                                    <label for="rolmocr-max-file-size" class="form-label">{{ _('Max File Size (MB)') }}</label>
+                                                    <input type="number" class="form-control" id="rolmocr-max-file-size" value="50" min="1" max="500">
+                                                    <div class="form-text">Maximum file size for processing</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label for="rolmocr-timeout" class="form-label">{{ _('Timeout (seconds)') }}</label>
+                                                    <input type="number" class="form-control" id="rolmocr-timeout" value="300" min="30" max="600">
+                                                    <div class="form-text">Request timeout duration</div>
+                                                </div>
+
+                                                <div class="mb-3">
+                                                    <label for="rolmocr-endpoint-id" class="form-label">{{ _('Endpoint ID') }}</label>
+                                                    <input type="text" class="form-control" id="rolmocr-endpoint-id" placeholder="{{ _('rolmocr-endpoint-id') }}">
+                                                    <div class="form-text">Specific endpoint for RoLMocr model</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="mt-2">
+                                            <button class="btn btn-success" onclick="testProvider('rolmocr')">
+                                                <i class="fas fa-play me-1"></i>
+                                                Test RoLMocr
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Pixtral Model Configuration -->
+                                <div class="card mb-4">
+                                    <div class="card-header bg-light">
+                                        <h5 class="mb-0">
+                                            <i class="fas fa-image me-2 text-warning"></i>
+                                            Pixtral (Vision Model)
+                                        </h5>
+                                        <small class="text-muted">{{ _('Mistral\'s vision model for document understanding') }}</small>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="alert alert-warning mb-3">
+                                            <i class="fas fa-info-circle me-1"></i>
+                                            <strong>About Pixtral:</strong> Multimodal vision model from Mistral AI. Excels at document analysis, table extraction, and visual question answering.
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label for="pixtral-model-name" class="form-label">{{ _('Model Identifier') }}</label>
+                                                    <input type="text" class="form-control" id="pixtral-model-name" placeholder="{{ _('mistralai/pixtral-12b') }}">
+                                                    <div class="form-text">Model identifier for Pixtral</div>
+                                                </div>
+
+                                                <div class="mb-3">
+                                                    <label for="pixtral-max-file-size" class="form-label">{{ _('Max File Size (MB)') }}</label>
+                                                    <input type="number" class="form-control" id="pixtral-max-file-size" value="50" min="1" max="500">
+                                                    <div class="form-text">Maximum file size for processing</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label for="pixtral-timeout" class="form-label">{{ _('Timeout (seconds)') }}</label>
+                                                    <input type="number" class="form-control" id="pixtral-timeout" value="300" min="30" max="600">
+                                                    <div class="form-text">Request timeout duration</div>
+                                                </div>
+
+                                                <div class="mb-3">
+                                                    <label for="pixtral-endpoint-id" class="form-label">{{ _('Endpoint ID') }}</label>
+                                                    <input type="text" class="form-control" id="pixtral-endpoint-id" placeholder="{{ _('pixtral-endpoint-id') }}">
+                                                    <div class="form-text">Specific endpoint for Pixtral model</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="mt-2">
+                                            <button class="btn btn-warning" onclick="testProvider('pixtral')">
+                                                <i class="fas fa-play me-1"></i>
+                                                Test Pixtral
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Cloud Providers Tab -->
+                        <div class="tab-pane fade" id="cloud-providers" role="tabpanel">
+                            <div class="provider-config">
+                                <div class="provider-header mb-4">
+                                    <h4><i class="fas fa-cloud me-2"></i>Cloud Provider Configuration</h4>
+                                    <p class="text-muted">{{ _('API keys and settings for cloud OCR and AI providers') }}</p>
+                                </div>
+
+                                <!-- Mistral AI Section -->
+                                <div class="card mb-4">
+                                    <div class="card-header bg-light">
+                                        <h5 class="mb-0">
+                                            <i class="fas fa-brain me-2 text-primary"></i>
+                                            Mistral AI
+                                        </h5>
+                                        <small class="text-muted">{{ _('Vision LLM for document OCR and analysis') }}</small>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label for="mistral-api-key" class="form-label">{{ _('API Key') }}</label>
+                                                    <div class="input-group">
+                                                        <input type="password" class="form-control" id="mistral-api-key" placeholder="{{ _('Enter Mistral API key') }}">
+                                                        <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('mistral-api-key')">
+                                                            <i class="fas fa-eye"></i>
+                                                        </button>
+                                                    </div>
+                                                    <div class="form-text">Get from <a href="https://console.mistral.ai/" target="_blank">Mistral Console</a></div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label for="mistral-model" class="form-label">{{ _('Model') }}</label>
+                                                    <select class="form-select" id="mistral-model">
+                                                        <option value="pixtral-12b-2409">{{ _('Pixtral 12B (Recommended)') }}</option>
+                                                        <option value="pixtral-large-latest">{{ _('Pixtral Large (Latest)') }}</option>
+                                                    </select>
+                                                    <div class="form-text">Mistral vision model</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Google Cloud Vision Section -->
+                                <div class="card mb-4">
+                                    <div class="card-header bg-light">
+                                        <h5 class="mb-0">
+                                            <i class="fab fa-google me-2 text-danger"></i>
+                                            Google Cloud Vision
+                                        </h5>
+                                        <small class="text-muted">{{ _('Enterprise-grade OCR with excellent accuracy') }}</small>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label for="google-credentials" class="form-label">{{ _('Credentials Path') }}</label>
+                                                    <input type="text" class="form-control" id="google-credentials" placeholder="{{ _('/path/to/service-account.json') }}">
+                                                    <div class="form-text">Path to service account JSON file</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label for="google-project-id" class="form-label">{{ _('Project ID') }}</label>
+                                                    <input type="text" class="form-control" id="google-project-id" placeholder="{{ _('your-gcp-project-id') }}">
+                                                    <div class="form-text">GCP project identifier</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="alert alert-info mb-0">
+                                            <small>
+                                                <strong>Setup:</strong> Enable Vision API in GCP Console → Create service account → Download JSON key
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- AWS Textract Section -->
+                                <div class="card mb-4">
+                                    <div class="card-header bg-light">
+                                        <h5 class="mb-0">
+                                            <i class="fab fa-aws me-2 text-warning"></i>
+                                            AWS Textract
+                                        </h5>
+                                        <small class="text-muted">{{ _('Advanced document analysis with form and table extraction') }}</small>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div class="mb-3">
+                                                    <label for="aws-access-key-id" class="form-label">{{ _('Access Key ID') }}</label>
+                                                    <input type="text" class="form-control" id="aws-access-key-id" placeholder="{{ _('AKIA...') }}">
+                                                    <div class="form-text">AWS access key</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="mb-3">
+                                                    <label for="aws-secret-access-key" class="form-label">{{ _('Secret Access Key') }}</label>
+                                                    <div class="input-group">
+                                                        <input type="password" class="form-control" id="aws-secret-access-key" placeholder="{{ _('Enter AWS secret key') }}">
+                                                        <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('aws-secret-access-key')">
+                                                            <i class="fas fa-eye"></i>
+                                                        </button>
+                                                    </div>
+                                                    <div class="form-text">AWS secret key</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="mb-3">
+                                                    <label for="aws-region" class="form-label">{{ _('Region') }}</label>
+                                                    <select class="form-select" id="aws-region">
+                                                        <option value="us-east-1">{{ _('US East (N. Virginia)') }}</option>
+                                                        <option value="us-west-2">{{ _('US West (Oregon)') }}</option>
+                                                        <option value="eu-west-1">{{ _('Europe (Ireland)') }}</option>
+                                                        <option value="ap-southeast-1">{{ _('Asia Pacific (Singapore)') }}</option>
+                                                    </select>
+                                                    <div class="form-text">AWS region</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="alert alert-info mb-0">
+                                            <small>
+                                                <strong>Setup:</strong> IAM Console → Create user with Textract permissions → Generate access keys
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Azure Document Intelligence Section -->
+                                <div class="card mb-4">
+                                    <div class="card-header bg-light">
+                                        <h5 class="mb-0">
+                                            <i class="fab fa-microsoft me-2 text-info"></i>
+                                            Azure Document Intelligence
+                                        </h5>
+                                        <small class="text-muted">{{ _('Microsoft\'s AI-powered document processing') }}</small>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label for="azure-endpoint" class="form-label">{{ _('Endpoint URL') }}</label>
+                                                    <input type="url" class="form-control" id="azure-endpoint" placeholder="{{ _('https://your-resource.cognitiveservices.azure.com/') }}">
+                                                    <div class="form-text">Azure Document Intelligence endpoint</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label for="azure-api-key" class="form-label">{{ _('API Key') }}</label>
+                                                    <div class="input-group">
+                                                        <input type="password" class="form-control" id="azure-api-key" placeholder="{{ _('Enter Azure API key') }}">
+                                                        <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('azure-api-key')">
+                                                            <i class="fas fa-eye"></i>
+                                                        </button>
+                                                    </div>
+                                                    <div class="form-text">Azure API key</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="alert alert-info mb-0">
+                                            <small>
+                                                <strong>Setup:</strong> Azure Portal → Create Document Intelligence resource → Copy endpoint and key
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Tesseract OCR Section -->
+                                <div class="card mb-4">
+                                    <div class="card-header bg-light">
+                                        <h5 class="mb-0">
+                                            <i class="fas fa-eye me-2 text-success"></i>
+                                            Tesseract OCR
+                                        </h5>
+                                        <small class="text-muted">{{ _('Open-source OCR engine for local processing (no API key required)') }}</small>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label for="tesseract-language" class="form-label">{{ _('Language') }}</label>
+                                                    <select class="form-select" id="tesseract-language">
+                                                        <option value="eng">{{ _('English') }}</option>
+                                                        <option value="fra">{{ _('French') }}</option>
+                                                        <option value="deu">{{ _('German') }}</option>
+                                                        <option value="ita">{{ _('Italian') }}</option>
+                                                        <option value="spa">{{ _('Spanish') }}</option>
+                                                        <option value="chi_sim">{{ _('Chinese (Simplified)') }}</option>
+                                                        <option value="jpn">{{ _('Japanese') }}</option>
+                                                        <option value="kor">{{ _('Korean') }}</option>
+                                                    </select>
+                                                    <div class="form-text">Primary OCR language</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label for="tesseract-dpi" class="form-label">{{ _('DPI') }}</label>
+                                                    <input type="number" class="form-control" id="tesseract-dpi" value="300" min="150" max="600">
+                                                    <div class="form-text">Image DPI (150-600, default 300)</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="alert alert-warning mb-0">
+                                            <small>
+                                                <strong>Installation Required:</strong> Tesseract must be installed on your system.
+                                                <a href="https://github.com/tesseract-ocr/tesseract" target="_blank">Download here</a>
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- HuggingFace Section -->
+                                <div class="card mb-4">
+                                    <div class="card-header bg-light">
+                                        <h5 class="mb-0">
+                                            <i class="fas fa-robot me-2 text-secondary"></i>
+                                            HuggingFace
+                                        </h5>
+                                        <small class="text-muted">{{ _('Access to gated models and private repositories') }}</small>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label for="hf-token" class="form-label">{{ _('HuggingFace Token') }}</label>
+                                                    <div class="input-group">
+                                                        <input type="password" class="form-control" id="hf-token" placeholder="{{ _('hf_...') }}">
+                                                        <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('hf-token')">
+                                                            <i class="fas fa-eye"></i>
+                                                        </button>
+                                                    </div>
+                                                    <div class="form-text">Required for gated models and private repos</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="alert alert-info mb-0">
+                                                    <small>
+                                                        <strong>Get Token:</strong>
+                                                        <a href="https://huggingface.co/settings/tokens" target="_blank">HuggingFace Settings</a> →
+                                                        Create new token with "read" permissions
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <!-- Logging Settings Tab -->
+                        <div class="tab-pane fade" id="logging" role="tabpanel">
+                            <div class="provider-config">
+                                <div class="provider-header mb-4">
+                                    <h4><i class="fas fa-file-alt me-2"></i>Logging Configuration</h4>
+                                    <p class="text-muted">{{ _('Application logging and monitoring settings') }}</p>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="log-level" class="form-label">{{ _('Log Level') }}</label>
+                                            <select class="form-select" id="log-level">
+                                                <option value="DEBUG">{{ _('DEBUG') }}</option>
+                                                <option value="INFO">{{ _('INFO') }}</option>
+                                                <option value="WARNING">{{ _('WARNING') }}</option>
+                                                <option value="ERROR">{{ _('ERROR') }}</option>
+                                                <option value="CRITICAL">{{ _('CRITICAL') }}</option>
+                                            </select>
+                                            <div class="form-text">Minimum logging level</div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="log-format" class="form-label">{{ _('Log Format') }}</label>
+                                            <select class="form-select" id="log-format">
+                                                <option value="json">{{ _('JSON') }}</option>
+                                                <option value="text">{{ _('Text') }}</option>
+                                            </select>
+                                            <div class="form-text">Log output format</div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="logfire-token" class="form-label">{{ _('Logfire Token') }}</label>
+                                            <div class="input-group">
+                                                <input type="password" class="form-control" id="logfire-token" placeholder="{{ _('Enter Logfire token') }}">
+                                                <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('logfire-token')">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                            </div>
+                                            <div class="form-text">Optional Logfire integration token</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="enable-file-logging" class="form-label">{{ _('File Logging') }}</label>
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" id="enable-file-logging">
+                                                <label class="form-check-label" for="enable-file-logging">{{ _('Enable file logging') }}</label>
+                                            </div>
+                                            <div class="form-text">Write logs to file</div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="log-file-path" class="form-label">{{ _('Log File Path') }}</label>
+                                            <input type="text" class="form-control" id="log-file-path" placeholder="{{ _('logs/ocular.log') }}">
+                                            <div class="form-text">Path to log file</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Security Settings Tab -->
+                        <div class="tab-pane fade" id="security" role="tabpanel">
+                            <div class="provider-config">
+                                <div class="provider-header mb-4">
+                                    <h4><i class="fas fa-shield-alt me-2"></i>Security Configuration</h4>
+                                    <p class="text-muted">{{ _('Security, CORS, and access control settings') }}</p>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="cors-origins" class="form-label">{{ _('CORS Allowed Origins') }}</label>
+                                            <textarea class="form-control" id="cors-origins" rows="3" placeholder="{{ _('https://example.com,https://app.example.com') }}">*</textarea>
+                                            <div class="form-text">Comma-separated origins (* for all)</div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="max-request-size" class="form-label">{{ _('Max Request Size (MB)') }}</label>
+                                            <input type="number" class="form-control" id="max-request-size" value="100" min="1" max="1000">
+                                            <div class="form-text">Maximum HTTP request body size</div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="rate-limit-rpm" class="form-label">{{ _('Rate Limit (req/min)') }}</label>
+                                            <input type="number" class="form-control" id="rate-limit-rpm" value="100" min="1" max="10000">
+                                            <div class="form-text">Requests per minute per IP</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="api-secret-key" class="form-label">{{ _('API Secret Key') }}</label>
+                                            <div class="input-group">
+                                                <input type="password" class="form-control" id="api-secret-key" placeholder="{{ _('your-api-secret') }}">
+                                                <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('api-secret-key')">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                            </div>
+                                            <div class="form-text">Secret key for API authentication</div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="encryption-key" class="form-label">{{ _('Encryption Key') }}</label>
+                                            <div class="input-group">
+                                                <input type="password" class="form-control" id="encryption-key" placeholder="{{ _('your-encryption-key') }}">
+                                                <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('encryption-key')">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                            </div>
+                                            <div class="form-text">Key for encrypting sensitive data</div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="enable-https-only" class="form-label">{{ _('HTTPS Only') }}</label>
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" id="enable-https-only" checked>
+                                                <label class="form-check-label" for="enable-https-only">{{ _('Enforce HTTPS connections') }}</label>
+                                            </div>
+                                            <div class="form-text">⚠️ Required for production</div>
+                                        </div>
+
+                                        <div class="alert alert-warning mt-3">
+                                            <i class="fas fa-exclamation-triangle me-1"></i>
+                                            <strong>Production Security:</strong><br>
+                                            - Use specific CORS origins<br>
+                                            - Enable HTTPS only<br>
+                                            - Set strong API keys<br>
+                                            - Disable debug mode
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Cache Settings Tab -->
+                        <div class="tab-pane fade" id="cache" role="tabpanel">
+                            <div class="provider-config">
+                                <div class="provider-header mb-4">
+                                    <h4><i class="fas fa-bolt me-2"></i>Cache Configuration</h4>
+                                    <p class="text-muted">{{ _('Caching settings for improved performance') }}</p>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="redis-url" class="form-label">{{ _('Redis URL') }}</label>
+                                            <input type="text" class="form-control" id="redis-url" placeholder="{{ _('redis://localhost:6379/0') }}">
+                                            <div class="form-text">Redis connection string (leave empty for in-memory cache)</div>
+                                        </div>
+
+                                        <div class="alert alert-info">
+                                            <strong>Redis Examples:</strong><br>
+                                            Local: <code>redis://localhost:6379/0</code><br>
+                                            Auth: <code>redis://:password@localhost:6379/0</code><br>
+                                            Cloud: <code>rediss://user:pass@host:port/db</code>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="cache-ttl" class="form-label">{{ _('Cache TTL (seconds)') }}</label>
+                                            <input type="number" class="form-control" id="cache-ttl" value="3600" min="60" max="86400">
+                                            <div class="form-text">Time-to-live for cached items (1 hour = 3600s)</div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="enable-caching" class="form-label">{{ _('Enable Caching') }}</label>
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" id="enable-caching" checked>
+                                                <label class="form-check-label" for="enable-caching">{{ _('Enable result caching') }}</label>
+                                            </div>
+                                            <div class="form-text">Cache OCR results for faster repeated requests</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', path='js/settings.js') }}"></script>
+{% endblock %}

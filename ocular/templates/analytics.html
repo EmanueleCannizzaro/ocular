@@ -1,0 +1,194 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('Analytics Dashboard') }} - Ocular OCR{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 my-5">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-1">
+                <i class="fas fa-chart-line me-2"></i>
+                {{ _('Analytics Dashboard') }}
+            </h1>
+            <p class="text-muted mb-0">{{ _('Deployment metrics, costs, and performance insights') }}</p>
+        </div>
+        <div>
+            <select class="form-select form-select-sm" id="period-selector" onchange="refreshDashboard()">
+                <option value="7">{{ _('Last 7 days') }}</option>
+                <option value="30" selected>{{ _('Last 30 days') }}</option>
+                <option value="90">{{ _('Last 90 days') }}</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-1 small">{{ _('Active Deployments') }}</p>
+                            <h3 class="mb-0" id="stat-active-deployments">-</h3>
+                        </div>
+                        <div class="text-success">
+                            <i class="fas fa-rocket fa-2x"></i>
+                        </div>
+                    </div>
+                    <div class="mt-2">
+                        <span class="badge bg-success-subtle text-success" id="stat-recent-deployments">-</span>
+                        <small class="text-muted ms-1">{{ _('in last 24h') }}</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-1 small">{{ _('GPU Utilization') }}</p>
+                            <h3 class="mb-0" id="stat-gpu-utilization">-</h3>
+                        </div>
+                        <div class="text-primary">
+                            <i class="fas fa-microchip fa-2x"></i>
+                        </div>
+                    </div>
+                    <div class="mt-2">
+                        <span id="stat-gpu-count">-</span>
+                        <small class="text-muted ms-1">{{ _('GPUs active') }}</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-1 small">{{ _('Daily Cost') }}</p>
+                            <h3 class="mb-0" id="stat-daily-cost">-</h3>
+                        </div>
+                        <div class="text-warning">
+                            <i class="fas fa-dollar-sign fa-2x"></i>
+                        </div>
+                    </div>
+                    <div class="mt-2">
+                        <small class="text-muted">{{ _('Estimated average') }}</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-1 small">{{ _('Total Models') }}</p>
+                            <h3 class="mb-0" id="stat-total-models">-</h3>
+                        </div>
+                        <div class="text-info">
+                            <i class="fas fa-cube fa-2x"></i>
+                        </div>
+                    </div>
+                    <div class="mt-2">
+                        <span class="badge bg-danger-subtle text-danger" id="stat-recent-failures">-</span>
+                        <small class="text-muted ms-1">{{ _('failures (24h)') }}</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row 1 -->
+    <div class="row g-3 mb-4">
+        <!-- Deployment Timeline Chart -->
+        <div class="col-md-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent border-0 py-3">
+                    <h6 class="mb-0">
+                        <i class="fas fa-chart-area me-2"></i>
+                        {{ _('Deployment Timeline') }}
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="deployment-timeline-chart" height="80"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- GPU Utilization Donut -->
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent border-0 py-3">
+                    <h6 class="mb-0">
+                        <i class="fas fa-chart-pie me-2"></i>
+                        {{ _('GPU Distribution') }}
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="gpu-distribution-chart" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row 2 -->
+    <div class="row g-3 mb-4">
+        <!-- Cost Breakdown Chart -->
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent border-0 py-3">
+                    <h6 class="mb-0">
+                        <i class="fas fa-chart-bar me-2"></i>
+                        {{ _('Cost Breakdown (Last 30 Days)') }}
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="cost-breakdown-chart" height="100"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Model Usage Chart -->
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent border-0 py-3">
+                    <h6 class="mb-0">
+                        <i class="fas fa-chart-bar me-2"></i>
+                        {{ _('Model Usage Statistics') }}
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="model-usage-chart" height="100"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Performance Trends -->
+    <div class="row g-3">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent border-0 py-3">
+                    <h6 class="mb-0">
+                        <i class="fas fa-chart-line me-2"></i>
+                        {{ _('Performance Trends & Success Rate') }}
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="performance-trends-chart" height="60"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', path='js/analytics.js') }}"></script>
+{% endblock %}

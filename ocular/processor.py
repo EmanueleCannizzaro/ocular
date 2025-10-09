@@ -7,9 +7,9 @@ from pathlib import Path
 from typing import List, Dict, Any, Optional, Union
 from enum import Enum
 
-from .client import MistralOCRClient
-from .config import OcularConfig
-from .exceptions import DocumentProcessingError
+from ocular.config import OcularConfig
+from ocular.deployment.mistralocr import MistralOCRClient
+from ocular.exceptions import DocumentProcessingError
 
 
 class DocumentType(Enum):

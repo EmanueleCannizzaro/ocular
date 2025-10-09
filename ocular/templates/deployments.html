@@ -1,0 +1,522 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('AI Model Deployment') }} - {{ _('Ocular OCR') }}{% endblock %}
+
+{% block head %}
+<link href="{{ url_for('static', path='css/deployments.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 my-5">
+    <div class="row">
+        <div class="col-12">
+            <div class="text-center mb-5">
+                <h1 class="display-4 text-primary">
+                    <i class="fas fa-rocket me-3"></i>
+                    {{ _('AI Model Deployment') }}
+                </h1>
+                <p class="lead">{{ _('Deploy OCR models to cloud GPU providers') }}</p>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb justify-content-center">
+                        <li class="breadcrumb-item"><a href="/">{{ _('Home') }}</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">{{ _('Deployment') }}</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card metric-card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="metric-icon bg-success bg-gradient">
+                        <i class="fas fa-server"></i>
+                    </div>
+                    <h4 class="metric-value" id="active-deployments">--</h4>
+                    <p class="metric-label text-muted mb-0">{{ _('Active Deployments') }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card metric-card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="metric-icon bg-info bg-gradient">
+                        <i class="fas fa-microchip"></i>
+                    </div>
+                    <h4 class="metric-value" id="gpu-count">--</h4>
+                    <p class="metric-label text-muted mb-0">{{ _('GPUs Allocated') }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card metric-card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="metric-icon bg-warning bg-gradient">
+                        <i class="fas fa-dollar-sign"></i>
+                    </div>
+                    <h4 class="metric-value" id="monthly-cost">--</h4>
+                    <p class="metric-label text-muted mb-0">{{ _('Est. Monthly Cost') }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card metric-card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="metric-icon bg-primary bg-gradient">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <h4 class="metric-value" id="avg-response">--</h4>
+                    <p class="metric-label text-muted mb-0">{{ _('Avg Response Time') }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Provider Selection -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent border-0">
+                    <h5 class="mb-0">
+                        <i class="fas fa-cloud me-2"></i>
+                        {{ _('Cloud GPU Providers') }}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row" id="provider-cards">
+                        <!-- RunPod -->
+                        <div class="col-md-4 mb-3">
+                            <div class="provider-card" data-provider="runpod">
+                                <div class="provider-logo">
+                                    <i class="fas fa-server fa-3x text-primary"></i>
+                                </div>
+                                <h5 class="mt-3">RunPod</h5>
+                                <p class="text-muted small">{{ _('Serverless GPU deployment with auto-scaling') }}</p>
+                                <div class="provider-status">
+                                    <span class="badge bg-success">{{ _('Available') }}</span>
+                                </div>
+                                <button class="btn btn-outline-primary btn-sm mt-2" onclick="selectProvider('runpod')">
+                                    <i class="fas fa-cog me-1"></i> {{ _('Configure') }}
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Vast.ai -->
+                        <div class="col-md-4 mb-3">
+                            <div class="provider-card" data-provider="vastai">
+                                <div class="provider-logo">
+                                    <i class="fas fa-hdd fa-3x text-info"></i>
+                                </div>
+                                <h5 class="mt-3">Vast.ai</h5>
+                                <p class="text-muted small">{{ _('Cost-effective GPU marketplace') }}</p>
+                                <div class="provider-status">
+                                    <span class="badge bg-secondary">{{ _('Coming Soon') }}</span>
+                                </div>
+                                <button class="btn btn-outline-secondary btn-sm mt-2" disabled>
+                                    <i class="fas fa-cog me-1"></i> {{ _('Configure') }}
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Lambda Labs -->
+                        <div class="col-md-4 mb-3">
+                            <div class="provider-card" data-provider="lambda">
+                                <div class="provider-logo">
+                                    <i class="fas fa-bolt fa-3x text-warning"></i>
+                                </div>
+                                <h5 class="mt-3">Lambda Labs</h5>
+                                <p class="text-muted small">{{ _('High-performance cloud GPUs') }}</p>
+                                <div class="provider-status">
+                                    <span class="badge bg-secondary">{{ _('Coming Soon') }}</span>
+                                </div>
+                                <button class="btn btn-outline-secondary btn-sm mt-2" disabled>
+                                    <i class="fas fa-cog me-1"></i> {{ _('Configure') }}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Deployments -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-list me-2"></i>
+                        {{ _('Active Deployments') }}
+                    </h5>
+                    <button class="btn btn-primary btn-sm" onclick="showNewDeployment()">
+                        <i class="fas fa-plus me-1"></i> {{ _('New Deployment') }}
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="deployments-table">
+                            <thead>
+                                <tr>
+                                    <th>{{ _('Model') }}</th>
+                                    <th>{{ _('Provider') }}</th>
+                                    <th>{{ _('GPU Type') }}</th>
+                                    <th>{{ _('Status') }}</th>
+                                    <th>{{ _('Endpoint') }}</th>
+                                    <th>{{ _('Cost/hr') }}</th>
+                                    <th>{{ _('Actions') }}</th>
+                                </tr>
+                            </thead>
+                            <tbody id="deployments-tbody">
+                                <tr>
+                                    <td colspan="7" class="text-center py-4">
+                                        <div class="spinner-border spinner-border-sm text-primary me-2"></div>
+                                        {{ _('Loading deployments...') }}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Available Models -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent border-0">
+                    <h5 class="mb-0">
+                        <i class="fas fa-cube me-2"></i>
+                        {{ _('Available Models') }}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row" id="models-grid">
+                        <!-- OLMocr -->
+                        <div class="col-md-6 col-lg-4 mb-3">
+                            <div class="model-card">
+                                <div class="model-header">
+                                    <h6>OLMocr 7B</h6>
+                                    <span class="badge bg-success">{{ _('Ready') }}</span>
+                                </div>
+                                <div class="model-details">
+                                    <p class="text-muted small mb-2">{{ _('AllenAI OCR Model - 7B parameters') }}</p>
+                                    <div class="model-specs">
+                                        <span class="spec-item"><i class="fas fa-memory me-1"></i> 16GB VRAM</span>
+                                        <span class="spec-item"><i class="fas fa-microchip me-1"></i> GPU: A4000+</span>
+                                    </div>
+                                </div>
+                                <button class="btn btn-sm btn-primary w-100 mt-2" onclick="deployModel('olmocr')">
+                                    <i class="fas fa-rocket me-1"></i> {{ _('Deploy') }}
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- RoLMocr -->
+                        <div class="col-md-6 col-lg-4 mb-3">
+                            <div class="model-card">
+                                <div class="model-header">
+                                    <h6>RoLMocr</h6>
+                                    <span class="badge bg-success">{{ _('Ready') }}</span>
+                                </div>
+                                <div class="model-details">
+                                    <p class="text-muted small mb-2">{{ _('Rotated OCR Model') }}</p>
+                                    <div class="model-specs">
+                                        <span class="spec-item"><i class="fas fa-memory me-1"></i> 16GB VRAM</span>
+                                        <span class="spec-item"><i class="fas fa-microchip me-1"></i> GPU: A4000+</span>
+                                    </div>
+                                </div>
+                                <button class="btn btn-sm btn-primary w-100 mt-2" onclick="deployModel('rolmocr')">
+                                    <i class="fas fa-rocket me-1"></i> {{ _('Deploy') }}
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Custom Model -->
+                        <div class="col-md-6 col-lg-4 mb-3">
+                            <div class="model-card">
+                                <div class="model-header">
+                                    <h6>{{ _('Custom Model') }}</h6>
+                                    <span class="badge bg-info">{{ _('Configure') }}</span>
+                                </div>
+                                <div class="model-details">
+                                    <p class="text-muted small mb-2">{{ _('Deploy your own model') }}</p>
+                                    <div class="model-specs">
+                                        <span class="spec-item"><i class="fas fa-question me-1"></i> {{ _('Custom specs') }}</span>
+                                    </div>
+                                </div>
+                                <button class="btn btn-sm btn-outline-primary w-100 mt-2" onclick="deployCustomModel()">
+                                    <i class="fas fa-cog me-1"></i> {{ _('Configure') }}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Deployment Templates -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent border-0">
+                    <h5 class="mb-0">
+                        <i class="fas fa-file-code me-2"></i>
+                        {{ _('Deployment Templates') }}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        <a href="/static/deployment-templates/runpod-olmocr.sh" download class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">{{ _('RunPod OLMocr Deployment Script') }}</h6>
+                                <small><i class="fas fa-download"></i></small>
+                            </div>
+                            <p class="mb-1 text-muted small">{{ _('Bash script for deploying OLMocr to RunPod serverless') }}</p>
+                            <small class="text-muted">{{ _('Supports Docker and vLLM deployments') }}</small>
+                        </a>
+                        <a href="/static/deployment-templates/runpod-handler.py" download class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">{{ _('RunPod Handler Template') }}</h6>
+                                <small><i class="fas fa-download"></i></small>
+                            </div>
+                            <p class="mb-1 text-muted small">{{ _('Python handler for RunPod serverless endpoints') }}</p>
+                            <small class="text-muted">{{ _('Includes S3 integration and error handling') }}</small>
+                        </a>
+                        <a href="/static/deployment-templates/Dockerfile" download class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">{{ _('Dockerfile Template') }}</h6>
+                                <small><i class="fas fa-download"></i></small>
+                            </div>
+                            <p class="mb-1 text-muted small">{{ _('Docker container configuration for OCR models') }}</p>
+                            <small class="text-muted">{{ _('Optimized for GPU inference') }}</small>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- New Deployment Modal -->
+<div class="modal fade" id="newDeploymentModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-rocket me-2"></i>
+                    {{ _('New Deployment') }}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="deployment-form">
+                    <!-- Step 1: Model & Provider Selection -->
+                    <div class="deployment-step" id="step-selection">
+                        <h6 class="mb-3">{{ _('1. Select Model and Provider') }}</h6>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">{{ _('Model') }}</label>
+                            <select class="form-select" id="model-select" onchange="handleModelChange()" required>
+                                <option value="">{{ _('Choose a model...') }}</option>
+                                <!-- Populated from database -->
+                            </select>
+                            <div class="alert alert-warning mt-2 d-none" id="model-select-alert">
+                                <i class="fas fa-info-circle me-1"></i>
+                                {{ _('No deployable models are available yet. Add models in the') }} <strong>{{ _('AI Models') }}</strong> {{ _('section.') }}
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">{{ _('Cloud Provider') }}</label>
+                            <select class="form-select" id="provider-select" onchange="handleProviderChange()" required>
+                                <option value="">{{ _('Choose a provider...') }}</option>
+                                <!-- Populated from database -->
+                            </select>
+                            <div class="alert alert-warning mt-2 d-none" id="provider-select-alert">
+                                <i class="fas fa-info-circle me-1"></i>
+                                {{ _('No cloud providers are configured. Add providers in the') }} <strong>{{ _('Cloud Providers') }}</strong> {{ _('settings.') }}
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">{{ _('Deployment Name') }}</label>
+                            <input type="text" class="form-control" id="deployment-name" placeholder="{{ _('e.g., olmocr-prod') }}" required>
+                        </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Provider-Specific Configuration (Dynamic) -->
+                    <div class="deployment-step mt-4" id="step-provider-config" style="display: none;">
+                        <h6 class="mb-3">{{ _('2. Provider Configuration') }}</h6>
+                        <div id="provider-config-fields">
+                            <!-- Dynamically populated based on provider selection -->
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Model-Specific Configuration (Dynamic) -->
+                    <div class="deployment-step mt-4" id="step-model-config" style="display: none;">
+                        <h6 class="mb-3">{{ _('3. Model Configuration') }}</h6>
+                        <div id="model-config-fields">
+                            <!-- Dynamically populated based on model selection -->
+                        </div>
+                    </div>
+
+                    <!-- Step 4: Model Upload to S3 (Optional) -->
+                    <div class="deployment-step mt-4" id="step-model-upload" style="display: none;">
+                        <h6 class="mb-3">{{ _('4. Model Upload to S3 Storage') }} <span class="badge bg-info">{{ _('Optional') }}</span></h6>
+                        <div class="alert alert-info mb-3">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>{{ _('Model Storage:') }}</strong> {{ _('Upload your model files to S3-compatible storage for faster deployment and persistent storage. Leave empty to use HuggingFace Hub directly (slower first load).') }}
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">{{ _('Model Source') }}</label>
+                                <select class="form-select" id="model-source" onchange="handleModelSourceChange()">
+                                    <option value="huggingface">{{ _('Download from HuggingFace Hub') }}</option>
+                                    <option value="s3">{{ _('Use existing S3 model') }}</option>
+                                    <option value="upload">{{ _('Upload local model files') }}</option>
+                                </select>
+                                <small class="text-muted">{{ _('Where to get the model files') }}</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">{{ _('S3 Bucket Name') }}</label>
+                                <input type="text" class="form-control" id="s3-bucket-name"
+                                       placeholder="{{ _('my-models-bucket') }}">
+                                <small class="text-muted">{{ _('Target S3 bucket for model storage') }}</small>
+                            </div>
+                        </div>
+
+                        <!-- HuggingFace Download Option -->
+                        <div id="huggingface-source" class="mb-3">
+                            <div class="row">
+                                <div class="col-md-8 mb-3">
+                                    <label class="form-label">{{ _('HuggingFace Model ID') }}</label>
+                                    <input type="text" class="form-control" id="hf-model-id"
+                                           placeholder="allenai/olmOCR-7B-0825">
+                                    <small class="text-muted">{{ _('Will be downloaded and uploaded to S3 automatically') }}</small>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">{{ _('HuggingFace Token') }}</label>
+                                    <div class="input-group">
+                                        <input type="password" class="form-control" id="hf-token"
+                                               placeholder="hf_...">
+                                        <button class="btn btn-outline-secondary" type="button"
+                                                onclick="togglePasswordField('hf-token')">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </div>
+                                    <small class="text-muted">{{ _('For gated models') }}</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- S3 Existing Model Option -->
+                        <div id="s3-source" class="mb-3" style="display: none;">
+                            <div class="row">
+                                <div class="col-md-12 mb-3">
+                                    <label class="form-label">{{ _('S3 Model Path') }}</label>
+                                    <input type="text" class="form-control" id="s3-model-path"
+                                           placeholder="{{ _('models/olmocr-7b/') }}">
+                                    <small class="text-muted">{{ _('Path to model files in S3 bucket') }}</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Local Upload Option -->
+                        <div id="upload-source" class="mb-3" style="display: none;">
+                            <div class="row">
+                                <div class="col-md-12 mb-3">
+                                    <label class="form-label">{{ _('Model Files') }}</label>
+                                    <input type="file" class="form-control" id="model-files"
+                                           multiple webkitdirectory directory>
+                                    <small class="text-muted">{{ _('Select model directory (config.json, model weights, tokenizer files)') }}</small>
+                                </div>
+                                <div class="col-md-12">
+                                    <div id="upload-progress" class="progress" style="display: none;">
+                                        <div class="progress-bar progress-bar-striped progress-bar-animated"
+                                             role="progressbar" id="upload-progress-bar"></div>
+                                    </div>
+                                    <div id="upload-status" class="mt-2"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- S3 Configuration -->
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="skip-s3-upload"
+                                           onchange="toggleS3Upload()">
+                                    <label class="form-check-label" for="skip-s3-upload">
+                                        {{ _('Skip S3 upload (use HuggingFace Hub directly on deployment)') }}
+                                    </label>
+                                </div>
+                                <small class="text-muted">
+                                    {{ _('First deployment will be slower but saves S3 storage costs') }}
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 5: Deployment Options -->
+                    <div class="deployment-step mt-4" id="step-options" style="display: none;">
+                        <h6 class="mb-3">{{ _('5. Deployment Options') }}</h6>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">{{ _('GPU Type') }}</label>
+                                <select class="form-select" id="gpu-select" required>
+                                    <option value="">{{ _('Select GPU...') }}</option>
+                                    <!-- Populated based on provider -->
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">{{ _('Deployment Type') }}</label>
+                                <select class="form-select" id="deployment-type" required>
+                                    <option value="docker">{{ _('Docker Container') }}</option>
+                                    <option value="vllm">{{ _('vLLM Optimized') }}</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">{{ _('Auto-scaling') }}</label>
+                                <select class="form-select" id="autoscaling">
+                                    <option value="true">{{ _('Enabled') }}</option>
+                                    <option value="false">{{ _('Disabled') }}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">{{ _('Max Workers') }}</label>
+                                <input type="number" class="form-control" id="max-workers" value="3" min="1" max="10">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">{{ _('Idle Timeout (seconds)') }}</label>
+                                <input type="number" class="form-control" id="idle-timeout" value="60" min="10" max="300">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">{{ _('Request Timeout (seconds)') }}</label>
+                                <input type="number" class="form-control" id="request-timeout" value="300" min="60" max="600">
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Cancel') }}</button>
+                <button type="button" class="btn btn-primary" onclick="submitDeployment()">
+                    <i class="fas fa-rocket me-1"></i> {{ _('Deploy') }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', path='js/deployments.js') }}"></script>
+{% endblock %}

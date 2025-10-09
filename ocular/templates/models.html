@@ -1,0 +1,563 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('AI Models Management') }} - {{ _('Ocular OCR') }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 my-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="display-5">
+                        <i class="fas fa-cube me-3 text-primary"></i>
+                        {{ _('AI Models Management') }}
+                    </h1>
+                    <p class="lead text-muted">{{ _('Manage OCR and vision models from HuggingFace catalog') }}</p>
+                </div>
+                <button class="btn btn-primary btn-lg" onclick="showAddModelModal()">
+                    <i class="fas fa-plus me-2"></i>
+                    {{ _('Add Model') }}
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="card border-0 shadow-sm mb-3">
+        <div class="card-body">
+            <div class="row g-3 mb-3">
+                <div class="col-md-2">
+                    <label for="filter-status" class="form-label small text-muted">{{ _('Status') }}</label>
+                    <select class="form-select form-select-sm" id="filter-status" onchange="applyFilters()">
+                        <option value="">{{ _('All Statuses') }}</option>
+                        <option value="available">{{ _('Available') }}</option>
+                        <option value="beta">{{ _('Beta') }}</option>
+                        <option value="deprecated">{{ _('Deprecated') }}</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="filter-opensource" class="form-label small text-muted">{{ _('Open Source') }}</label>
+                    <select class="form-select form-select-sm" id="filter-opensource" onchange="applyFilters()">
+                        <option value="">{{ _('All Models') }}</option>
+                        <option value="true">{{ _('Open Source Only') }}</option>
+                        <option value="false">{{ _('Proprietary Only') }}</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="filter-cloud-storage" class="form-label small text-muted">{{ _('Cloud Storage') }}</label>
+                    <select class="form-select form-select-sm" id="filter-cloud-storage" onchange="applyFilters()">
+                        <option value="">{{ _('All Models') }}</option>
+                        <option value="true">{{ _('Uploaded to Cloud') }}</option>
+                        <option value="false">{{ _('Not Uploaded') }}</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="filter-vllm" class="form-label small text-muted">{{ _('vLLM Support') }}</label>
+                    <select class="form-select form-select-sm" id="filter-vllm" onchange="applyFilters()">
+                        <option value="">{{ _('All Models') }}</option>
+                        <option value="true">{{ _('vLLM Compatible') }}</option>
+                        <option value="false">{{ _('Not Compatible') }}</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="filter-vram" class="form-label small text-muted">{{ _('VRAM Requirement') }}</label>
+                    <select class="form-select form-select-sm" id="filter-vram" onchange="applyFilters()">
+                        <option value="">{{ _('All Sizes') }}</option>
+                        <option value="0-10">≤ 10 GB</option>
+                        <option value="10-20">10-20 GB</option>
+                        <option value="20-40">20-40 GB</option>
+                        <option value="40-80">40-80 GB</option>
+                        <option value="80+">80+ GB</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="filter-provider" class="form-label small text-muted">{{ _('Provider Type') }}</label>
+                    <select class="form-select form-select-sm" id="filter-provider" onchange="applyFilters()">
+                        <option value="">{{ _('All Providers') }}</option>
+                        <option value="vision">{{ _('Vision AI') }}</option>
+                        <option value="ocr">{{ _('OCR Engine') }}</option>
+                        <option value="document">{{ _('Document AI') }}</option>
+                        <option value="custom">{{ _('Custom') }}</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label for="filter-search" class="form-label small text-muted">{{ _('Search') }}</label>
+                    <input type="text" class="form-control form-control-sm" id="filter-search"
+                           placeholder="{{ _('Search by name, version, or description...') }}" onkeyup="applyFilters()">
+                </div>
+                <div class="col-md-2">
+                    <label for="filter-min-downloads" class="form-label small text-muted">{{ _('Min Downloads') }}</label>
+                    <input type="number" class="form-control form-control-sm" id="filter-min-downloads"
+                           placeholder="{{ _('e.g., 1000') }}" onchange="applyFilters()">
+                </div>
+                <div class="col-md-2">
+                    <label for="filter-min-likes" class="form-label small text-muted">{{ _('Min Likes') }}</label>
+                    <input type="number" class="form-control form-control-sm" id="filter-min-likes"
+                           placeholder="{{ _('e.g., 10') }}" onchange="applyFilters()">
+                </div>
+                <div class="col-md-3">
+                    <label for="filter-tags" class="form-label small text-muted">{{ _('HuggingFace Tags') }}</label>
+                    <input type="text" class="form-control form-control-sm" id="filter-tags"
+                           placeholder="{{ _('e.g., transformers, pytorch') }}" onkeyup="applyFilters()">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small text-muted">&nbsp;</label>
+                    <button class="btn btn-sm btn-outline-secondary w-100" onclick="clearFilters()">
+                        <i class="fas fa-times me-1"></i> {{ _('Clear Filters') }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bulk Actions Bar -->
+    <div class="card border-0 shadow-sm mb-3" id="bulk-actions-bar" style="display: none;">
+        <div class="card-body py-2">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <span class="fw-bold me-3">
+                        <span id="selected-count">0</span> {{ _('selected') }}
+                    </span>
+                    <button class="btn btn-sm btn-outline-primary me-2" onclick="selectAllModels()">
+                        <i class="fas fa-check-square me-1"></i> {{ _('Select All') }}
+                    </button>
+                    <button class="btn btn-sm btn-outline-secondary me-2" onclick="clearSelection()">
+                        <i class="fas fa-times me-1"></i> {{ _('Clear Selection') }}
+                    </button>
+                </div>
+                <div>
+                    <button class="btn btn-sm btn-primary me-2" onclick="compareSelectedModels()">
+                        <i class="fas fa-balance-scale me-1"></i> {{ _('Compare') }}
+                    </button>
+                    <button class="btn btn-sm btn-success me-2" onclick="exportSelectedModels()">
+                        <i class="fas fa-download me-1"></i> {{ _('Export') }}
+                    </button>
+                    <button class="btn btn-sm btn-warning me-2" onclick="bulkUpdateStatus()">
+                        <i class="fas fa-edit me-1"></i> {{ _('Status') }}
+                    </button>
+                    <button class="btn btn-sm btn-info me-2" onclick="bulkUploadToCloud()">
+                        <i class="fas fa-cloud-upload-alt me-1"></i> {{ _('Upload') }}
+                    </button>
+                    <button class="btn btn-sm btn-danger" onclick="deleteSelectedModels()">
+                        <i class="fas fa-trash me-1"></i> {{ _('Delete') }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Models Table -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-transparent border-0">
+            <h5 class="mb-0">
+                <i class="fas fa-list me-2"></i>
+                {{ _('Available Models') }}
+                <span class="badge bg-secondary ms-2" id="model-count">0</span>
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover" id="models-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 40px;">
+                                <input type="checkbox" class="form-check-input" id="select-all-checkbox" onchange="toggleSelectAll()">
+                            </th>
+                            <th>{{ _('Model') }}</th>
+                            <th>{{ _('Version') }}</th>
+                            <th>{{ _('VRAM') }}</th>
+                            <th style="min-width: 120px;">{{ _('HF Stats') }}</th>
+                            <th>{{ _('Cloud Storage') }}</th>
+                            <th>{{ _('Open Source') }}</th>
+                            <th>{{ _('vLLM') }}</th>
+                            <th>{{ _('Status') }}</th>
+                            <th style="min-width: 250px;">{{ _('Actions') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody id="models-tbody">
+                        <tr>
+                            <td colspan="10" class="text-center py-4">
+                                <div class="spinner-border spinner-border-sm text-primary me-2"></div>
+                                {{ _('Loading models...') }}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Hugging Face Preview Modal -->
+<div class="modal fade" id="huggingfacePreviewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="huggingface-preview-title">{{ _('Model Preview') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Close') }}"></button>
+            </div>
+            <div class="modal-body p-0">
+                <div class="ratio ratio-16x9 position-relative">
+                    <div id="huggingface-preview-spinner" class="position-absolute top-50 start-50 translate-middle d-none">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">{{ _('Loading...') }}</span>
+                        </div>
+                    </div>
+                    <iframe id="huggingface-preview-frame"
+                            src=""
+                            title="{{ _('Hugging Face Preview') }}"
+                            loading="lazy"
+                            style="border: 0;"
+                            referrerpolicy="no-referrer-when-downgrade"></iframe>
+                </div>
+                <div class="p-3 border-top">
+                    <p class="small text-muted mb-2">
+                        {{ _('If the preview does not load, you can open the model page directly on Hugging Face.') }}
+                    </p>
+                    <a id="huggingface-preview-fallback" href="#" target="_blank" rel="noopener"
+                       class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-external-link-alt me-1"></i>
+                        {{ _('Open on Hugging Face') }}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Upload to Cloud Storage Modal -->
+<div class="modal fade" id="uploadModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-cloud-upload-alt me-2"></i>
+                    {{ _('Upload Model to Cloud Storage') }}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="upload-form" enctype="multipart/form-data">
+                    <input type="hidden" id="upload-model-id">
+
+                    <div class="mb-3">
+                        <label class="form-label">{{ _('Upload Source') }} <span class="text-danger">*</span></label>
+                        <select class="form-select" id="upload-source">
+                            <option value="huggingface">{{ _('Download from HuggingFace') }}</option>
+                            <option value="file">{{ _('Upload Local File') }}</option>
+                        </select>
+                        <small class="text-muted">{{ _('Choose to download model from HuggingFace or upload a local file') }}</small>
+                    </div>
+
+                    <div class="mb-3" id="file-upload-group" style="display: none;">
+                        <label class="form-label">{{ _('Model File') }} <span class="text-danger">*</span></label>
+                        <input type="file" class="form-control" id="upload-file">
+                        <small class="text-muted">{{ _('Weights, Docker image, or configuration file') }}</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">{{ _('S3 Bucket') }} <span class="text-danger">*</span></label>
+                        <select class="form-select" id="upload-bucket" required>
+                            <option value="">{{ _('Loading buckets...') }}</option>
+                        </select>
+                        <small class="text-muted">{{ _('Select storage bucket from configuration') }}</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">{{ _('Storage Provider') }}</label>
+                        <select class="form-select" id="upload-provider" disabled>
+                            <option value="runpod">{{ _('RunPod Storage') }}</option>
+                            <option value="aws">{{ _('AWS S3') }}</option>
+                            <option value="custom">{{ _('Custom S3-Compatible') }}</option>
+                        </select>
+                        <small class="text-muted">{{ _('Auto-selected based on bucket') }}</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="upload-public">
+                            <label class="form-check-label" for="upload-public">
+                                {{ _('Make publicly accessible') }}
+                            </label>
+                        </div>
+                    </div>
+
+                    <div id="upload-progress" class="mb-3" style="display: none;">
+                        <div class="progress">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated"
+                                 role="progressbar" style="width: 100%"></div>
+                        </div>
+                        <small class="text-muted" id="upload-progress-text">{{ _('Processing...') }}</small>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Cancel') }}</button>
+                <button type="button" class="btn btn-primary" onclick="uploadToCloudStorage()">
+                    <i class="fas fa-cloud-upload-alt me-1"></i> {{ _('Upload') }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add/Edit Model Modal -->
+<div class="modal fade" id="modelModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modelModalTitle">
+                    <i class="fas fa-cube me-2"></i>
+                    <span id="modal-title-text">{{ _('Add New Model') }}</span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="model-form">
+                    <input type="hidden" id="model-id">
+
+                    <!-- HuggingFace Search -->
+                    <div class="mb-4">
+                        <label class="form-label">{{ _('Search HuggingFace Hub') }}</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="hf-search"
+                                   placeholder="{{ _('Search for models (e.g., OCR, vision, pixtral)') }}">
+                            <button class="btn btn-outline-primary" type="button" onclick="searchHuggingFace()">
+                                <i class="fas fa-search me-1"></i> {{ _('Search') }}
+                            </button>
+                        </div>
+                        <small class="text-muted">{{ _('Search HuggingFace for OCR and vision models') }}</small>
+                    </div>
+
+                    <div id="hf-results" class="mb-4" style="display: none;">
+                        <div class="list-group" id="hf-results-list"></div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <!-- Model Details -->
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="model-name" class="form-label">{{ _('Model Name') }} <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="model-name" required
+                                   placeholder="{{ _('e.g., olmocr') }}">
+                            <small class="text-muted">{{ _('Internal identifier (lowercase, no spaces)') }}</small>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="display-name" class="form-label">{{ _('Display Name') }} <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="display-name" required
+                                   placeholder="{{ _('e.g., OLMocr 7B') }}">
+                            <small class="text-muted">{{ _('User-friendly name') }}</small>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label for="model-version" class="form-label">{{ _('Model Version/ID') }} <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="model-version" required
+                                   placeholder="{{ _('e.g., allenai/olmOCR-7B-0825') }}">
+                            <small class="text-muted">{{ _('HuggingFace model identifier') }}</small>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="model-description" class="form-label">{{ _('Description') }}</label>
+                        <textarea class="form-control" id="model-description" rows="2"
+                                  placeholder="{{ _("Brief description of the model's capabilities") }}"></textarea>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="docker-image" class="form-label">{{ _('Docker Image') }}</label>
+                            <input type="text" class="form-control" id="docker-image"
+                                   placeholder="{{ _('e.g., ocular/olmocr-runpod:latest') }}">
+                            <small class="text-muted">{{ _('Container image for deployment') }}</small>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="min-vram" class="form-label">{{ _('Min VRAM (GB)') }} <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="min-vram" required
+                                   min="1" max="200" value="16">
+                            <small class="text-muted">{{ _('Minimum GPU memory required') }}</small>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="recommended-gpu" class="form-label">{{ _('Recommended GPU') }}</label>
+                            <input type="text" class="form-control" id="recommended-gpu"
+                                   placeholder="{{ _('e.g., RTX A4000+') }}">
+                            <small class="text-muted">{{ _('Suggested GPU type') }}</small>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="model-status" class="form-label">{{ _('Status') }}</label>
+                            <select class="form-select" id="model-status">
+                                <option value="available">{{ _('Available') }}</option>
+                                <option value="beta">{{ _('Beta') }}</option>
+                                <option value="deprecated">{{ _('Deprecated') }}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="supports-vllm">
+                                <label class="form-check-label" for="supports-vllm">
+                                    {{ _('Supports vLLM acceleration') }}
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Cancel') }}</button>
+                <button type="button" class="btn btn-primary" onclick="saveModel()">
+                    <i class="fas fa-save me-1"></i> {{ _('Save Model') }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Version History Modal -->
+<div class="modal fade" id="versionHistoryModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-code-branch me-2"></i>
+                    {{ _('Version History') }}: <span id="versionHistoryModelName"></span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex justify-content-between mb-3">
+                    <button class="btn btn-primary" onclick="showNewVersionModal()">
+                        <i class="fas fa-plus me-2"></i>{{ _('Create New Version') }}
+                    </button>
+                    <div class="btn-group">
+                        <button class="btn btn-outline-primary" id="compareVersionsBtn" onclick="compareSelectedVersions()" disabled>
+                            {{ _('Compare Selected') }} (0)
+                        </button>
+                        <button class="btn btn-outline-info" onclick="setupABTest()">
+                            <i class="fas fa-flask me-2"></i>{{ _('Setup A/B Test') }}
+                        </button>
+                    </div>
+                </div>
+                <div id="versionsList"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- New Version Modal -->
+<div class="modal fade" id="newVersionModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{{ _('Create New Version') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="newVersionForm">
+                    <div class="mb-3">
+                        <label for="version_number" class="form-label">{{ _('Version Number') }} *</label>
+                        <input type="text" class="form-control" id="version_number" name="version_number"
+                               placeholder="{{ _('e.g., v1.0.0, 2024-01-05') }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="version_name" class="form-label">{{ _('Version Name') }}</label>
+                        <input type="text" class="form-control" id="version_name" name="version_name"
+                               placeholder="{{ _('e.g., Stable Release') }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="version_tag" class="form-label">{{ _('Version Tag') }}</label>
+                        <select class="form-select" id="version_tag" name="version_tag">
+                            <option value="">{{ _('No Tag') }}</option>
+                            <option value="latest">{{ _('Latest') }}</option>
+                            <option value="stable">{{ _('Stable') }}</option>
+                            <option value="beta">{{ _('Beta') }}</option>
+                            <option value="alpha">{{ _('Alpha') }}</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="changelog" class="form-label">{{ _('Changelog') }}</label>
+                        <textarea class="form-control" id="changelog" name="changelog" rows="3"
+                                  placeholder="{{ _("Describe what's new in this version...") }}"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="docker_image" class="form-label">{{ _('Docker Image') }}</label>
+                        <input type="text" class="form-control" id="docker_image" name="docker_image"
+                               placeholder="{{ _('e.g., myregistry/model:v1.0.0') }}">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Cancel') }}</button>
+                <button type="button" class="btn btn-primary" onclick="createNewVersion()">
+                    <i class="fas fa-save me-2"></i>{{ _('Create Version') }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Version Comparison Modal -->
+<div class="modal fade" id="versionComparisonModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-balance-scale me-2"></i>{{ _('Version Comparison') }}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>{{ _('Attribute') }}</th>
+                                <th class="text-center" id="comparison-header-1"></th>
+                                <th class="text-center" id="comparison-header-2"></th>
+                                <th class="text-center" id="comparison-header-3"></th>
+                                <th class="text-center" id="comparison-header-4"></th>
+                                <th class="text-center" id="comparison-header-5"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="versionComparisonBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Version Details Modal -->
+<div class="modal fade" id="versionDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-info-circle me-2"></i>{{ _('Version Details') }}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="versionDetailsContent">
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', path='js/models.js') }}"></script>
+<script src="{{ url_for('static', path='js/models_bulk_operations.js') }}"></script>
+<script src="{{ url_for('static', path='js/models_test.js') }}"></script>
+<script src="{{ url_for('static', path='js/versions.js') }}"></script>
+{% endblock %}

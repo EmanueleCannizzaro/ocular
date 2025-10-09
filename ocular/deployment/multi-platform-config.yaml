@@ -1,0 +1,578 @@
+# Multi-Platform AI Model Deployment Configuration
+# Supports: RunPod, Modal, Replicate, Google Cloud Run, DigitalOcean, Lambda Labs
+# Version: 1.0.0
+
+# Global configuration for all platforms
+global:
+  project_name: "ai-model-deployment"
+  model_name: "allenai/olmOCR-7B-0225-preview"
+  model_version: "main"
+  description: "Multi-platform AI model deployment for OLMocr with vLLM"
+
+  # Environment variables shared across platforms
+  environment:
+    MODEL_NAME: "allenai/olmOCR-7B-0225-preview"
+    MODEL_REVISION: "main"
+    MAX_MODEL_LEN: "4096"
+    GPU_MEMORY_UTILIZATION: "0.9"
+    DTYPE: "bfloat16"
+    TRUST_REMOTE_CODE: "true"
+    HF_TOKEN: "${HF_TOKEN}"
+    LOG_LEVEL: "INFO"
+
+  # Resource requirements
+  resources:
+    min_gpu_memory_gb: 16
+    recommended_gpu_memory_gb: 20
+    min_cpu_cores: 8
+    min_memory_gb: 32
+    storage_gb: 50
+
+  # Scaling configuration
+  scaling:
+    min_instances: 0
+    max_instances: 5
+    target_concurrency: 100
+    scale_down_delay: 300  # seconds
+
+  # Health check configuration
+  health_check:
+    enabled: true
+    path: "/health"
+    timeout_seconds: 30
+    interval_seconds: 60
+
+# Platform-specific configurations
+platforms:
+
+  # RunPod Serverless Configuration
+  runpod:
+    enabled: true
+
+    # RunPod specific settings
+    config:
+      endpoint_name: "olmocr-vllm-runpod"
+      base_image: "runpod/worker-vllm:stable"
+      regions: ["US-OR-1", "US-TX-1", "EU-RO-1"]
+
+      # GPU configuration
+      gpu_types:
+        - "NVIDIA L40S"
+        - "NVIDIA A100"
+        - "NVIDIA H100"
+      gpu_count: 1
+
+      # Container settings
+      container_disk_size_gb: 50
+      network_storage: true
+      volume_size_gb: 100
+      volume_mount_path: "/runpod-volume"
+
+      # Scaling settings
+      idle_timeout: 5  # minutes
+      max_concurrency: 256
+
+      # Environment variables specific to RunPod
+      environment:
+        BASE_PATH: "/runpod-volume"
+        WORKER_CUDA_VERSION: "12.1.0"
+        VLLM_ENGINE_ARGS: "--model=allenai/olmOCR-7B-0225-preview --max-model-len=4096 --gpu-memory-utilization=0.9 --dtype=bfloat16 --trust-remote-code"
+        OPENAI_API_BASE: "/v1"
+        OPENAI_SERVE_CHAT: "true"
+        HF_HOME: "/runpod-volume/hf_cache"
+        TRANSFORMERS_CACHE: "/runpod-volume/transformers_cache"
+
+      # Deployment command and API endpoint format
+      deploy_command: |
+        runpodctl deploy \
+          --name olmocr-vllm-runpod \
+          --image runpod/worker-vllm:stable \
+          --gpu "NVIDIA L40S" \
+          --region US-OR-1 \
+          --env MODEL_NAME=allenai/olmOCR-7B-0225-preview
+
+      # API endpoint format (example with endpoint ID: 6dldf1jqc8frk8)
+      api_endpoint_template: "https://api.runpod.ai/v2/{endpoint_id}/run"
+      example_request: |
+        import requests
+        headers = {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer YOUR_API_KEY'
+        }
+        data = {
+            'input': {
+                "model": "allenai/olmOCR-7B-0225-preview",
+                "messages": [...],
+                "max_tokens": 4096
+            }
+        }
+        response = requests.post('https://api.runpod.ai/v2/6dldf1jqc8frk8/run', headers=headers, json=data)
+
+  # Modal Configuration
+  modal:
+    enabled: true
+
+    config:
+      app_name: "olmocr-vllm-modal"
+      image: "modal-python:3.11"
+
+      # GPU configuration
+      gpu_config:
+        type: "A100"  # T4, L4, L40S, A10, A100, H100, H200, B200
+        count: 1
+        memory: "40GB"
+
+      # Resource limits
+      cpu: 8.0
+      memory: 32768  # MB
+      timeout: 300   # seconds
+
+      # Volume configuration
+      volumes:
+        model_cache: "/cache"
+
+      # Environment variables specific to Modal
+      environment:
+        MODAL_ENVIRONMENT: "main"
+        MODEL_CACHE_DIR: "/cache"
+        PYTHONPATH: "/app"
+
+      # Secrets (configured in Modal dashboard)
+      secrets:
+        - "huggingface-token"
+        - "model-config"
+
+      # Python requirements
+      requirements:
+        - "vllm>=0.4.0"
+        - "torch>=2.1.0"
+        - "transformers>=4.35.0"
+        - "fastapi>=0.104.0"
+        - "pillow>=10.0.0"
+
+      # Deployment configuration
+      schedule: null  # For scheduled jobs
+      webhook_config:
+        method: "POST"
+        wait_for_response: true
+
+  # Replicate Configuration
+  replicate:
+    enabled: true
+
+    config:
+      model_name: "olmocr-vllm"
+      version: "1.0.0"
+
+      # Hardware configuration
+      hardware: "nvidia-a40-large"  # nvidia-t4, nvidia-a40-small, nvidia-a40-large, nvidia-a100
+
+      # Prediction configuration
+      predict:
+        inputs:
+          model:
+            type: "str"
+            default: "allenai/olmOCR-7B-0225-preview"
+            description: "Model name from Hugging Face"
+          messages:
+            type: "array"
+            description: "Chat messages with image support"
+          max_tokens:
+            type: "integer"
+            default: 4096
+            minimum: 1
+            maximum: 8192
+          temperature:
+            type: "number"
+            default: 0.1
+            minimum: 0.0
+            maximum: 2.0
+          top_p:
+            type: "number"
+            default: 0.9
+            minimum: 0.0
+            maximum: 1.0
+        output:
+          type: "object"
+          description: "Generated response with choices and usage info"
+
+      # Build configuration
+      build:
+        system_packages:
+          - "libgl1-mesa-glx"
+          - "libglib2.0-0"
+        python_packages:
+          - "vllm==0.4.0"
+          - "torch==2.1.0"
+          - "transformers==4.35.0"
+          - "Pillow==10.0.0"
+        python_version: "3.11"
+        cuda_version: "12.1"
+
+      # Environment variables
+      environment:
+        REPLICATE_MODEL_CACHE: "/src/.cache"
+        TORCH_HOME: "/src/.cache/torch"
+        HF_HOME: "/src/.cache/huggingface"
+
+  # Google Cloud Run Configuration
+  google_cloud_run:
+    enabled: true
+
+    config:
+      service_name: "olmocr-vllm-cloudrun"
+      region: "us-central1"
+      project_id: "${GOOGLE_CLOUD_PROJECT}"
+
+      # Container configuration
+      container:
+        image: "gcr.io/${GOOGLE_CLOUD_PROJECT}/olmocr-vllm:latest"
+        port: 8080
+
+      # Resource configuration
+      resources:
+        limits:
+          cpu: "8"
+          memory: "32Gi"
+          gpu:
+            type: "nvidia-l4"
+            count: 1
+        requests:
+          cpu: "4"
+          memory: "16Gi"
+
+      # Scaling configuration
+      scaling:
+        min_instances: 0
+        max_instances: 10
+        concurrency: 80
+
+      # Service configuration
+      traffic:
+        percent: 100
+        latest_revision: true
+
+      # Environment variables
+      environment:
+        GOOGLE_CLOUD_PROJECT: "${GOOGLE_CLOUD_PROJECT}"
+        MODEL_CACHE_GCS: "gs://${GOOGLE_CLOUD_PROJECT}-model-cache"
+        CLOUD_RUN_SERVICE: "true"
+
+      # IAM and security
+      service_account: "olmocr-service@${GOOGLE_CLOUD_PROJECT}.iam.gserviceaccount.com"
+
+      # Deployment command
+      deploy_command: |
+        gcloud run deploy olmocr-vllm-cloudrun \
+          --image gcr.io/${GOOGLE_CLOUD_PROJECT}/olmocr-vllm:latest \
+          --platform managed \
+          --region us-central1 \
+          --gpu 1 \
+          --gpu-type nvidia-l4 \
+          --memory 32Gi \
+          --cpu 8 \
+          --max-instances 10 \
+          --allow-unauthenticated
+
+  # DigitalOcean Configuration
+  digitalocean:
+    enabled: true
+
+    config:
+      # App Platform configuration
+      app_name: "olmocr-vllm-do"
+
+      # Service configuration
+      services:
+        - name: "api"
+          source_dir: "/"
+          github:
+            repo: "your-username/olmocr-deployment"
+            branch: "main"
+
+          # Resource configuration
+          instance_count: 1
+          instance_size_slug: "gpu-h100-1x"  # gpu-rtx6000-1x, gpu-h100-1x
+
+          # Environment variables
+          envs:
+            - key: "MODEL_NAME"
+              value: "allenai/olmOCR-7B-0225-preview"
+            - key: "DO_SPACES_ENDPOINT"
+              value: "https://nyc3.digitaloceanspaces.com"
+            - key: "DO_SPACES_BUCKET"
+              value: "olmocr-models"
+
+          # Health check
+          health_check:
+            http_path: "/health"
+            initial_delay_seconds: 30
+            period_seconds: 10
+            timeout_seconds: 5
+
+          # HTTP configuration
+          http_port: 8080
+          routes:
+            - path: "/"
+
+      # Database configuration (optional)
+      databases:
+        - name: "cache-db"
+          engine: "REDIS"
+          version: "7"
+          size: "db-s-1vcpu-1gb"
+
+      # Domain configuration
+      domains:
+        - name: "olmocr-api.yourdomain.com"
+          type: "PRIMARY"
+
+  # Lambda Labs Configuration
+  lambda_labs:
+    enabled: true
+
+    config:
+      instance_name: "olmocr-vllm-lambda"
+
+      # Instance configuration
+      instance_type: "gpu_1x_a100_sxm4"  # gpu_1x_a6000, gpu_1x_a100_sxm4, gpu_1x_h100_pcie
+      region: "us-west-2"
+
+      # SSH and security
+      ssh_key_names:
+        - "default"
+
+      # File system
+      file_system_names:
+        - "shared"
+
+      # Cloud init script
+      cloud_init: |
+        #!/bin/bash
+        apt-get update
+        apt-get install -y docker.io nvidia-docker2
+        systemctl restart docker
+
+        # Pull and run model container
+        docker run -d \
+          --name olmocr-vllm \
+          --gpus all \
+          -p 8080:8080 \
+          -e MODEL_NAME=allenai/olmOCR-7B-0225-preview \
+          -e HF_TOKEN=${HF_TOKEN} \
+          vllm/vllm-openai:latest
+
+      # Environment setup
+      environment:
+        LAMBDA_LABS_INSTANCE: "true"
+        CUDA_VISIBLE_DEVICES: "0"
+
+      # Deployment command
+      deploy_command: |
+        lambda cloud instance launch \
+          --instance-type gpu_1x_a100_sxm4 \
+          --ssh-key-name default \
+          --file-system-name shared \
+          --name olmocr-vllm-lambda
+
+# Deployment strategies
+deployment_strategies:
+
+  # Multi-platform deployment strategy
+  multi_platform:
+    description: "Deploy to multiple platforms for redundancy and load distribution"
+    platforms:
+      primary: "runpod"
+      secondary: ["modal", "replicate"]
+      fallback: "google_cloud_run"
+
+    load_balancing:
+      strategy: "round_robin"  # round_robin, weighted, geographic
+      health_check_interval: 30
+      failover_threshold: 3
+
+  # Cost-optimized strategy
+  cost_optimized:
+    description: "Prioritize platforms with best price-performance ratio"
+    platforms:
+      primary: "runpod"
+      secondary: "lambda_labs"
+
+    auto_scaling:
+      scale_down_aggressive: true
+      cold_start_tolerance: "high"
+
+  # Performance-optimized strategy
+  performance_optimized:
+    description: "Prioritize platforms with fastest response times"
+    platforms:
+      primary: "modal"
+      secondary: "google_cloud_run"
+
+    resource_allocation:
+      gpu_type: "H100"
+      memory_allocation: "aggressive"
+      cold_start_optimization: true
+
+# Monitoring and observability
+monitoring:
+
+  # Metrics to track across all platforms
+  metrics:
+    - name: "response_time"
+      threshold: 5000  # milliseconds
+      alert: true
+    - name: "error_rate"
+      threshold: 0.05  # 5%
+      alert: true
+    - name: "throughput"
+      unit: "requests_per_minute"
+    - name: "gpu_utilization"
+      threshold: 0.8  # 80%
+    - name: "cost_per_request"
+      unit: "usd"
+
+  # Alerting configuration
+  alerts:
+    channels:
+      - type: "email"
+        address: "admin@yourdomain.com"
+      - type: "slack"
+        webhook: "${SLACK_WEBHOOK_URL}"
+
+    rules:
+      - name: "high_error_rate"
+        condition: "error_rate > 0.1"
+        severity: "critical"
+      - name: "high_latency"
+        condition: "response_time > 10000"
+        severity: "warning"
+
+  # Logging configuration
+  logging:
+    level: "INFO"
+    format: "json"
+    destinations:
+      - "stdout"
+      - "platform_native"  # Use each platform's native logging
+
+# Security configuration
+security:
+
+  # Authentication
+  authentication:
+    type: "api_key"  # api_key, oauth2, jwt
+    header_name: "Authorization"
+
+  # Rate limiting
+  rate_limiting:
+    requests_per_minute: 100
+    burst_limit: 200
+
+  # Input validation
+  input_validation:
+    max_image_size_mb: 50
+    allowed_image_types: ["image/jpeg", "image/png", "application/pdf"]
+    max_tokens: 8192
+
+  # Network security
+  network:
+    cors_enabled: true
+    cors_origins: ["*"]
+    https_only: true
+
+  # Secrets management
+  secrets:
+    - name: "HF_TOKEN"
+      description: "Hugging Face authentication token"
+      required: false
+    - name: "API_SECRET_KEY"
+      description: "API authentication secret"
+      required: true
+    - name: "ENCRYPTION_KEY"
+      description: "Data encryption key"
+      required: false
+
+# Testing configuration
+testing:
+
+  # Test scenarios
+  scenarios:
+    - name: "health_check"
+      endpoint: "/health"
+      method: "GET"
+      expected_status: 200
+
+    - name: "text_completion"
+      endpoint: "/v1/chat/completions"
+      method: "POST"
+      payload:
+        model: "allenai/olmOCR-7B-0225-preview"
+        messages:
+          - role: "user"
+            content:
+              - type: "text"
+                text: "Extract text from this image"
+              - type: "image_url"
+                image_url:
+                  url: "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQ..."
+        max_tokens: 512
+      expected_status: 200
+
+    - name: "load_test"
+      type: "load"
+      concurrent_users: 10
+      duration_seconds: 60
+      ramp_up_seconds: 10
+
+  # Performance benchmarks
+  benchmarks:
+    cold_start_time_ms: 5000
+    warm_response_time_ms: 1000
+    throughput_rps: 10
+    gpu_utilization_percent: 80
+
+# Cost optimization
+cost_optimization:
+
+  # Auto-shutdown rules
+  auto_shutdown:
+    idle_threshold_minutes: 10
+    weekend_shutdown: true
+    scheduled_shutdown:
+      - time: "02:00"
+        timezone: "UTC"
+        duration_hours: 4
+
+  # Resource optimization
+  resource_optimization:
+    gpu_sharing: true
+    dynamic_batching: true
+    model_quantization: "bfloat16"
+    memory_optimization: true
+
+  # Cost alerts
+  cost_alerts:
+    daily_limit_usd: 100
+    weekly_limit_usd: 500
+    monthly_limit_usd: 2000
+
+# Backup and disaster recovery
+backup:
+
+  # Model backup
+  model_backup:
+    enabled: true
+    storage_type: "cloud_storage"  # cloud_storage, distributed
+    retention_days: 30
+
+  # Configuration backup
+  config_backup:
+    enabled: true
+    frequency: "daily"
+
+  # Disaster recovery
+  disaster_recovery:
+    multi_region: true
+    failover_time_minutes: 5
+    backup_platform: "google_cloud_run"

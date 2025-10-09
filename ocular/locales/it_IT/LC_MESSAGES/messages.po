@@ -1,0 +1,2875 @@
+# Italian translations for Ocular OCR
+# Copyright (C) 2025 Ocular OCR
+# This file is distributed under the same license as the Ocular package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Ocular OCR 1.0\n"
+"Report-Msgid-Bugs-To: support@ocular-ocr.com\n"
+"POT-Creation-Date: 2025-10-09 02:15+0200\n"
+"PO-Revision-Date: 2025-10-09 01:11+0000\n"
+"Last-Translator: DeepL API\n"
+"Language: it_IT\n"
+"Language-Team: Italian\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ocular/templates/analytics.html:3 ocular/templates/analytics.html:12
+msgid "Analytics Dashboard"
+msgstr ""
+
+#: ocular/templates/analytics.html:14
+msgid "Deployment metrics, costs, and performance insights"
+msgstr ""
+
+#: ocular/templates/analytics.html:18
+msgid "Last 7 days"
+msgstr ""
+
+#: ocular/templates/analytics.html:19
+msgid "Last 30 days"
+msgstr ""
+
+#: ocular/templates/analytics.html:20
+msgid "Last 90 days"
+msgstr ""
+
+#: ocular/templates/analytics.html:32 ocular/templates/deployments.html:38
+#: ocular/templates/deployments.html:152
+msgid "Active Deployments"
+msgstr ""
+
+#: ocular/templates/analytics.html:41
+msgid "in last 24h"
+msgstr ""
+
+#: ocular/templates/analytics.html:52
+msgid "GPU Utilization"
+msgstr ""
+
+#: ocular/templates/analytics.html:61
+msgid "GPUs active"
+msgstr ""
+
+#: ocular/templates/analytics.html:72
+msgid "Daily Cost"
+msgstr ""
+
+#: ocular/templates/analytics.html:80
+msgid "Estimated average"
+msgstr ""
+
+#: ocular/templates/analytics.html:91
+msgid "Total Models"
+msgstr ""
+
+#: ocular/templates/analytics.html:100
+msgid "failures (24h)"
+msgstr ""
+
+#: ocular/templates/analytics.html:115
+msgid "Deployment Timeline"
+msgstr ""
+
+#: ocular/templates/analytics.html:130
+msgid "GPU Distribution"
+msgstr ""
+
+#: ocular/templates/analytics.html:148
+msgid "Cost Breakdown (Last 30 Days)"
+msgstr ""
+
+#: ocular/templates/analytics.html:163
+msgid "Model Usage Statistics"
+msgstr ""
+
+#: ocular/templates/analytics.html:180
+msgid "Performance Trends & Success Rate"
+msgstr ""
+
+#: ocular/templates/base.html:6 ocular/templates/base.html:22
+#: ocular/templates/base.html:216 ocular/templates/index.html:3
+#: ocular/templates/index.html:9 ocular/templates/settings.html:3
+#: ocular/templates/settings.html:133
+msgid "Ocular OCR Service"
+msgstr ""
+
+#: ocular/templates/base.html:54
+msgid "Notifications"
+msgstr ""
+
+#: ocular/templates/base.html:58
+msgid "Loading notifications..."
+msgstr ""
+
+#: ocular/templates/base.html:62
+msgid "View all"
+msgstr ""
+
+#: ocular/templates/base.html:76
+msgid "Guest"
+msgstr ""
+
+#: ocular/templates/base.html:85
+msgid "Profile"
+msgstr ""
+
+#: ocular/templates/base.html:90 ocular/templates/billing.html:10
+msgid "Billing"
+msgstr ""
+
+#: ocular/templates/base.html:96
+msgid "Logout"
+msgstr ""
+
+#: ocular/templates/base.html:102
+msgid "Login"
+msgstr ""
+
+#: ocular/templates/base.html:107
+msgid "Sign Up"
+msgstr ""
+
+#: ocular/templates/base.html:122
+msgid "Core Features"
+msgstr ""
+
+#: ocular/templates/base.html:126 ocular/templates/models.html:141
+#: ocular/templates/models.html:299
+msgid "Upload"
+msgstr ""
+
+#: ocular/templates/base.html:131 ocular/templates/batch.html:3
+msgid "Batch Processing"
+msgstr ""
+
+#: ocular/templates/base.html:136 ocular/templates/document_tracking.html:3
+#: ocular/templates/document_tracking.html:13
+msgid "Document History"
+msgstr ""
+
+#: ocular/templates/base.html:142
+msgid "Infrastructure"
+msgstr ""
+
+#: ocular/templates/base.html:146
+msgid "Deployments"
+msgstr ""
+
+#: ocular/templates/base.html:151
+msgid "Models"
+msgstr ""
+
+#: ocular/templates/base.html:156
+msgid "Providers"
+msgstr ""
+
+#: ocular/templates/base.html:162
+msgid "Analytics & Monitoring"
+msgstr ""
+
+#: ocular/templates/base.html:166
+msgid "Analytics"
+msgstr ""
+
+#: ocular/templates/base.html:171 ocular/templates/observability.html:3
+msgid "Observability"
+msgstr ""
+
+#: ocular/templates/base.html:177
+msgid "System"
+msgstr ""
+
+#: ocular/templates/base.html:181 ocular/templates/settings.html:3
+msgid "Settings"
+msgstr ""
+
+#: ocular/templates/base.html:217
+msgid "Powered by Mistral AI, OLM OCR, and RoLM OCR"
+msgstr ""
+
+#: ocular/templates/base.html:222 ocular/templates/models.html:169
+#: ocular/templates/settings.html:144
+msgid "Version"
+msgstr ""
+
+#: ocular/templates/batch.html:3 ocular/templates/billing.html:3
+#: ocular/templates/deployments.html:3 ocular/templates/models.html:3
+#: ocular/templates/providers.html:3
+msgid "Ocular OCR"
+msgstr ""
+
+#: ocular/templates/batch.html:14
+msgid "Batch Processing & Job Queue"
+msgstr ""
+
+#: ocular/templates/batch.html:16
+msgid "Manage batch OCR jobs and scheduled processing"
+msgstr ""
+
+#: ocular/templates/batch.html:21
+msgid "New Batch Job"
+msgstr ""
+
+#: ocular/templates/batch.html:25
+msgid "New Schedule"
+msgstr ""
+
+#: ocular/templates/batch.html:41
+msgid "Active Jobs"
+msgstr ""
+
+#: ocular/templates/batch.html:52
+msgid "Queued Jobs"
+msgstr ""
+
+#: ocular/templates/batch.html:63 ocular/templates/batch.html:94
+msgid "Schedules"
+msgstr ""
+
+#: ocular/templates/batch.html:74
+msgid "Files Processed"
+msgstr ""
+
+#: ocular/templates/batch.html:88
+msgid "Batch Jobs"
+msgstr ""
+
+#: ocular/templates/batch.html:100
+msgid "Queue View"
+msgstr ""
+
+#: ocular/templates/batch.html:116 ocular/templates/models.html:32
+msgid "All Statuses"
+msgstr ""
+
+#: ocular/templates/batch.html:117 ocular/templates/billing.html:83
+msgid "Pending"
+msgstr ""
+
+#: ocular/templates/batch.html:118
+msgid "Queued"
+msgstr ""
+
+#: ocular/templates/batch.html:119
+msgid "Processing"
+msgstr ""
+
+#: ocular/templates/batch.html:120
+msgid "Completed"
+msgstr ""
+
+#: ocular/templates/batch.html:121 ocular/templates/billing.html:85
+msgid "Failed"
+msgstr ""
+
+#: ocular/templates/batch.html:122
+msgid "Cancelled"
+msgstr ""
+
+#: ocular/templates/batch.html:127
+msgid "All Priorities"
+msgstr ""
+
+#: ocular/templates/batch.html:128 ocular/templates/batch.html:249
+msgid "Urgent"
+msgstr ""
+
+#: ocular/templates/batch.html:129 ocular/templates/batch.html:250
+msgid "High"
+msgstr ""
+
+#: ocular/templates/batch.html:130 ocular/templates/batch.html:251
+msgid "Normal"
+msgstr ""
+
+#: ocular/templates/batch.html:131 ocular/templates/batch.html:252
+msgid "Low"
+msgstr ""
+
+#: ocular/templates/batch.html:135
+msgid "Search jobs..."
+msgstr ""
+
+#: ocular/templates/batch.html:140 ocular/templates/models.html:108
+msgid "Clear Filters"
+msgstr ""
+
+#: ocular/templates/batch.html:154 ocular/templates/batch.html:169
+#: ocular/templates/index.html:184 ocular/templates/models.html:205
+msgid "Loading..."
+msgstr ""
+
+#: ocular/templates/batch.html:156
+msgid "Loading batch jobs..."
+msgstr ""
+
+#: ocular/templates/batch.html:171
+msgid "Loading schedules..."
+msgstr ""
+
+#: ocular/templates/batch.html:182
+msgid "Processing Queue"
+msgstr ""
+
+#: ocular/templates/batch.html:189
+msgid "Queue is empty"
+msgstr ""
+
+#: ocular/templates/batch.html:205
+msgid "Create Batch Job"
+msgstr ""
+
+#: ocular/templates/batch.html:212
+msgid "Job Name"
+msgstr ""
+
+#: ocular/templates/batch.html:217
+msgid "Files"
+msgstr ""
+
+#: ocular/templates/batch.html:219
+msgid "Select multiple files to process"
+msgstr ""
+
+#: ocular/templates/batch.html:224 ocular/templates/batch.html:324
+msgid "OCR Provider"
+msgstr ""
+
+#: ocular/templates/batch.html:226 ocular/templates/batch.html:326
+msgid "Mistral AI"
+msgstr ""
+
+#: ocular/templates/batch.html:227 ocular/templates/batch.html:327
+#: ocular/templates/document_tracking.html:114
+msgid "Google Vision"
+msgstr ""
+
+#: ocular/templates/batch.html:228 ocular/templates/batch.html:328
+#: ocular/templates/document_tracking.html:115
+msgid "AWS Textract"
+msgstr ""
+
+#: ocular/templates/batch.html:229 ocular/templates/batch.html:329
+#: ocular/templates/document_tracking.html:116
+msgid "Tesseract"
+msgstr ""
+
+#: ocular/templates/batch.html:230 ocular/templates/document_tracking.html:117
+msgid "OLM OCR"
+msgstr ""
+
+#: ocular/templates/batch.html:231 ocular/templates/document_tracking.html:118
+msgid "RoLM OCR"
+msgstr ""
+
+#: ocular/templates/batch.html:235 ocular/templates/batch.html:333
+#: ocular/templates/index.html:82
+msgid "Processing Strategy"
+msgstr ""
+
+#: ocular/templates/batch.html:237 ocular/templates/batch.html:335
+#: ocular/templates/settings.html:216
+msgid "Single Provider"
+msgstr ""
+
+#: ocular/templates/batch.html:238 ocular/templates/batch.html:336
+#: ocular/templates/settings.html:217
+msgid "Fallback Chain"
+msgstr ""
+
+#: ocular/templates/batch.html:239 ocular/templates/index.html:167
+#: ocular/templates/settings.html:218
+msgid "Ensemble"
+msgstr ""
+
+#: ocular/templates/batch.html:240 ocular/templates/settings.html:219
+msgid "Best Quality"
+msgstr ""
+
+#: ocular/templates/batch.html:247
+msgid "Priority"
+msgstr ""
+
+#: ocular/templates/batch.html:256
+msgid "Batch Size (Concurrent Files)"
+msgstr ""
+
+#: ocular/templates/batch.html:265
+msgid "Retry failed files (up to 3 attempts)"
+msgstr ""
+
+#: ocular/templates/batch.html:272 ocular/templates/batch.html:352
+#: ocular/templates/billing.html:226 ocular/templates/deployments.html:510
+#: ocular/templates/models.html:297 ocular/templates/models.html:416
+#: ocular/templates/models.html:499 ocular/templates/providers.html:215
+#: ocular/templates/user_profile.html:198
+msgid "Cancel"
+msgstr ""
+
+#: ocular/templates/batch.html:275
+msgid "Create and Start"
+msgstr ""
+
+#: ocular/templates/batch.html:289
+msgid "Create Scheduled Job"
+msgstr ""
+
+#: ocular/templates/batch.html:296
+msgid "Schedule Name"
+msgstr ""
+
+#: ocular/templates/batch.html:301
+msgid "Schedule Type"
+msgstr ""
+
+#: ocular/templates/batch.html:303
+msgid "Run Once"
+msgstr ""
+
+#: ocular/templates/batch.html:304
+msgid "Hourly"
+msgstr ""
+
+#: ocular/templates/batch.html:305 ocular/templates/billing.html:201
+msgid "Daily"
+msgstr ""
+
+#: ocular/templates/batch.html:306 ocular/templates/billing.html:202
+msgid "Weekly"
+msgstr ""
+
+#: ocular/templates/batch.html:307 ocular/templates/billing.html:203
+msgid "Monthly"
+msgstr ""
+
+#: ocular/templates/batch.html:308
+msgid "CRON Expression"
+msgstr ""
+
+#: ocular/templates/batch.html:317
+msgid "Source Path"
+msgstr ""
+
+#: ocular/templates/batch.html:319
+msgid "File pattern or directory to process"
+msgstr ""
+
+#: ocular/templates/batch.html:345
+msgid "Enable schedule immediately"
+msgstr ""
+
+#: ocular/templates/batch.html:355
+msgid "Create Schedule"
+msgstr ""
+
+#: ocular/templates/batch.html:369
+msgid "Job Details"
+msgstr ""
+
+#: ocular/templates/billing.html:3
+msgid "Billing & Cost Management"
+msgstr ""
+
+#: ocular/templates/billing.html:7 ocular/templates/document_tracking.html:10
+#: ocular/templates/observability.html:19 ocular/templates/user_profile.html:7
+msgid "breadcrumb"
+msgstr ""
+
+#: ocular/templates/billing.html:30
+msgid "Current Month Cost"
+msgstr ""
+
+#: ocular/templates/billing.html:31 ocular/templates/document_tracking.html:90
+msgid "$0.00"
+msgstr ""
+
+#: ocular/templates/billing.html:32
+msgid "Updated in real-time"
+msgstr ""
+
+#: ocular/templates/billing.html:39
+msgid "Cost Breakdown"
+msgstr ""
+
+#: ocular/templates/billing.html:78
+msgid "Invoices"
+msgstr ""
+
+#: ocular/templates/billing.html:81
+msgid "All Status"
+msgstr ""
+
+#: ocular/templates/billing.html:82
+msgid "Paid"
+msgstr ""
+
+#: ocular/templates/billing.html:84
+msgid "Draft"
+msgstr ""
+
+#: ocular/templates/billing.html:121
+msgid "Cost Distribution"
+msgstr ""
+
+#: ocular/templates/billing.html:131
+msgid "Cost Trends"
+msgstr ""
+
+#: ocular/templates/billing.html:134
+msgid "Cost trend analysis coming soon..."
+msgstr ""
+
+#: ocular/templates/billing.html:145
+msgid "Budget Alerts"
+msgstr ""
+
+#: ocular/templates/billing.html:172
+msgid "Create Budget Alert"
+msgstr ""
+
+#: ocular/templates/billing.html:180
+msgid "e.g., Monthly Budget Alert"
+msgstr ""
+
+#: ocular/templates/billing.html:186
+msgid "100.00"
+msgstr ""
+
+#: ocular/templates/billing.html:190
+msgid "Alert Type"
+msgstr ""
+
+#: ocular/templates/billing.html:192
+msgid "Threshold"
+msgstr ""
+
+#: ocular/templates/billing.html:193
+msgid "Hard Limit"
+msgstr ""
+
+#: ocular/templates/billing.html:194
+msgid "Forecast"
+msgstr ""
+
+#: ocular/templates/billing.html:199
+msgid "Period"
+msgstr ""
+
+#: ocular/templates/billing.html:204
+msgid "Yearly"
+msgstr ""
+
+#: ocular/templates/billing.html:211
+msgid "Email Notifications"
+msgstr ""
+
+#: ocular/templates/billing.html:215
+msgid "Slack Notifications"
+msgstr ""
+
+#: ocular/templates/billing.html:220
+msgid "Slack Webhook URL (optional)"
+msgstr ""
+
+#: ocular/templates/billing.html:222
+msgid "https://hooks.slack.com/services/..."
+msgstr ""
+
+#: ocular/templates/deployments.html:3 ocular/templates/deployments.html:16
+msgid "AI Model Deployment"
+msgstr ""
+
+#: ocular/templates/deployments.html:18
+msgid "Deploy OCR models to cloud GPU providers"
+msgstr ""
+
+#: ocular/templates/deployments.html:21
+msgid "Home"
+msgstr ""
+
+#: ocular/templates/deployments.html:22 ocular/templates/observability.html:22
+msgid "Deployment"
+msgstr ""
+
+#: ocular/templates/deployments.html:49
+msgid "GPUs Allocated"
+msgstr ""
+
+#: ocular/templates/deployments.html:60
+msgid "Est. Monthly Cost"
+msgstr ""
+
+#: ocular/templates/deployments.html:71
+msgid "Avg Response Time"
+msgstr ""
+
+#: ocular/templates/deployments.html:84 ocular/templates/providers.html:30
+msgid "Cloud GPU Providers"
+msgstr ""
+
+#: ocular/templates/deployments.html:96
+msgid "Serverless GPU deployment with auto-scaling"
+msgstr ""
+
+#: ocular/templates/deployments.html:98 ocular/templates/index.html:140
+#: ocular/templates/models.html:33 ocular/templates/models.html:396
+#: ocular/templates/providers.html:46
+msgid "Available"
+msgstr ""
+
+#: ocular/templates/deployments.html:101 ocular/templates/deployments.html:118
+#: ocular/templates/deployments.html:135 ocular/templates/deployments.html:244
+#: ocular/templates/deployments.html:253
+msgid "Configure"
+msgstr ""
+
+#: ocular/templates/deployments.html:113
+msgid "Cost-effective GPU marketplace"
+msgstr ""
+
+#: ocular/templates/deployments.html:115 ocular/templates/deployments.html:132
+msgid "Coming Soon"
+msgstr ""
+
+#: ocular/templates/deployments.html:130
+msgid "High-performance cloud GPUs"
+msgstr ""
+
+#: ocular/templates/deployments.html:155 ocular/templates/deployments.html:313
+msgid "New Deployment"
+msgstr ""
+
+#: ocular/templates/deployments.html:163 ocular/templates/deployments.html:324
+#: ocular/templates/models.html:168 ocular/templates/settings.html:556
+#: ocular/templates/settings.html:761
+msgid "Model"
+msgstr ""
+
+#: ocular/templates/deployments.html:164
+#: ocular/templates/document_tracking.html:110
+msgid "Provider"
+msgstr ""
+
+#: ocular/templates/deployments.html:165 ocular/templates/deployments.html:471
+msgid "GPU Type"
+msgstr ""
+
+#: ocular/templates/deployments.html:166 ocular/templates/models.html:30
+#: ocular/templates/models.html:138 ocular/templates/models.html:175
+#: ocular/templates/models.html:394 ocular/templates/providers.html:158
+msgid "Status"
+msgstr ""
+
+#: ocular/templates/deployments.html:167
+msgid "Endpoint"
+msgstr ""
+
+#: ocular/templates/deployments.html:168
+msgid "Cost/hr"
+msgstr ""
+
+#: ocular/templates/deployments.html:169 ocular/templates/models.html:176
+msgid "Actions"
+msgstr ""
+
+#: ocular/templates/deployments.html:176
+msgid "Loading deployments..."
+msgstr ""
+
+#: ocular/templates/deployments.html:194 ocular/templates/models.html:156
+msgid "Available Models"
+msgstr ""
+
+#: ocular/templates/deployments.html:204 ocular/templates/deployments.html:224
+msgid "Ready"
+msgstr ""
+
+#: ocular/templates/deployments.html:207
+msgid "AllenAI OCR Model - 7B parameters"
+msgstr ""
+
+#: ocular/templates/deployments.html:214 ocular/templates/deployments.html:234
+#: ocular/templates/deployments.html:512
+msgid "Deploy"
+msgstr ""
+
+#: ocular/templates/deployments.html:227
+msgid "Rotated OCR Model"
+msgstr ""
+
+#: ocular/templates/deployments.html:243
+msgid "Custom Model"
+msgstr ""
+
+#: ocular/templates/deployments.html:247
+msgid "Deploy your own model"
+msgstr ""
+
+#: ocular/templates/deployments.html:249
+msgid "Custom specs"
+msgstr ""
+
+#: ocular/templates/deployments.html:270
+msgid "Deployment Templates"
+msgstr ""
+
+#: ocular/templates/deployments.html:277
+msgid "RunPod OLMocr Deployment Script"
+msgstr ""
+
+#: ocular/templates/deployments.html:280
+msgid "Bash script for deploying OLMocr to RunPod serverless"
+msgstr ""
+
+#: ocular/templates/deployments.html:281
+msgid "Supports Docker and vLLM deployments"
+msgstr ""
+
+#: ocular/templates/deployments.html:285
+msgid "RunPod Handler Template"
+msgstr ""
+
+#: ocular/templates/deployments.html:288
+msgid "Python handler for RunPod serverless endpoints"
+msgstr ""
+
+#: ocular/templates/deployments.html:289
+msgid "Includes S3 integration and error handling"
+msgstr ""
+
+#: ocular/templates/deployments.html:293
+msgid "Dockerfile Template"
+msgstr ""
+
+#: ocular/templates/deployments.html:296
+msgid "Docker container configuration for OCR models"
+msgstr ""
+
+#: ocular/templates/deployments.html:297
+msgid "Optimized for GPU inference"
+msgstr ""
+
+#: ocular/templates/deployments.html:321
+msgid "1. Select Model and Provider"
+msgstr ""
+
+#: ocular/templates/deployments.html:326
+msgid "Choose a model..."
+msgstr ""
+
+#: ocular/templates/deployments.html:331
+msgid "No deployable models are available yet. Add models in the"
+msgstr ""
+
+#: ocular/templates/deployments.html:331
+msgid "AI Models"
+msgstr ""
+
+#: ocular/templates/deployments.html:331
+msgid "section."
+msgstr ""
+
+#: ocular/templates/deployments.html:335
+msgid "Cloud Provider"
+msgstr ""
+
+#: ocular/templates/deployments.html:337
+msgid "Choose a provider..."
+msgstr ""
+
+#: ocular/templates/deployments.html:342
+msgid "No cloud providers are configured. Add providers in the"
+msgstr ""
+
+#: ocular/templates/deployments.html:342
+msgid "Cloud Providers"
+msgstr ""
+
+#: ocular/templates/deployments.html:342
+msgid "settings."
+msgstr ""
+
+#: ocular/templates/deployments.html:346
+msgid "Deployment Name"
+msgstr ""
+
+#: ocular/templates/deployments.html:347
+msgid "e.g., olmocr-prod"
+msgstr ""
+
+#: ocular/templates/deployments.html:354
+msgid "2. Provider Configuration"
+msgstr ""
+
+#: ocular/templates/deployments.html:362
+msgid "3. Model Configuration"
+msgstr ""
+
+#: ocular/templates/deployments.html:370
+msgid "4. Model Upload to S3 Storage"
+msgstr ""
+
+#: ocular/templates/deployments.html:370
+msgid "Optional"
+msgstr ""
+
+#: ocular/templates/deployments.html:373
+msgid "Model Storage:"
+msgstr ""
+
+#: ocular/templates/deployments.html:373
+msgid ""
+"Upload your model files to S3-compatible storage for faster deployment "
+"and persistent storage. Leave empty to use HuggingFace Hub directly "
+"(slower first load)."
+msgstr ""
+
+#: ocular/templates/deployments.html:378
+msgid "Model Source"
+msgstr ""
+
+#: ocular/templates/deployments.html:380
+msgid "Download from HuggingFace Hub"
+msgstr ""
+
+#: ocular/templates/deployments.html:381
+msgid "Use existing S3 model"
+msgstr ""
+
+#: ocular/templates/deployments.html:382
+msgid "Upload local model files"
+msgstr ""
+
+#: ocular/templates/deployments.html:384
+msgid "Where to get the model files"
+msgstr ""
+
+#: ocular/templates/deployments.html:387
+msgid "S3 Bucket Name"
+msgstr ""
+
+#: ocular/templates/deployments.html:389
+msgid "my-models-bucket"
+msgstr ""
+
+#: ocular/templates/deployments.html:390
+msgid "Target S3 bucket for model storage"
+msgstr ""
+
+#: ocular/templates/deployments.html:398
+msgid "HuggingFace Model ID"
+msgstr ""
+
+#: ocular/templates/deployments.html:401
+msgid "Will be downloaded and uploaded to S3 automatically"
+msgstr ""
+
+#: ocular/templates/deployments.html:404 ocular/templates/settings.html:954
+msgid "HuggingFace Token"
+msgstr ""
+
+#: ocular/templates/deployments.html:413
+msgid "For gated models"
+msgstr ""
+
+#: ocular/templates/deployments.html:422
+msgid "S3 Model Path"
+msgstr ""
+
+#: ocular/templates/deployments.html:424
+msgid "models/olmocr-7b/"
+msgstr ""
+
+#: ocular/templates/deployments.html:425
+msgid "Path to model files in S3 bucket"
+msgstr ""
+
+#: ocular/templates/deployments.html:434
+msgid "Model Files"
+msgstr ""
+
+#: ocular/templates/deployments.html:437
+msgid "Select model directory (config.json, model weights, tokenizer files)"
+msgstr ""
+
+#: ocular/templates/deployments.html:456
+msgid "Skip S3 upload (use HuggingFace Hub directly on deployment)"
+msgstr ""
+
+#: ocular/templates/deployments.html:460
+msgid "First deployment will be slower but saves S3 storage costs"
+msgstr ""
+
+#: ocular/templates/deployments.html:468
+msgid "5. Deployment Options"
+msgstr ""
+
+#: ocular/templates/deployments.html:473
+msgid "Select GPU..."
+msgstr ""
+
+#: ocular/templates/deployments.html:478
+msgid "Deployment Type"
+msgstr ""
+
+#: ocular/templates/deployments.html:480
+msgid "Docker Container"
+msgstr ""
+
+#: ocular/templates/deployments.html:481
+msgid "vLLM Optimized"
+msgstr ""
+
+#: ocular/templates/deployments.html:485
+msgid "Auto-scaling"
+msgstr ""
+
+#: ocular/templates/deployments.html:487
+msgid "Enabled"
+msgstr ""
+
+#: ocular/templates/deployments.html:488
+msgid "Disabled"
+msgstr ""
+
+#: ocular/templates/deployments.html:494
+msgid "Max Workers"
+msgstr ""
+
+#: ocular/templates/deployments.html:498
+msgid "Idle Timeout (seconds)"
+msgstr ""
+
+#: ocular/templates/deployments.html:502
+msgid "Request Timeout (seconds)"
+msgstr ""
+
+#: ocular/templates/document_tracking.html:23
+msgid "Track processed documents and prevent duplicates"
+msgstr ""
+
+#: ocular/templates/document_tracking.html:50
+msgid "Total Processed"
+msgstr ""
+
+#: ocular/templates/document_tracking.html:63
+msgid "Unique Documents"
+msgstr ""
+
+#: ocular/templates/document_tracking.html:76
+msgid "Duplicates Found"
+msgstr ""
+
+#: ocular/templates/document_tracking.html:89
+msgid "Total Cost Saved"
+msgstr ""
+
+#: ocular/templates/document_tracking.html:106
+msgid "File Name"
+msgstr ""
+
+#: ocular/templates/document_tracking.html:107
+msgid "Search by filename..."
+msgstr ""
+
+#: ocular/templates/document_tracking.html:112 ocular/templates/models.html:76
+msgid "All Providers"
+msgstr ""
+
+#: ocular/templates/document_tracking.html:113
+msgid "Mistral"
+msgstr ""
+
+#: ocular/templates/document_tracking.html:122
+msgid "From Date"
+msgstr ""
+
+#: ocular/templates/document_tracking.html:126
+msgid "To Date"
+msgstr ""
+
+#: ocular/templates/document_tracking.html:182
+msgid "Loading documents..."
+msgstr ""
+
+#: ocular/templates/document_tracking.html:194
+msgid "Page navigation"
+msgstr ""
+
+#: ocular/templates/document_tracking.html:218
+msgid "Upload a file to check if it has been processed before."
+msgstr ""
+
+#: ocular/templates/document_tracking.html:221
+msgid "Select File"
+msgstr ""
+
+#: ocular/templates/document_tracking.html:236
+#: ocular/templates/document_tracking.html:263 ocular/templates/models.html:199
+#: ocular/templates/observability.html:330
+#: ocular/templates/user_profile.html:129
+msgid "Close"
+msgstr ""
+
+#: ocular/templates/index.html:11
+msgid "Extract text and data from PDFs and images using advanced OCR technology"
+msgstr ""
+
+#: ocular/templates/index.html:22
+msgid "Unified OCR Upload"
+msgstr ""
+
+#: ocular/templates/index.html:32 ocular/templates/index.html:200
+msgid "OLMocr Document Processor"
+msgstr ""
+
+#: ocular/templates/index.html:46
+msgid "Unified OCR Workflow"
+msgstr ""
+
+#: ocular/templates/index.html:48
+msgid ""
+"Select providers, configure strategies, and process multiple documents in"
+" one place"
+msgstr ""
+
+#: ocular/templates/index.html:59
+msgid "Upload Files"
+msgstr ""
+
+#: ocular/templates/index.html:64
+msgid "Drop files here or click to browse"
+msgstr ""
+
+#: ocular/templates/index.html:65
+msgid "Supported formats: PDF, JPG, PNG, BMP, TIFF, WEBP"
+msgstr ""
+
+#: ocular/templates/index.html:77
+msgid "Processing Options"
+msgstr ""
+
+#: ocular/templates/index.html:92
+msgid "Choose how the platform coordinates multiple OCR providers."
+msgstr ""
+
+#: ocular/templates/index.html:97
+msgid "Custom Prompt (Optional)"
+msgstr ""
+
+#: ocular/templates/index.html:99
+msgid "e.g., Extract invoice data with line items"
+msgstr ""
+
+#: ocular/templates/index.html:110 ocular/templates/providers.html:23
+msgid "OCR Providers"
+msgstr ""
+
+#: ocular/templates/index.html:132
+msgid "Unknown type"
+msgstr ""
+
+#: ocular/templates/index.html:142
+msgid "Status unknown"
+msgstr ""
+
+#: ocular/templates/index.html:151
+msgid "No OCR providers available. Check your configuration."
+msgstr ""
+
+#: ocular/templates/index.html:156
+msgid "Process Files"
+msgstr ""
+
+#: ocular/templates/index.html:163
+msgid "Processing Strategies"
+msgstr ""
+
+#: ocular/templates/index.html:165
+msgid "Single"
+msgstr ""
+
+#: ocular/templates/index.html:165
+msgid "Use one provider"
+msgstr ""
+
+#: ocular/templates/index.html:166
+msgid "Fallback"
+msgstr ""
+
+#: ocular/templates/index.html:166
+msgid "Try providers until success"
+msgstr ""
+
+#: ocular/templates/index.html:167
+msgid "Use multiple providers"
+msgstr ""
+
+#: ocular/templates/index.html:168
+msgid "Best"
+msgstr ""
+
+#: ocular/templates/index.html:168
+msgid "Choose best result by confidence"
+msgstr ""
+
+#: ocular/templates/index.html:177 ocular/templates/index.html:298
+msgid "Processing Results"
+msgstr ""
+
+#: ocular/templates/index.html:186
+msgid "Processing Files..."
+msgstr ""
+
+#: ocular/templates/index.html:187
+msgid "Please wait while we extract text from your documents"
+msgstr ""
+
+#: ocular/templates/index.html:202
+msgid "Convert PDFs and images to markdown using AI-powered OCR technology"
+msgstr ""
+
+#: ocular/templates/index.html:214
+msgid "Upload File"
+msgstr ""
+
+#: ocular/templates/index.html:220
+msgid "Process from URL"
+msgstr ""
+
+#: ocular/templates/index.html:232
+msgid "Select Document"
+msgstr ""
+
+#: ocular/templates/index.html:237
+msgid "Supported formats: PDF, PNG, JPG, JPEG (max 50MB)"
+msgstr ""
+
+#: ocular/templates/index.html:244 ocular/templates/index.html:274
+msgid "Include processing metadata in response"
+msgstr ""
+
+#: ocular/templates/index.html:249
+msgid "Process Document"
+msgstr ""
+
+#: ocular/templates/index.html:262
+msgid "Document URL"
+msgstr ""
+
+#: ocular/templates/index.html:267
+msgid "Enter a direct link to a PDF or image file"
+msgstr ""
+
+#: ocular/templates/index.html:279
+msgid "Process URL"
+msgstr ""
+
+#: ocular/templates/index.html:289 ocular/templates/models.html:292
+msgid "Processing..."
+msgstr ""
+
+#: ocular/templates/index.html:291
+msgid "Processing document with OLMocr..."
+msgstr ""
+
+#: ocular/templates/index.html:302
+msgid "Copy"
+msgstr ""
+
+#: ocular/templates/index.html:305
+msgid "Download"
+msgstr ""
+
+#: ocular/templates/index.html:311
+msgid "Processing Information"
+msgstr ""
+
+#: ocular/templates/index.html:316
+msgid "Extracted Content"
+msgstr ""
+
+#: ocular/templates/index.html:327
+msgid "Processing Error"
+msgstr ""
+
+#: ocular/templates/index.html:337
+msgid "AI-Powered OCR"
+msgstr ""
+
+#: ocular/templates/index.html:338
+msgid "Uses OLMocr for accurate document conversion"
+msgstr ""
+
+#: ocular/templates/index.html:346
+msgid "Structure Preservation"
+msgstr ""
+
+#: ocular/templates/index.html:347
+msgid "Maintains document structure, tables, equations, and reading order"
+msgstr ""
+
+#: ocular/templates/index.html:355
+msgid "Markdown Output"
+msgstr ""
+
+#: ocular/templates/index.html:356
+msgid "Clean, structured markdown format ready for publishing"
+msgstr ""
+
+#: ocular/templates/models.html:3 ocular/templates/models.html:13
+msgid "AI Models Management"
+msgstr ""
+
+#: ocular/templates/models.html:15
+msgid "Manage OCR and vision models from HuggingFace catalog"
+msgstr ""
+
+#: ocular/templates/models.html:19
+msgid "Add Model"
+msgstr ""
+
+#: ocular/templates/models.html:34 ocular/templates/models.html:397
+#: ocular/templates/models.html:482
+msgid "Beta"
+msgstr ""
+
+#: ocular/templates/models.html:35 ocular/templates/models.html:398
+msgid "Deprecated"
+msgstr ""
+
+#: ocular/templates/models.html:39 ocular/templates/models.html:173
+msgid "Open Source"
+msgstr ""
+
+#: ocular/templates/models.html:41 ocular/templates/models.html:49
+#: ocular/templates/models.html:57
+msgid "All Models"
+msgstr ""
+
+#: ocular/templates/models.html:42
+msgid "Open Source Only"
+msgstr ""
+
+#: ocular/templates/models.html:43
+msgid "Proprietary Only"
+msgstr ""
+
+#: ocular/templates/models.html:47 ocular/templates/models.html:172
+msgid "Cloud Storage"
+msgstr ""
+
+#: ocular/templates/models.html:50
+msgid "Uploaded to Cloud"
+msgstr ""
+
+#: ocular/templates/models.html:51
+msgid "Not Uploaded"
+msgstr ""
+
+#: ocular/templates/models.html:55
+msgid "vLLM Support"
+msgstr ""
+
+#: ocular/templates/models.html:58
+msgid "vLLM Compatible"
+msgstr ""
+
+#: ocular/templates/models.html:59
+msgid "Not Compatible"
+msgstr ""
+
+#: ocular/templates/models.html:63
+msgid "VRAM Requirement"
+msgstr ""
+
+#: ocular/templates/models.html:65
+msgid "All Sizes"
+msgstr ""
+
+#: ocular/templates/models.html:74
+msgid "Provider Type"
+msgstr ""
+
+#: ocular/templates/models.html:77
+msgid "Vision AI"
+msgstr ""
+
+#: ocular/templates/models.html:78
+msgid "OCR Engine"
+msgstr ""
+
+#: ocular/templates/models.html:79
+msgid "Document AI"
+msgstr ""
+
+#: ocular/templates/models.html:80
+msgid "Custom"
+msgstr ""
+
+#: ocular/templates/models.html:86 ocular/templates/models.html:328
+msgid "Search"
+msgstr ""
+
+#: ocular/templates/models.html:88
+msgid "Search by name, version, or description..."
+msgstr ""
+
+#: ocular/templates/models.html:91
+msgid "Min Downloads"
+msgstr ""
+
+#: ocular/templates/models.html:93
+msgid "e.g., 1000"
+msgstr ""
+
+#: ocular/templates/models.html:96
+msgid "Min Likes"
+msgstr ""
+
+#: ocular/templates/models.html:98
+msgid "e.g., 10"
+msgstr ""
+
+#: ocular/templates/models.html:101
+msgid "HuggingFace Tags"
+msgstr ""
+
+#: ocular/templates/models.html:103
+msgid "e.g., transformers, pytorch"
+msgstr ""
+
+#: ocular/templates/models.html:121
+msgid "selected"
+msgstr ""
+
+#: ocular/templates/models.html:124
+msgid "Select All"
+msgstr ""
+
+#: ocular/templates/models.html:127
+msgid "Clear Selection"
+msgstr ""
+
+#: ocular/templates/models.html:132
+msgid "Compare"
+msgstr ""
+
+#: ocular/templates/models.html:135
+msgid "Export"
+msgstr ""
+
+#: ocular/templates/models.html:144
+msgid "Delete"
+msgstr ""
+
+#: ocular/templates/models.html:170
+msgid "VRAM"
+msgstr ""
+
+#: ocular/templates/models.html:171
+msgid "HF Stats"
+msgstr ""
+
+#: ocular/templates/models.html:174
+msgid "vLLM"
+msgstr ""
+
+#: ocular/templates/models.html:183
+msgid "Loading models..."
+msgstr ""
+
+#: ocular/templates/models.html:198
+msgid "Model Preview"
+msgstr ""
+
+#: ocular/templates/models.html:210
+msgid "Hugging Face Preview"
+msgstr ""
+
+#: ocular/templates/models.html:217
+msgid ""
+"If the preview does not load, you can open the model page directly on "
+"Hugging Face."
+msgstr ""
+
+#: ocular/templates/models.html:222
+msgid "Open on Hugging Face"
+msgstr ""
+
+#: ocular/templates/models.html:237
+msgid "Upload Model to Cloud Storage"
+msgstr ""
+
+#: ocular/templates/models.html:246
+msgid "Upload Source"
+msgstr ""
+
+#: ocular/templates/models.html:248
+msgid "Download from HuggingFace"
+msgstr ""
+
+#: ocular/templates/models.html:249
+msgid "Upload Local File"
+msgstr ""
+
+#: ocular/templates/models.html:251
+msgid "Choose to download model from HuggingFace or upload a local file"
+msgstr ""
+
+#: ocular/templates/models.html:255
+msgid "Model File"
+msgstr ""
+
+#: ocular/templates/models.html:257
+msgid "Weights, Docker image, or configuration file"
+msgstr ""
+
+#: ocular/templates/models.html:261
+msgid "S3 Bucket"
+msgstr ""
+
+#: ocular/templates/models.html:263
+msgid "Loading buckets..."
+msgstr ""
+
+#: ocular/templates/models.html:265
+msgid "Select storage bucket from configuration"
+msgstr ""
+
+#: ocular/templates/models.html:269
+msgid "Storage Provider"
+msgstr ""
+
+#: ocular/templates/models.html:271
+msgid "RunPod Storage"
+msgstr ""
+
+#: ocular/templates/models.html:272
+msgid "AWS S3"
+msgstr ""
+
+#: ocular/templates/models.html:273
+msgid "Custom S3-Compatible"
+msgstr ""
+
+#: ocular/templates/models.html:275
+msgid "Auto-selected based on bucket"
+msgstr ""
+
+#: ocular/templates/models.html:282
+msgid "Make publicly accessible"
+msgstr ""
+
+#: ocular/templates/models.html:313
+msgid "Add New Model"
+msgstr ""
+
+#: ocular/templates/models.html:323
+msgid "Search HuggingFace Hub"
+msgstr ""
+
+#: ocular/templates/models.html:326
+msgid "Search for models (e.g., OCR, vision, pixtral)"
+msgstr ""
+
+#: ocular/templates/models.html:331
+msgid "Search HuggingFace for OCR and vision models"
+msgstr ""
+
+#: ocular/templates/models.html:343
+msgid "Model Name"
+msgstr ""
+
+#: ocular/templates/models.html:345
+msgid "e.g., olmocr"
+msgstr ""
+
+#: ocular/templates/models.html:346 ocular/templates/providers.html:135
+msgid "Internal identifier (lowercase, no spaces)"
+msgstr ""
+
+#: ocular/templates/models.html:349 ocular/templates/providers.html:138
+msgid "Display Name"
+msgstr ""
+
+#: ocular/templates/models.html:351
+msgid "e.g., OLMocr 7B"
+msgstr ""
+
+#: ocular/templates/models.html:352 ocular/templates/providers.html:141
+msgid "User-friendly name"
+msgstr ""
+
+#: ocular/templates/models.html:358
+msgid "Model Version/ID"
+msgstr ""
+
+#: ocular/templates/models.html:360
+msgid "e.g., allenai/olmOCR-7B-0825"
+msgstr ""
+
+#: ocular/templates/models.html:361
+msgid "HuggingFace model identifier"
+msgstr ""
+
+#: ocular/templates/models.html:366 ocular/templates/providers.html:146
+#: ocular/templates/settings.html:138
+msgid "Description"
+msgstr ""
+
+#: ocular/templates/models.html:368
+msgid "Brief description of the model's capabilities"
+msgstr ""
+
+#: ocular/templates/models.html:373 ocular/templates/models.html:492
+msgid "Docker Image"
+msgstr ""
+
+#: ocular/templates/models.html:375
+msgid "e.g., ocular/olmocr-runpod:latest"
+msgstr ""
+
+#: ocular/templates/models.html:376
+msgid "Container image for deployment"
+msgstr ""
+
+#: ocular/templates/models.html:379
+msgid "Min VRAM (GB)"
+msgstr ""
+
+#: ocular/templates/models.html:382
+msgid "Minimum GPU memory required"
+msgstr ""
+
+#: ocular/templates/models.html:388
+msgid "Recommended GPU"
+msgstr ""
+
+#: ocular/templates/models.html:390
+msgid "e.g., RTX A4000+"
+msgstr ""
+
+#: ocular/templates/models.html:391
+msgid "Suggested GPU type"
+msgstr ""
+
+#: ocular/templates/models.html:408
+msgid "Supports vLLM acceleration"
+msgstr ""
+
+#: ocular/templates/models.html:418
+msgid "Save Model"
+msgstr ""
+
+#: ocular/templates/models.html:432
+msgid "Version History"
+msgstr ""
+
+#: ocular/templates/models.html:439 ocular/templates/models.html:461
+msgid "Create New Version"
+msgstr ""
+
+#: ocular/templates/models.html:443
+msgid "Compare Selected"
+msgstr ""
+
+#: ocular/templates/models.html:446
+msgid "Setup A/B Test"
+msgstr ""
+
+#: ocular/templates/models.html:467
+msgid "Version Number"
+msgstr ""
+
+#: ocular/templates/models.html:469
+msgid "e.g., v1.0.0, 2024-01-05"
+msgstr ""
+
+#: ocular/templates/models.html:472
+msgid "Version Name"
+msgstr ""
+
+#: ocular/templates/models.html:474
+msgid "e.g., Stable Release"
+msgstr ""
+
+#: ocular/templates/models.html:477
+msgid "Version Tag"
+msgstr ""
+
+#: ocular/templates/models.html:479
+msgid "No Tag"
+msgstr ""
+
+#: ocular/templates/models.html:480
+msgid "Latest"
+msgstr ""
+
+#: ocular/templates/models.html:481
+msgid "Stable"
+msgstr ""
+
+#: ocular/templates/models.html:483
+msgid "Alpha"
+msgstr ""
+
+#: ocular/templates/models.html:487
+msgid "Changelog"
+msgstr ""
+
+#: ocular/templates/models.html:489
+msgid "Describe what's new in this version..."
+msgstr ""
+
+#: ocular/templates/models.html:494
+msgid "e.g., myregistry/model:v1.0.0"
+msgstr ""
+
+#: ocular/templates/models.html:501
+msgid "Create Version"
+msgstr ""
+
+#: ocular/templates/models.html:514
+msgid "Version Comparison"
+msgstr ""
+
+#: ocular/templates/models.html:523
+msgid "Attribute"
+msgstr ""
+
+#: ocular/templates/models.html:546
+msgid "Version Details"
+msgstr ""
+
+#: ocular/templates/observability.html:18
+msgid "Monitor deployment health, performance metrics, and system status"
+msgstr ""
+
+#: ocular/templates/observability.html:39
+msgid "Checking System Health..."
+msgstr ""
+
+#: ocular/templates/observability.html:40
+msgid "Please wait while we assess all components"
+msgstr ""
+
+#: ocular/templates/observability.html:54
+#: ocular/templates/observability.html:65
+#: ocular/templates/observability.html:76
+#: ocular/templates/observability.html:87
+msgid "--"
+msgstr ""
+
+#: ocular/templates/observability.html:55
+msgid "Uptime"
+msgstr ""
+
+#: ocular/templates/observability.html:66
+msgid "Avg Response"
+msgstr ""
+
+#: ocular/templates/observability.html:77
+msgid "Memory Usage"
+msgstr ""
+
+#: ocular/templates/observability.html:88
+msgid "Requests/Hour"
+msgstr ""
+
+#: ocular/templates/observability.html:323
+msgid "Deployment Action"
+msgstr ""
+
+#: ocular/templates/observability.html:331
+msgid "Execute"
+msgstr ""
+
+#: ocular/templates/providers.html:3 ocular/templates/providers.html:11
+msgid "Providers Management"
+msgstr ""
+
+#: ocular/templates/providers.html:13
+msgid "Manage OCR providers and cloud GPU infrastructure"
+msgstr ""
+
+#: ocular/templates/providers.html:55
+msgid "Unavailable"
+msgstr ""
+
+#: ocular/templates/providers.html:64
+msgid "Total"
+msgstr ""
+
+#: ocular/templates/providers.html:73
+msgid "Refresh Status"
+msgstr ""
+
+#: ocular/templates/providers.html:84
+msgid "Loading OCR providers..."
+msgstr ""
+
+#: ocular/templates/providers.html:93
+msgid "Cloud GPU Infrastructure"
+msgstr ""
+
+#: ocular/templates/providers.html:94
+msgid "Manage deployment providers for AI models"
+msgstr ""
+
+#: ocular/templates/providers.html:98
+msgid "Add Provider"
+msgstr ""
+
+#: ocular/templates/providers.html:106
+msgid "Loading cloud providers..."
+msgstr ""
+
+#: ocular/templates/providers.html:120
+msgid "Add Cloud Provider"
+msgstr ""
+
+#: ocular/templates/providers.html:129
+msgid "Basic Information"
+msgstr ""
+
+#: ocular/templates/providers.html:132
+msgid "Provider Name"
+msgstr ""
+
+#: ocular/templates/providers.html:134
+msgid "e.g., runpod"
+msgstr ""
+
+#: ocular/templates/providers.html:140
+msgid "e.g., RunPod Serverless"
+msgstr ""
+
+#: ocular/templates/providers.html:148
+msgid "Brief description of the provider"
+msgstr ""
+
+#: ocular/templates/providers.html:153
+msgid "Website"
+msgstr ""
+
+#: ocular/templates/providers.html:160
+msgid "Active"
+msgstr ""
+
+#: ocular/templates/providers.html:161
+msgid "Inactive"
+msgstr ""
+
+#: ocular/templates/providers.html:162 ocular/templates/settings.html:155
+msgid "Testing"
+msgstr ""
+
+#: ocular/templates/providers.html:170
+msgid "Available GPUs"
+msgstr ""
+
+#: ocular/templates/providers.html:172
+msgid "GPU Types"
+msgstr ""
+
+#: ocular/templates/providers.html:174
+msgid "One GPU per line, e.g.:"
+msgstr ""
+
+#: ocular/templates/providers.html:175
+msgid "List all available GPU types (one per line)"
+msgstr ""
+
+#: ocular/templates/providers.html:181
+msgid "Features & Capabilities"
+msgstr ""
+
+#: ocular/templates/providers.html:187
+msgid "Supports Auto-scaling"
+msgstr ""
+
+#: ocular/templates/providers.html:193
+msgid "Supports Spot Instances"
+msgstr ""
+
+#: ocular/templates/providers.html:201
+msgid "Supports Custom Docker Images"
+msgstr ""
+
+#: ocular/templates/providers.html:207
+msgid "Supports Persistent Storage"
+msgstr ""
+
+#: ocular/templates/providers.html:217
+msgid "Save Provider"
+msgstr ""
+
+#: ocular/templates/settings.html:20
+msgid "Manage all Ocular OCR system settings and configuration"
+msgstr ""
+
+#: ocular/templates/settings.html:124
+msgid "Main application configuration and behavior"
+msgstr ""
+
+#: ocular/templates/settings.html:129
+msgid "Basic Configuration"
+msgstr ""
+
+#: ocular/templates/settings.html:132
+msgid "Application Title"
+msgstr ""
+
+#: ocular/templates/settings.html:139
+msgid "Extract text and data from PDFs and images"
+msgstr ""
+
+#: ocular/templates/settings.html:145
+msgid "0.1.0"
+msgstr ""
+
+#: ocular/templates/settings.html:150
+msgid "Environment"
+msgstr ""
+
+#: ocular/templates/settings.html:152
+msgid "Development"
+msgstr ""
+
+#: ocular/templates/settings.html:153
+msgid "Staging"
+msgstr ""
+
+#: ocular/templates/settings.html:154
+msgid "Production"
+msgstr ""
+
+#: ocular/templates/settings.html:161
+msgid "Debug Mode"
+msgstr ""
+
+#: ocular/templates/settings.html:164
+msgid "Enable debug mode"
+msgstr ""
+
+#: ocular/templates/settings.html:169
+msgid "Server Configuration"
+msgstr ""
+
+#: ocular/templates/settings.html:172
+msgid "Host"
+msgstr ""
+
+#: ocular/templates/settings.html:173
+msgid "0.0.0.0"
+msgstr ""
+
+#: ocular/templates/settings.html:178
+msgid "Port"
+msgstr ""
+
+#: ocular/templates/settings.html:184
+msgid "Workers"
+msgstr ""
+
+#: ocular/templates/settings.html:191
+msgid "File Processing"
+msgstr ""
+
+#: ocular/templates/settings.html:194 ocular/templates/settings.html:596
+#: ocular/templates/settings.html:647 ocular/templates/settings.html:698
+msgid "Max File Size (MB)"
+msgstr ""
+
+#: ocular/templates/settings.html:200
+msgid "Max Files Per Request"
+msgstr ""
+
+#: ocular/templates/settings.html:206
+msgid "Supported Formats"
+msgstr ""
+
+#: ocular/templates/settings.html:207
+msgid "pdf,png,jpg,jpeg,bmp,tiff,webp"
+msgstr ""
+
+#: ocular/templates/settings.html:211
+msgid "Processing Configuration"
+msgstr ""
+
+#: ocular/templates/settings.html:214
+msgid "Default Processing Strategy"
+msgstr ""
+
+#: ocular/templates/settings.html:225
+msgid "Default Providers"
+msgstr ""
+
+#: ocular/templates/settings.html:226
+msgid "mistral,google_vision"
+msgstr ""
+
+#: ocular/templates/settings.html:231
+msgid "Max Concurrent Requests"
+msgstr ""
+
+#: ocular/templates/settings.html:236
+msgid "Static Files"
+msgstr ""
+
+#: ocular/templates/settings.html:239
+msgid "Templates Directory"
+msgstr ""
+
+#: ocular/templates/settings.html:240
+msgid "templates"
+msgstr ""
+
+#: ocular/templates/settings.html:245
+msgid "Static Files Directory"
+msgstr ""
+
+#: ocular/templates/settings.html:246
+msgid "static"
+msgstr ""
+
+#: ocular/templates/settings.html:251
+msgid "Enable Static Files"
+msgstr ""
+
+#: ocular/templates/settings.html:254
+msgid "Serve static files"
+msgstr ""
+
+#: ocular/templates/settings.html:268
+msgid "Database connection and pool settings"
+msgstr ""
+
+#: ocular/templates/settings.html:274
+msgid "Database URL"
+msgstr ""
+
+#: ocular/templates/settings.html:275
+msgid "sqlite:///./ocular_deployments.db"
+msgstr ""
+
+#: ocular/templates/settings.html:289
+msgid "Connection Pool Size"
+msgstr ""
+
+#: ocular/templates/settings.html:295
+msgid "Max Overflow"
+msgstr ""
+
+#: ocular/templates/settings.html:309
+msgid "User authentication and authorization settings"
+msgstr ""
+
+#: ocular/templates/settings.html:314
+msgid "Clerk Authentication"
+msgstr ""
+
+#: ocular/templates/settings.html:317
+msgid "Clerk Secret Key"
+msgstr ""
+
+#: ocular/templates/settings.html:319 ocular/templates/settings.html:371
+msgid "sk_..."
+msgstr ""
+
+#: ocular/templates/settings.html:328
+msgid "Clerk Publishable Key"
+msgstr ""
+
+#: ocular/templates/settings.html:329 ocular/templates/settings.html:381
+msgid "pk_..."
+msgstr ""
+
+#: ocular/templates/settings.html:335
+msgid "JWT Configuration"
+msgstr ""
+
+#: ocular/templates/settings.html:338
+msgid "JWT Secret Key"
+msgstr ""
+
+#: ocular/templates/settings.html:340
+msgid "your-jwt-secret"
+msgstr ""
+
+#: ocular/templates/settings.html:349
+msgid "Session Timeout (minutes)"
+msgstr ""
+
+#: ocular/templates/settings.html:363
+msgid "Stripe payment integration settings"
+msgstr ""
+
+#: ocular/templates/settings.html:369
+msgid "Stripe Secret Key"
+msgstr ""
+
+#: ocular/templates/settings.html:380
+msgid "Stripe Publishable Key"
+msgstr ""
+
+#: ocular/templates/settings.html:386
+msgid "Stripe Webhook Secret"
+msgstr ""
+
+#: ocular/templates/settings.html:388
+msgid "whsec_..."
+msgstr ""
+
+#: ocular/templates/settings.html:417
+msgid ""
+"Configure deployed AI models on cloud GPU providers (RunPod, Vast.ai, "
+"DeepInfra)"
+msgstr ""
+
+#: ocular/templates/settings.html:427
+msgid "Infrastructure settings for all AI model deployments"
+msgstr ""
+
+#: ocular/templates/settings.html:431
+msgid "Primary Cloud Provider"
+msgstr ""
+
+#: ocular/templates/settings.html:433
+msgid "RunPod (Serverless GPU)"
+msgstr ""
+
+#: ocular/templates/settings.html:434
+msgid "Vast.ai (Cost-effective GPU)"
+msgstr ""
+
+#: ocular/templates/settings.html:435
+msgid "DeepInfra (Managed API)"
+msgstr ""
+
+#: ocular/templates/settings.html:446 ocular/templates/settings.html:660
+#: ocular/templates/settings.html:711
+msgid "Endpoint ID"
+msgstr ""
+
+#: ocular/templates/settings.html:447
+msgid "your-endpoint-id"
+msgstr ""
+
+#: ocular/templates/settings.html:452 ocular/templates/settings.html:519
+#: ocular/templates/settings.html:545 ocular/templates/settings.html:749
+#: ocular/templates/settings.html:878
+msgid "API Key"
+msgstr ""
+
+#: ocular/templates/settings.html:454
+msgid "Enter RunPod API key"
+msgstr ""
+
+#: ocular/templates/settings.html:463 ocular/templates/settings.html:839
+msgid "Region"
+msgstr ""
+
+#: ocular/templates/settings.html:465
+msgid "EUR-IS-1 (Iceland)"
+msgstr ""
+
+#: ocular/templates/settings.html:466
+msgid "US-CA-1 (California)"
+msgstr ""
+
+#: ocular/templates/settings.html:467
+msgid "US-TX-1 (Texas)"
+msgstr ""
+
+#: ocular/templates/settings.html:473
+msgid "S3 Storage"
+msgstr ""
+
+#: ocular/templates/settings.html:476 ocular/templates/settings.html:820
+msgid "Access Key ID"
+msgstr ""
+
+#: ocular/templates/settings.html:477
+msgid "user_..."
+msgstr ""
+
+#: ocular/templates/settings.html:482 ocular/templates/settings.html:827
+msgid "Secret Access Key"
+msgstr ""
+
+#: ocular/templates/settings.html:484
+msgid "rps_..."
+msgstr ""
+
+#: ocular/templates/settings.html:493
+msgid "Bucket Endpoint URL"
+msgstr ""
+
+#: ocular/templates/settings.html:494
+msgid "https://s3api-eur-is-1.runpod.io/"
+msgstr ""
+
+#: ocular/templates/settings.html:499
+msgid "Network Volume ID"
+msgstr ""
+
+#: ocular/templates/settings.html:500
+msgid "volume-id"
+msgstr ""
+
+#: ocular/templates/settings.html:513
+msgid "Instance ID"
+msgstr ""
+
+#: ocular/templates/settings.html:514
+msgid "instance-12345"
+msgstr ""
+
+#: ocular/templates/settings.html:521
+msgid "Enter Vast.ai API key"
+msgstr ""
+
+#: ocular/templates/settings.html:531 ocular/templates/settings.html:871
+msgid "Endpoint URL"
+msgstr ""
+
+#: ocular/templates/settings.html:532
+msgid "https://your-instance.vast.ai:port"
+msgstr ""
+
+#: ocular/templates/settings.html:547
+msgid "Enter DeepInfra token"
+msgstr ""
+
+#: ocular/templates/settings.html:557
+msgid "allenai/olmOCR-7B-0825"
+msgstr ""
+
+#: ocular/templates/settings.html:563
+msgid "Base URL"
+msgstr ""
+
+#: ocular/templates/settings.html:564
+msgid "https://api.deepinfra.com/v1/openai"
+msgstr ""
+
+#: ocular/templates/settings.html:580
+msgid "State-of-the-art OCR model from AllenAI - allenai/olmOCR-7B"
+msgstr ""
+
+#: ocular/templates/settings.html:590 ocular/templates/settings.html:641
+#: ocular/templates/settings.html:692
+msgid "Model Identifier"
+msgstr ""
+
+#: ocular/templates/settings.html:591
+msgid "allenai/olmOCR-7B-0225-preview"
+msgstr ""
+
+#: ocular/templates/settings.html:603 ocular/templates/settings.html:654
+#: ocular/templates/settings.html:705
+msgid "Timeout (seconds)"
+msgstr ""
+
+#: ocular/templates/settings.html:609
+msgid "Allowed Extensions"
+msgstr ""
+
+#: ocular/templates/settings.html:610
+msgid ".pdf,.png,.jpg,.jpeg"
+msgstr ""
+
+#: ocular/templates/settings.html:631
+msgid "Specialized for rotated and skewed document processing"
+msgstr ""
+
+#: ocular/templates/settings.html:642
+msgid "custom/rolmocr-model"
+msgstr ""
+
+#: ocular/templates/settings.html:661
+msgid "rolmocr-endpoint-id"
+msgstr ""
+
+#: ocular/templates/settings.html:682
+msgid "Mistral's vision model for document understanding"
+msgstr ""
+
+#: ocular/templates/settings.html:693
+msgid "mistralai/pixtral-12b"
+msgstr ""
+
+#: ocular/templates/settings.html:712
+msgid "pixtral-endpoint-id"
+msgstr ""
+
+#: ocular/templates/settings.html:733
+msgid "API keys and settings for cloud OCR and AI providers"
+msgstr ""
+
+#: ocular/templates/settings.html:743
+msgid "Vision LLM for document OCR and analysis"
+msgstr ""
+
+#: ocular/templates/settings.html:751
+msgid "Enter Mistral API key"
+msgstr ""
+
+#: ocular/templates/settings.html:763
+msgid "Pixtral 12B (Recommended)"
+msgstr ""
+
+#: ocular/templates/settings.html:764
+msgid "Pixtral Large (Latest)"
+msgstr ""
+
+#: ocular/templates/settings.html:780
+msgid "Enterprise-grade OCR with excellent accuracy"
+msgstr ""
+
+#: ocular/templates/settings.html:786
+msgid "Credentials Path"
+msgstr ""
+
+#: ocular/templates/settings.html:787
+msgid "/path/to/service-account.json"
+msgstr ""
+
+#: ocular/templates/settings.html:793
+msgid "Project ID"
+msgstr ""
+
+#: ocular/templates/settings.html:794
+msgid "your-gcp-project-id"
+msgstr ""
+
+#: ocular/templates/settings.html:814
+msgid "Advanced document analysis with form and table extraction"
+msgstr ""
+
+#: ocular/templates/settings.html:821
+msgid "AKIA..."
+msgstr ""
+
+#: ocular/templates/settings.html:829
+msgid "Enter AWS secret key"
+msgstr ""
+
+#: ocular/templates/settings.html:841
+msgid "US East (N. Virginia)"
+msgstr ""
+
+#: ocular/templates/settings.html:842
+msgid "US West (Oregon)"
+msgstr ""
+
+#: ocular/templates/settings.html:843
+msgid "Europe (Ireland)"
+msgstr ""
+
+#: ocular/templates/settings.html:844
+msgid "Asia Pacific (Singapore)"
+msgstr ""
+
+#: ocular/templates/settings.html:865
+msgid "Microsoft's AI-powered document processing"
+msgstr ""
+
+#: ocular/templates/settings.html:872
+msgid "https://your-resource.cognitiveservices.azure.com/"
+msgstr ""
+
+#: ocular/templates/settings.html:880
+msgid "Enter Azure API key"
+msgstr ""
+
+#: ocular/templates/settings.html:904
+msgid "Open-source OCR engine for local processing (no API key required)"
+msgstr ""
+
+#: ocular/templates/settings.html:910
+msgid "Language"
+msgstr ""
+
+#: ocular/templates/settings.html:912
+msgid "English"
+msgstr ""
+
+#: ocular/templates/settings.html:913
+msgid "French"
+msgstr ""
+
+#: ocular/templates/settings.html:914
+msgid "German"
+msgstr ""
+
+#: ocular/templates/settings.html:915
+msgid "Italian"
+msgstr ""
+
+#: ocular/templates/settings.html:916
+msgid "Spanish"
+msgstr ""
+
+#: ocular/templates/settings.html:917
+msgid "Chinese (Simplified)"
+msgstr ""
+
+#: ocular/templates/settings.html:918
+msgid "Japanese"
+msgstr ""
+
+#: ocular/templates/settings.html:919
+msgid "Korean"
+msgstr ""
+
+#: ocular/templates/settings.html:926
+msgid "DPI"
+msgstr ""
+
+#: ocular/templates/settings.html:948
+msgid "Access to gated models and private repositories"
+msgstr ""
+
+#: ocular/templates/settings.html:956
+msgid "hf_..."
+msgstr ""
+
+#: ocular/templates/settings.html:985
+msgid "Application logging and monitoring settings"
+msgstr ""
+
+#: ocular/templates/settings.html:991
+msgid "Log Level"
+msgstr ""
+
+#: ocular/templates/settings.html:993
+msgid "DEBUG"
+msgstr ""
+
+#: ocular/templates/settings.html:994
+msgid "INFO"
+msgstr ""
+
+#: ocular/templates/settings.html:995
+msgid "WARNING"
+msgstr ""
+
+#: ocular/templates/settings.html:996
+msgid "ERROR"
+msgstr ""
+
+#: ocular/templates/settings.html:997
+msgid "CRITICAL"
+msgstr ""
+
+#: ocular/templates/settings.html:1003
+msgid "Log Format"
+msgstr ""
+
+#: ocular/templates/settings.html:1005
+msgid "JSON"
+msgstr ""
+
+#: ocular/templates/settings.html:1006
+msgid "Text"
+msgstr ""
+
+#: ocular/templates/settings.html:1012
+msgid "Logfire Token"
+msgstr ""
+
+#: ocular/templates/settings.html:1014
+msgid "Enter Logfire token"
+msgstr ""
+
+#: ocular/templates/settings.html:1025
+msgid "File Logging"
+msgstr ""
+
+#: ocular/templates/settings.html:1028
+msgid "Enable file logging"
+msgstr ""
+
+#: ocular/templates/settings.html:1034
+msgid "Log File Path"
+msgstr ""
+
+#: ocular/templates/settings.html:1035
+msgid "logs/ocular.log"
+msgstr ""
+
+#: ocular/templates/settings.html:1048
+msgid "Security, CORS, and access control settings"
+msgstr ""
+
+#: ocular/templates/settings.html:1054
+msgid "CORS Allowed Origins"
+msgstr ""
+
+#: ocular/templates/settings.html:1055
+msgid "https://example.com,https://app.example.com"
+msgstr ""
+
+#: ocular/templates/settings.html:1060
+msgid "Max Request Size (MB)"
+msgstr ""
+
+#: ocular/templates/settings.html:1066
+msgid "Rate Limit (req/min)"
+msgstr ""
+
+#: ocular/templates/settings.html:1074
+msgid "API Secret Key"
+msgstr ""
+
+#: ocular/templates/settings.html:1076
+msgid "your-api-secret"
+msgstr ""
+
+#: ocular/templates/settings.html:1085
+msgid "Encryption Key"
+msgstr ""
+
+#: ocular/templates/settings.html:1087
+msgid "your-encryption-key"
+msgstr ""
+
+#: ocular/templates/settings.html:1096
+msgid "HTTPS Only"
+msgstr ""
+
+#: ocular/templates/settings.html:1099
+msgid "Enforce HTTPS connections"
+msgstr ""
+
+#: ocular/templates/settings.html:1122
+msgid "Caching settings for improved performance"
+msgstr ""
+
+#: ocular/templates/settings.html:1128
+msgid "Redis URL"
+msgstr ""
+
+#: ocular/templates/settings.html:1129
+msgid "redis://localhost:6379/0"
+msgstr ""
+
+#: ocular/templates/settings.html:1143
+msgid "Cache TTL (seconds)"
+msgstr ""
+
+#: ocular/templates/settings.html:1149
+msgid "Enable Caching"
+msgstr ""
+
+#: ocular/templates/settings.html:1152
+msgid "Enable result caching"
+msgstr ""
+
+#: ocular/templates/user_profile.html:3 ocular/templates/user_profile.html:10
+msgid "User Profile"
+msgstr ""
+
+#: ocular/templates/user_profile.html:28
+msgid "user@example.com"
+msgstr ""
+
+#: ocular/templates/user_profile.html:71
+msgid "First Name"
+msgstr ""
+
+#: ocular/templates/user_profile.html:75
+msgid "Last Name"
+msgstr ""
+
+#: ocular/templates/user_profile.html:81
+msgid "Username"
+msgstr ""
+
+#: ocular/templates/user_profile.html:86
+msgid "Email Address"
+msgstr ""
+
+#: ocular/templates/user_profile.html:88
+msgid "Email cannot be changed here. Manage through your authentication provider."
+msgstr ""
+
+#: ocular/templates/user_profile.html:128
+msgid "Create New API Key"
+msgstr ""
+
+#: ocular/templates/user_profile.html:136
+msgid "e.g., Production API Key"
+msgstr ""
+
+#: ocular/templates/user_profile.html:137
+msgid "Choose a descriptive name to identify this key"
+msgstr ""
+
+#: ocular/templates/user_profile.html:141
+msgid "Permissions"
+msgstr ""
+
+#: ocular/templates/user_profile.html:146
+msgid "Read Models"
+msgstr ""
+
+#: ocular/templates/user_profile.html:150
+msgid "Create Models"
+msgstr ""
+
+#: ocular/templates/user_profile.html:154
+msgid "Read Deployments"
+msgstr ""
+
+#: ocular/templates/user_profile.html:158
+msgid "Create Deployments"
+msgstr ""
+
+#: ocular/templates/user_profile.html:164
+msgid "Start Deployments"
+msgstr ""
+
+#: ocular/templates/user_profile.html:168
+msgid "Stop Deployments"
+msgstr ""
+
+#: ocular/templates/user_profile.html:172
+msgid "Read Analytics"
+msgstr ""
+
+#: ocular/templates/user_profile.html:180
+msgid "Expiration (days)"
+msgstr ""
+
+#: ocular/templates/user_profile.html:182
+msgid "Never expires (leave empty)"
+msgstr ""
+
+#: ocular/templates/user_profile.html:183
+msgid "Optional: Number of days until key expires"
+msgstr ""
+
+#: ocular/templates/user_profile.html:186
+msgid "Rate Limit (per minute)"
+msgstr ""
+
+#: ocular/templates/user_profile.html:188
+msgid "No limit (leave empty)"
+msgstr ""
+
+#~ msgid ""
+#~ "AI-Powered OCR\"\n"
+#~ "msgstr \"AI-Powered OCR\"\n"
+#~ "\n"
+#~ "msgid \"Active Deployments\"\n"
+#~ "msgstr \"Active Deployments\"\n"
+#~ "\n"
+#~ "msgid \"Analytics\"\n"
+#~ "msgstr \"Analytics\"\n"
+#~ "\n"
+#~ "msgid \"Analytics & Monitoring\"\n"
+#~ "msgstr \"Analytics & Monitoring\"\n"
+#~ "\n"
+#~ "msgid \"Analytics Dashboard\"\n"
+#~ "msgstr \"Analytics Dashboard\"\n"
+#~ "\n"
+#~ "msgid \"Available\"\n"
+#~ "msgstr \"Available\"\n"
+#~ "\n"
+#~ "msgid \"Batch Processing\"\n"
+#~ "msgstr \"Batch Processing\"\n"
+#~ "\n"
+#~ "msgid \"Best\"\n"
+#~ "msgstr \"Best\"\n"
+#~ "\n"
+#~ "msgid \"Billing\"\n"
+#~ "msgstr \"Billing\"\n"
+#~ "\n"
+#~ "msgid \"Choose best result by confidence\"\n"
+#~ "msgstr \"Choose best result by confidence\"\n"
+#~ "\n"
+#~ "msgid \"Choose how the platform coordinates multiple OCR providers.\"\n"
+#~ "msgstr \"Choose how the platform "
+#~ "coordinates multiple OCR providers.\"\n"
+#~ "\n"
+#~ "msgid \"Clean, structured markdown format ready for publishing\"\n"
+#~ "msgstr \"Clean, structured markdown format ready for publishing\"\n"
+#~ "\n"
+#~ "msgid \"Convert PDFs and images to "
+#~ "markdown using AI-powered OCR "
+#~ "technology\"\n"
+#~ "msgstr \"Convert PDFs and images to "
+#~ "markdown using AI-powered OCR "
+#~ "technology\"\n"
+#~ "\n"
+#~ "msgid \"Copy\"\n"
+#~ "msgstr \"Copy\"\n"
+#~ "\n"
+#~ "msgid \"Core Features\"\n"
+#~ "msgstr \"Core Features\"\n"
+#~ "\n"
+#~ "msgid \"Cost Breakdown (Last 30 Days)\"\n"
+#~ "msgstr \"Cost Breakdown (Last 30 Days)\"\n"
+#~ "\n"
+#~ "msgid \"Custom Prompt (Optional)\"\n"
+#~ "msgstr \"Custom Prompt (Optional)\"\n"
+#~ "\n"
+#~ "msgid \"Daily Cost\"\n"
+#~ "msgstr \"Daily Cost\"\n"
+#~ "\n"
+#~ "msgid \"Deployment Timeline\"\n"
+#~ "msgstr \"Deployment Timeline\"\n"
+#~ "\n"
+#~ "msgid \"Deployment metrics, costs, and performance insights\"\n"
+#~ "msgstr \"Deployment metrics, costs, and performance insights\"\n"
+#~ "\n"
+#~ "msgid \"Deployments\"\n"
+#~ "msgstr \"Deployments\"\n"
+#~ "\n"
+#~ "msgid \"Document History\"\n"
+#~ "msgstr \"Document History\"\n"
+#~ "\n"
+#~ "msgid \"Document URL\"\n"
+#~ "msgstr \"Document URL\"\n"
+#~ "\n"
+#~ "msgid \"Download\"\n"
+#~ "msgstr \"Download\"\n"
+#~ "\n"
+#~ "msgid \"Drop files here or click to browse\"\n"
+#~ "msgstr \"Drop files here or click to browse\"\n"
+#~ "\n"
+#~ "msgid \"Ensemble\"\n"
+#~ "msgstr \"Ensemble\"\n"
+#~ "\n"
+#~ "msgid \"Enter a direct link to a PDF or image file\"\n"
+#~ "msgstr \"Enter a direct link to a PDF or image file\"\n"
+#~ "\n"
+#~ "msgid \"Estimated average\"\n"
+#~ "msgstr \"Estimated average\"\n"
+#~ "\n"
+#~ "msgid \"Extract text and data from "
+#~ "PDFs and images using advanced OCR "
+#~ "technology\"\n"
+#~ "msgstr \"Extract text and data from "
+#~ "PDFs and images using advanced OCR "
+#~ "technology\"\n"
+#~ "\n"
+#~ "msgid \"Extracted Content\"\n"
+#~ "msgstr \"Extracted Content\"\n"
+#~ "\n"
+#~ "msgid \"Fallback\"\n"
+#~ "msgstr \"Fallback\"\n"
+#~ "\n"
+#~ "msgid \"GPU Distribution\"\n"
+#~ "msgstr \"GPU Distribution\"\n"
+#~ "\n"
+#~ "msgid \"GPU Utilization\"\n"
+#~ "msgstr \"GPU Utilization\"\n"
+#~ "\n"
+#~ "msgid \"GPUs active\"\n"
+#~ "msgstr \"GPUs active\"\n"
+#~ "\n"
+#~ "msgid \"Guest\"\n"
+#~ "msgstr \"Guest\"\n"
+#~ "\n"
+#~ "msgid \"Include processing metadata in response\"\n"
+#~ "msgstr \"Include processing metadata in response\"\n"
+#~ "\n"
+#~ "msgid \"Infrastructure\"\n"
+#~ "msgstr \"Infrastructure\"\n"
+#~ "\n"
+#~ "msgid \"Last 30 days\"\n"
+#~ "msgstr \"Last 30 days\"\n"
+#~ "\n"
+#~ "msgid \"Last 7 days\"\n"
+#~ "msgstr \"Last 7 days\"\n"
+#~ "\n"
+#~ "msgid \"Last 90 days\"\n"
+#~ "msgstr \"Last 90 days\"\n"
+#~ "\n"
+#~ "msgid \"Loading notifications...\"\n"
+#~ "msgstr \"Loading notifications...\"\n"
+#~ "\n"
+#~ "msgid \"Loading...\"\n"
+#~ "msgstr \"Loading...\"\n"
+#~ "\n"
+#~ "msgid \"Login\"\n"
+#~ "msgstr \"Login\"\n"
+#~ "\n"
+#~ "msgid \"Logout\"\n"
+#~ "msgstr \"Logout\"\n"
+#~ "\n"
+#~ "msgid \"Maintains document structure, tables,"
+#~ " equations, and reading order\"\n"
+#~ "msgstr \"Maintains document structure, tables,"
+#~ " equations, and reading order\"\n"
+#~ "\n"
+#~ "msgid \"Markdown Output\"\n"
+#~ "msgstr \"Markdown Output\"\n"
+#~ "\n"
+#~ "msgid \"Model Usage Statistics\"\n"
+#~ "msgstr \"Model Usage Statistics\"\n"
+#~ "\n"
+#~ "msgid \"Models\"\n"
+#~ "msgstr \"Models\"\n"
+#~ "\n"
+#~ "msgid \"No OCR providers available. Check your configuration.\"\n"
+#~ "msgstr \"No OCR providers available. Check your configuration.\"\n"
+#~ "\n"
+#~ "msgid \"Notifications\"\n"
+#~ "msgstr \"Notifications\"\n"
+#~ "\n"
+#~ "msgid \"OCR Providers\"\n"
+#~ "msgstr \"OCR Providers\"\n"
+#~ "\n"
+#~ "msgid \"OLMocr Document Processor\"\n"
+#~ "msgstr \"OLMocr Document Processor\"\n"
+#~ "\n"
+#~ "msgid \"Observability\"\n"
+#~ "msgstr \"Observability\"\n"
+#~ "\n"
+#~ "msgid \"Ocular OCR Service\"\n"
+#~ "msgstr \"Ocular OCR Service\"\n"
+#~ "\n"
+#~ "msgid \"Performance Trends & Success Rate\"\n"
+#~ "msgstr \"Performance Trends & Success Rate\"\n"
+#~ "\n"
+#~ "msgid \"Please wait while we extract text from your documents\"\n"
+#~ "msgstr \"Please wait while we extract text from your documents\"\n"
+#~ "\n"
+#~ "msgid \"Powered by Mistral AI, OLM OCR, and RoLM OCR\"\n"
+#~ "msgstr \"Powered by Mistral AI, OLM OCR, and RoLM OCR\"\n"
+#~ "\n"
+#~ "msgid \"Process Document\"\n"
+#~ "msgstr \"Process Document\"\n"
+#~ "\n"
+#~ "msgid \"Process Files\"\n"
+#~ "msgstr \"Process Files\"\n"
+#~ "\n"
+#~ "msgid \"Process URL\"\n"
+#~ "msgstr \"Process URL\"\n"
+#~ "\n"
+#~ "msgid \"Process from URL\"\n"
+#~ "msgstr \"Process from URL\"\n"
+#~ "\n"
+#~ "msgid \"Processing Error\"\n"
+#~ "msgstr \"Processing Error\"\n"
+#~ "\n"
+#~ "msgid \"Processing Files...\"\n"
+#~ "msgstr \"Processing Files...\"\n"
+#~ "\n"
+#~ "msgid \"Processing Information\"\n"
+#~ "msgstr \"Processing Information\"\n"
+#~ "\n"
+#~ "msgid \"Processing Options\"\n"
+#~ "msgstr \"Processing Options\"\n"
+#~ "\n"
+#~ "msgid \"Processing Results\"\n"
+#~ "msgstr \"Processing Results\"\n"
+#~ "\n"
+#~ "msgid \"Processing Strategies\"\n"
+#~ "msgstr \"Processing Strategies\"\n"
+#~ "\n"
+#~ "msgid \"Processing Strategy\"\n"
+#~ "msgstr \"Processing Strategy\"\n"
+#~ "\n"
+#~ "msgid \"Processing document with OLMocr...\"\n"
+#~ "msgstr \"Processing document with OLMocr...\"\n"
+#~ "\n"
+#~ "msgid \"Processing...\"\n"
+#~ "msgstr \"Processing...\"\n"
+#~ "\n"
+#~ "msgid \"Profile\"\n"
+#~ "msgstr \"Profile\"\n"
+#~ "\n"
+#~ "msgid \"Providers\"\n"
+#~ "msgstr \"Providers\"\n"
+#~ "\n"
+#~ "msgid \"Select Document\"\n"
+#~ "msgstr \"Select Document\"\n"
+#~ "\n"
+#~ "msgid \"Select providers, configure "
+#~ "strategies, and process multiple documents "
+#~ "in one place\"\n"
+#~ "msgstr \"Select providers, configure "
+#~ "strategies, and process multiple documents "
+#~ "in one place\"\n"
+#~ "\n"
+#~ "msgid \"Settings\"\n"
+#~ "msgstr \"Settings\"\n"
+#~ "\n"
+#~ "msgid \"Sign Up\"\n"
+#~ "msgstr \"Sign Up\"\n"
+#~ "\n"
+#~ "msgid \"Single\"\n"
+#~ "msgstr \"Single\"\n"
+#~ "\n"
+#~ "msgid \"Status unknown\"\n"
+#~ "msgstr \"Status unknown\"\n"
+#~ "\n"
+#~ "msgid \"Structure Preservation\"\n"
+#~ "msgstr \"Structure Preservation\"\n"
+#~ "\n"
+#~ "msgid \"Supported formats: PDF, JPG, PNG, BMP, TIFF, WEBP\"\n"
+#~ "msgstr \"Supported formats: PDF, JPG, PNG, BMP, TIFF, WEBP\"\n"
+#~ "\n"
+#~ "msgid \"Supported formats: PDF, PNG, JPG, JPEG (max 50MB)\"\n"
+#~ "msgstr \"Supported formats: PDF, PNG, JPG, JPEG (max 50MB)\"\n"
+#~ "\n"
+#~ "msgid \"System\"\n"
+#~ "msgstr \"System\"\n"
+#~ "\n"
+#~ "msgid \"Total Models\"\n"
+#~ "msgstr \"Total Models\"\n"
+#~ "\n"
+#~ "msgid \"Try providers until success\"\n"
+#~ "msgstr \"Try providers until success\"\n"
+#~ "\n"
+#~ "msgid \"Unified OCR Upload\"\n"
+#~ "msgstr \"Unified OCR Upload\"\n"
+#~ "\n"
+#~ "msgid \"Unified OCR Workflow\"\n"
+#~ "msgstr \"Unified OCR Workflow\"\n"
+#~ "\n"
+#~ "msgid \"Upload\"\n"
+#~ "msgstr \"Upload\"\n"
+#~ "\n"
+#~ "msgid \"Upload File\"\n"
+#~ "msgstr \"Upload File\"\n"
+#~ "\n"
+#~ "msgid \"Upload Files\"\n"
+#~ "msgstr \"Upload Files\"\n"
+#~ "\n"
+#~ "msgid \"Use multiple providers\"\n"
+#~ "msgstr \"Use multiple providers\"\n"
+#~ "\n"
+#~ "msgid \"Use one provider\"\n"
+#~ "msgstr \"Use one provider\"\n"
+#~ "\n"
+#~ "msgid \"Uses OLMocr for accurate document conversion\"\n"
+#~ "msgstr \"Uses OLMocr for accurate document conversion\"\n"
+#~ "\n"
+#~ "msgid \"Version\"\n"
+#~ "msgstr \"Version\"\n"
+#~ "\n"
+#~ "msgid \"View all\"\n"
+#~ "msgstr \"View all\"\n"
+#~ "\n"
+#~ "msgid \"e.g., Extract invoice data with line items\"\n"
+#~ "msgstr \"e.g., Extract invoice data with line items\"\n"
+#~ "\n"
+#~ "msgid \"failures (24h)\"\n"
+#~ "msgstr \"failures (24h)\"\n"
+#~ "\n"
+#~ "msgid \"in last 24h\"\n"
+#~ "msgstr \"in last 24h\"\\"
+#~ msgstr ""
+

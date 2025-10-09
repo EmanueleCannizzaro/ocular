@@ -96,10 +96,15 @@ class ProviderFactory:
                     logger.info(f"Provider {provider_type.value} is available")
                 else:
                     logger.warning(f"Provider {provider_type.value} is not available")
-                
+
                 await provider.cleanup()
-                
+
+            except ConfigurationError as e:
+                # Expected errors for missing dependencies or credentials
+                logger.debug(f"Provider {provider_type.value} is not available: {e}")
+                continue
             except Exception as e:
+                # Unexpected errors
                 logger.error(f"Error checking provider {provider_type.value}: {e}")
                 continue
         

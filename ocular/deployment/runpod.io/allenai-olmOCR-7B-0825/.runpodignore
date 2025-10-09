@@ -1,0 +1,149 @@
+# RunPod ignore file for OLMocr vLLM deployment
+# Files and directories to exclude during deployment
+
+# Development and local files
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+*.log
+.DS_Store
+Thumbs.db
+
+# Python cache and compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.sublime-*
+
+# Git and version control
+.git/
+.gitignore
+.gitattributes
+
+# Documentation
+README.md
+docs/
+*.md
+
+# Test files
+tests/
+test_*
+*_test.py
+pytest.ini
+.pytest_cache/
+
+# Configuration files (keep only the necessary ones)
+docker-compose.yml
+docker-compose.yaml
+Dockerfile.dev
+.dockerignore
+
+# Large model files (will be downloaded at runtime)
+models/
+*.bin
+*.safetensors
+*.pt
+*.pth
+*.ckpt
+
+# Jupyter notebooks
+*.ipynb
+.jupyter/
+.ipynb_checkpoints/
+
+# Cache directories
+.cache/
+cache/
+tmp/
+temp/
+
+# OS and system files
+.system/
+/proc/
+/sys/
+/dev/
+
+# Backup files
+*.bak
+*.backup
+*.old
+
+# Temporary files
+*.tmp
+*.temp
+
+# Local development scripts
+run_local.sh
+test_local.sh
+debug.py
+
+# Node.js files (if any)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Local configuration
+config.local.json
+settings.local.yml
+
+# Secrets and keys
+*.pem
+*.key
+*.crt
+secrets/
+credentials/
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+logs/
+*.log
+
+# Coverage reports
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+.nyc_output
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json

@@ -5,6 +5,7 @@ Tests for core models.
 import pytest
 from datetime import datetime
 from pathlib import Path
+from pydantic import ValidationError
 
 from ocular.core.models import (
     OCRResult, ProcessingRequest, ProcessingResult, 
@@ -57,10 +58,10 @@ class TestOCRResult:
         assert result.confidence == 0.5
         
         # Invalid confidence - should raise validation error
-        with pytest.raises(ValueError, match="Confidence must be between 0.0 and 1.0"):
+        with pytest.raises(ValidationError, match="Input should be less than or equal to 1"):
             OCRResult(text="test", confidence=1.5, provider="test")
         
-        with pytest.raises(ValueError, match="Confidence must be between 0.0 and 1.0"):
+        with pytest.raises(ValidationError, match="Input should be greater than or equal to 0"):
             OCRResult(text="test", confidence=-0.1, provider="test")
 
 

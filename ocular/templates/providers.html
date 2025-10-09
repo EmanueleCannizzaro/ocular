@@ -1,0 +1,227 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('Providers Management') }} - {{ _('Ocular OCR') }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 my-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="display-5">
+                <i class="fas fa-server me-3 text-primary"></i>
+                {{ _('Providers Management') }}
+            </h1>
+            <p class="lead text-muted">{{ _('Manage OCR providers and cloud GPU infrastructure') }}</p>
+        </div>
+    </div>
+
+    <!-- Tabs for OCR Providers and Cloud Providers -->
+    <ul class="nav nav-tabs mb-4" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="ocr-providers-tab" data-bs-toggle="tab"
+                    data-bs-target="#ocr-providers" type="button" role="tab">
+                <i class="fas fa-robot me-2"></i>
+                {{ _('OCR Providers') }}
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="cloud-providers-tab" data-bs-toggle="tab"
+                    data-bs-target="#cloud-providers" type="button" role="tab">
+                <i class="fas fa-cloud me-2"></i>
+                {{ _('Cloud GPU Providers') }}
+            </button>
+        </li>
+    </ul>
+
+    <!-- Tab Content -->
+    <div class="tab-content">
+        <!-- OCR Providers Tab -->
+        <div class="tab-pane fade show active" id="ocr-providers" role="tabpanel">
+            <!-- Overview Stats -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card text-center border-success">
+                        <div class="card-body">
+                            <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
+                            <h5 class="card-title" id="ocr-available-count">0</h5>
+                            <p class="card-text text-muted">{{ _('Available') }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center border-warning">
+                        <div class="card-body">
+                            <i class="fas fa-exclamation-triangle fa-2x text-warning mb-2"></i>
+                            <h5 class="card-title" id="ocr-unavailable-count">0</h5>
+                            <p class="card-text text-muted">{{ _('Unavailable') }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center border-info">
+                        <div class="card-body">
+                            <i class="fas fa-clock fa-2x text-info mb-2"></i>
+                            <h5 class="card-title" id="ocr-total-count">0</h5>
+                            <p class="card-text text-muted">{{ _('Total') }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center border-primary">
+                        <div class="card-body">
+                            <i class="fas fa-sync-alt fa-2x text-primary mb-2"></i>
+                            <button class="btn btn-sm btn-primary" onclick="checkOCRProviders()">
+                                {{ _('Refresh Status') }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- OCR Providers Grid -->
+            <div class="row" id="ocr-providers-grid">
+                <div class="col-12 text-center py-5">
+                    <div class="spinner-border text-primary"></div>
+                    <p class="mt-3 text-muted">{{ _('Loading OCR providers...') }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cloud GPU Providers Tab -->
+        <div class="tab-pane fade" id="cloud-providers" role="tabpanel">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h5 class="mb-0">{{ _('Cloud GPU Infrastructure') }}</h5>
+                    <p class="text-muted mb-0">{{ _('Manage deployment providers for AI models') }}</p>
+                </div>
+                <button class="btn btn-primary" onclick="showAddProviderModal()">
+                    <i class="fas fa-plus me-2"></i>
+                    {{ _('Add Provider') }}
+                </button>
+            </div>
+
+            <!-- Cloud Providers Grid -->
+            <div class="row" id="cloud-providers-grid">
+                <div class="col-12 text-center py-5">
+                    <div class="spinner-border text-primary"></div>
+                    <p class="mt-3 text-muted">{{ _('Loading cloud providers...') }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add/Edit Cloud Provider Modal -->
+<div class="modal fade" id="providerModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-cloud me-2"></i>
+                    <span id="provider-modal-title-text">{{ _('Add Cloud Provider') }}</span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="provider-form">
+                    <input type="hidden" id="provider-id">
+
+                    <!-- Basic Information -->
+                    <h6 class="mb-3">{{ _('Basic Information') }}</h6>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="provider-name" class="form-label">{{ _('Provider Name') }} <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="provider-name" required
+                                   placeholder="{{ _('e.g., runpod') }}">
+                            <small class="text-muted">{{ _('Internal identifier (lowercase, no spaces)') }}</small>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="provider-display-name" class="form-label">{{ _('Display Name') }} <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="provider-display-name" required
+                                   placeholder="{{ _('e.g., RunPod Serverless') }}">
+                            <small class="text-muted">{{ _('User-friendly name') }}</small>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="provider-description" class="form-label">{{ _('Description') }}</label>
+                        <textarea class="form-control" id="provider-description" rows="2"
+                                  placeholder="{{ _('Brief description of the provider') }}"></textarea>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="provider-website" class="form-label">{{ _('Website') }}</label>
+                            <input type="url" class="form-control" id="provider-website"
+                                   placeholder="https://www.runpod.io">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="provider-status" class="form-label">{{ _('Status') }}</label>
+                            <select class="form-select" id="provider-status">
+                                <option value="ACTIVE">{{ _('Active') }}</option>
+                                <option value="INACTIVE">{{ _('Inactive') }}</option>
+                                <option value="TESTING">{{ _('Testing') }}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <!-- Available GPUs -->
+                    <h6 class="mb-3">{{ _('Available GPUs') }}</h6>
+                    <div class="mb-3">
+                        <label for="available-gpus" class="form-label">{{ _('GPU Types') }}</label>
+                        <textarea class="form-control" id="available-gpus" rows="3"
+                                  placeholder="{{ _('One GPU per line, e.g.:') }}&#10;RTX 4000 Ada (20GB)&#10;RTX A4000 (16GB)&#10;RTX A5000 (24GB)"></textarea>
+                        <small class="text-muted">{{ _('List all available GPU types (one per line)') }}</small>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <!-- Features -->
+                    <h6 class="mb-3">{{ _('Features & Capabilities') }}</h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="supports-autoscaling">
+                                <label class="form-check-label" for="supports-autoscaling">
+                                    {{ _('Supports Auto-scaling') }}
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="supports-spot-instances">
+                                <label class="form-check-label" for="supports-spot-instances">
+                                    {{ _('Supports Spot Instances') }}
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="supports-custom-images">
+                                <label class="form-check-label" for="supports-custom-images">
+                                    {{ _('Supports Custom Docker Images') }}
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="supports-persistent-storage">
+                                <label class="form-check-label" for="supports-persistent-storage">
+                                    {{ _('Supports Persistent Storage') }}
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Cancel') }}</button>
+                <button type="button" class="btn btn-primary" onclick="saveProvider()">
+                    <i class="fas fa-save me-1"></i> {{ _('Save Provider') }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', path='js/providers.js') }}"></script>
+{% endblock %}

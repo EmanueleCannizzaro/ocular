@@ -5,7 +5,7 @@ import os
 import json
 from pathlib import Path
 
-from ocular.client import MistralOCRClient
+from deployment.mistralocr import MistralOCRClient
 from ocular.exceptions import APIError, OCRError, ConfigurationError
 from ocular.models import RootModel
 from ocular.config import OcularConfig

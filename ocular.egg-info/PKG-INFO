@@ -35,6 +35,10 @@ Requires-Dist: pdf2image>=1.17.0
 Requires-Dist: python-jose==3.3.0
 Requires-Dist: clerk-backend-api>=2.1.0
 Requires-Dist: stripe>=12.5.0
+Requires-Dist: pytest-asyncio>=1.1.0
+Requires-Dist: runpod>=1.7.13
+Requires-Dist: pytesseract>=0.3.13
+Requires-Dist: sqlalchemy>=2.0.0
 Provides-Extra: dev
 Requires-Dist: pytest>=7.0; extra == "dev"
 Requires-Dist: pytest-asyncio>=0.21.0; extra == "dev"

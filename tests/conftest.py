@@ -107,20 +107,23 @@ startxref
 @pytest.fixture
 def test_settings(temp_dir):
     """Create test settings."""
+    temp_path = temp_dir / "temp"
+    upload_path = temp_dir / "uploads"
+    
+    # Create directories first
+    temp_path.mkdir(exist_ok=True)
+    upload_path.mkdir(exist_ok=True)
+    
     settings = OcularSettings(
         environment="testing",
         providers__mistral_api_key="test_key",
         providers__enabled_providers=["mistral"],
         files__max_file_size_mb=10,
-        files__temp_dir=temp_dir / "temp",
-        files__upload_dir=temp_dir / "uploads",
+        files__temp_dir=str(temp_path),
+        files__upload_dir=str(upload_path),
         processing__enable_caching=False,
         web__debug=True
     )
-    
-    # Create directories
-    settings.files.temp_dir.mkdir(exist_ok=True)
-    settings.files.upload_dir.mkdir(exist_ok=True)
     
     return settings
 
