@@ -1,0 +1,230 @@
+{# Navigation Macros for Cross-Template Integration #}
+
+{# Breadcrumb Navigation #}
+{% macro render_breadcrumbs(items) %}
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb bg-light p-3 rounded">
+        <li class="breadcrumb-item">
+            <a href="/"><i class="fas fa-home me-1"></i>{{ _('Home') }}</a>
+        </li>
+        {% for item in items %}
+            {% if loop.last %}
+                <li class="breadcrumb-item active" aria-current="page">
+                    {% if item.icon %}<i class="{{ item.icon }} me-1"></i>{% endif %}
+                    {{ _(item.label) }}
+                </li>
+            {% else %}
+                <li class="breadcrumb-item">
+                    <a href="{{ item.url }}">
+                        {% if item.icon %}<i class="{{ item.icon }} me-1"></i>{% endif %}
+                        {{ _(item.label) }}
+                    </a>
+                </li>
+            {% endif %}
+        {% endfor %}
+    </ol>
+</nav>
+{% endmacro %}
+
+{# Quick Action Card #}
+{% macro quick_action_card(title, icon, description, url, badge=None, color="primary") %}
+<div class="col-md-6 col-lg-4 mb-3">
+    <div class="card h-100 shadow-sm hover-lift quick-action-card">
+        <div class="card-body">
+            <div class="d-flex align-items-start justify-content-between mb-2">
+                <div class="icon-circle bg-{{ color }} bg-opacity-10 text-{{ color }} p-3 rounded-circle">
+                    <i class="{{ icon }} fa-2x"></i>
+                </div>
+                {% if badge %}
+                <span class="badge bg-{{ badge.color or 'info' }}">{{ _(badge.text) }}</span>
+                {% endif %}
+            </div>
+            <h5 class="card-title mb-2">{{ _(title) }}</h5>
+            <p class="card-text text-muted small">{{ _(description) }}</p>
+            <a href="{{ url }}" class="stretched-link"></a>
+        </div>
+    </div>
+</div>
+{% endmacro %}
+
+{# Contextual Help Panel #}
+{% macro contextual_help(section, tips) %}
+<div class="alert alert-info d-flex align-items-start" role="alert">
+    <i class="fas fa-lightbulb fa-2x me-3"></i>
+    <div>
+        <h6 class="alert-heading">{{ _('Quick Tips') }} - {{ _(section) }}</h6>
+        <ul class="mb-0 small">
+            {% for tip in tips %}
+            <li>{{ _(tip) }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endmacro %}
+
+{# Workflow Progress Indicator #}
+{% macro workflow_progress(steps, current_step) %}
+<div class="workflow-progress mb-4">
+    <div class="d-flex justify-content-between align-items-center">
+        {% for step in steps %}
+        <div class="workflow-step {% if loop.index0 <= current_step %}completed{% endif %} {% if loop.index0 == current_step %}active{% endif %} text-center" style="flex: 1;">
+            <div class="step-icon mx-auto mb-2">
+                <i class="{{ step.icon }}"></i>
+            </div>
+            <div class="step-label small">{{ _(step.label) }}</div>
+        </div>
+        {% if not loop.last %}
+        <div class="workflow-connector {% if loop.index0 < current_step %}completed{% endif %}"></div>
+        {% endif %}
+        {% endfor %}
+    </div>
+</div>
+{% endmacro %}
+
+{# Related Features Sidebar #}
+{% macro related_features(features) %}
+<div class="card shadow-sm">
+    <div class="card-header bg-primary text-white">
+        <i class="fas fa-link me-2"></i>{{ _('Related Features') }}
+    </div>
+    <div class="list-group list-group-flush">
+        {% for feature in features %}
+        <a href="{{ feature.url }}" class="list-group-item list-group-item-action d-flex align-items-center">
+            <i class="{{ feature.icon }} me-3 text-{{ feature.color or 'primary' }}"></i>
+            <div>
+                <div class="fw-bold">{{ _(feature.title) }}</div>
+                {% if feature.description %}
+                <small class="text-muted">{{ _(feature.description) }}</small>
+                {% endif %}
+            </div>
+            {% if feature.badge %}
+            <span class="badge bg-{{ feature.badge.color or 'secondary' }} ms-auto">{{ _(feature.badge.text) }}</span>
+            {% endif %}
+        </a>
+        {% endfor %}
+    </div>
+</div>
+{% endmacro %}
+
+{# Statistics Widget #}
+{% macro stats_widget(stats) %}
+<div class="row g-3 mb-4">
+    {% for stat in stats %}
+    <div class="col-md-6 col-lg-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center">
+                <div class="stat-icon text-{{ stat.color or 'primary' }} mb-2">
+                    <i class="{{ stat.icon }} fa-2x"></i>
+                </div>
+                <h3 class="mb-0">{{ stat.value }}</h3>
+                <p class="text-muted mb-0 small">{{ _(stat.label) }}</p>
+                {% if stat.change %}
+                <small class="text-{{ 'success' if stat.change > 0 else 'danger' }}">
+                    <i class="fas fa-{{ 'arrow-up' if stat.change > 0 else 'arrow-down' }}"></i>
+                    {{ stat.change|abs }}%
+                </small>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endmacro %}
+
+{# Feature Status Badge #}
+{% macro feature_status_badge(status) %}
+{% if status == 'active' %}
+    <span class="badge bg-success"><i class="fas fa-check-circle me-1"></i>{{ _('Active') }}</span>
+{% elif status == 'pending' %}
+    <span class="badge bg-warning"><i class="fas fa-clock me-1"></i>{{ _('Pending') }}</span>
+{% elif status == 'disabled' %}
+    <span class="badge bg-secondary"><i class="fas fa-pause-circle me-1"></i>{{ _('Disabled') }}</span>
+{% elif status == 'error' %}
+    <span class="badge bg-danger"><i class="fas fa-exclamation-circle me-1"></i>{{ _('Error') }}</span>
+{% else %}
+    <span class="badge bg-info">{{ _(status) }}</span>
+{% endif %}
+{% endmacro %}
+
+{# Empty State Placeholder #}
+{% macro empty_state(title, description, icon, action_url=None, action_text=None) %}
+<div class="text-center py-5">
+    <i class="{{ icon }} fa-4x text-muted mb-3 d-block"></i>
+    <h4 class="text-muted">{{ _(title) }}</h4>
+    <p class="text-muted">{{ _(description) }}</p>
+    {% if action_url and action_text %}
+    <a href="{{ action_url }}" class="btn btn-primary mt-3">
+        <i class="fas fa-plus me-2"></i>{{ _(action_text) }}
+    </a>
+    {% endif %}
+</div>
+{% endmacro %}
+
+{# Page Header with Actions #}
+{% macro page_header(title, subtitle=None, icon=None, actions=None) %}
+<div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+    <div>
+        <h1 class="display-5 mb-2">
+            {% if icon %}<i class="{{ icon }} me-3 text-primary"></i>{% endif %}
+            {{ _(title) }}
+        </h1>
+        {% if subtitle %}
+        <p class="lead text-muted mb-0">{{ _(subtitle) }}</p>
+        {% endif %}
+    </div>
+    {% if actions %}
+    <div class="btn-group">
+        {% for action in actions %}
+        <a href="{{ action.url }}" class="btn btn-{{ action.variant or 'primary' }}" {% if action.onclick %}onclick="{{ action.onclick }}"{% endif %}>
+            {% if action.icon %}<i class="{{ action.icon }} me-2"></i>{% endif %}
+            {{ _(action.label) }}
+        </a>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+{% endmacro %}
+
+{# Tab Navigation with State Persistence #}
+{% macro tab_navigation(tabs, active_tab_id) %}
+<ul class="nav nav-tabs mb-4" role="tablist">
+    {% for tab in tabs %}
+    <li class="nav-item" role="presentation">
+        <button class="nav-link {% if tab.id == active_tab_id %}active{% endif %}"
+                id="tab-{{ tab.id }}"
+                data-bs-toggle="tab"
+                data-bs-target="#panel-{{ tab.id }}"
+                type="button"
+                role="tab"
+                onclick="saveTabState('{{ tab.id }}')">
+            {% if tab.icon %}<i class="{{ tab.icon }} me-2"></i>{% endif %}
+            {{ _(tab.label) }}
+            {% if tab.badge %}
+            <span class="badge bg-{{ tab.badge.color or 'primary' }} ms-2">{{ tab.badge.text }}</span>
+            {% endif %}
+        </button>
+    </li>
+    {% endfor %}
+</ul>
+{% endmacro %}
+
+{# Loading Skeleton #}
+{% macro loading_skeleton(type='card', count=1) %}
+{% for i in range(count) %}
+<div class="skeleton-loader mb-3">
+    {% if type == 'card' %}
+    <div class="card">
+        <div class="card-body">
+            <div class="skeleton-line mb-2" style="width: 60%;"></div>
+            <div class="skeleton-line mb-2" style="width: 100%;"></div>
+            <div class="skeleton-line" style="width: 80%;"></div>
+        </div>
+    </div>
+    {% elif type == 'table' %}
+    <div class="skeleton-line mb-2" style="width: 100%; height: 40px;"></div>
+    {% elif type == 'text' %}
+    <div class="skeleton-line mb-2" style="width: 100%;"></div>
+    {% endif %}
+</div>
+{% endfor %}
+{% endmacro %}

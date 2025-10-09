@@ -332,6 +332,123 @@ async def get_extraction_schema():
     }
 
 
+@router.post("/extract-from-text", response_model=Dict[str, Any])
+async def extract_from_text(
+    text: str = Form(..., description="OCR text from appraisal document"),
+    llm_provider: Optional[str] = Form(
+        default="ollama",
+        description="LLM provider (ollama, mistral-7b, phi-3-mini, anthropic)"
+    ),
+    model_name: Optional[str] = Form(
+        default="llama3:8b",
+        description="Specific model name (e.g., llama3:8b for Ollama)"
+    ),
+    additional_context: Optional[str] = Form(
+        default=None,
+        description="Optional JSON string with additional context"
+    )
+):
+    """
+    Extract structured property data directly from OCR text.
+
+    This endpoint is useful when you already have the text extracted
+    and only need the AI structure conversion step.
+
+    **Example Usage:**
+    ```python
+    import requests
+
+    text = '''
+    TRIBUNALE DI SPOLETO
+    Giudice: Dott. Alberto CAPPELLINI
+    RELAZIONE
+    Esecuzione Immobiliare
+    R.G. 102/2022
+    ...
+    '''
+
+    response = requests.post(
+        "http://localhost:8000/api/property-extraction/extract-from-text",
+        data={
+            "text": text,
+            "llm_provider": "ollama",
+            "model_name": "llama3:8b"
+        }
+    )
+
+    structured_data = response.json()
+    ```
+
+    **Recommended Local Setup (FREE):**
+    1. Install Ollama: https://ollama.ai
+    2. Pull model: `ollama pull llama3:8b`
+    3. Ensure Ollama is running: `ollama serve`
+    4. Use this endpoint with llm_provider="ollama"
+
+    **Returns:**
+    - structured_data: Complete AuctionPropertyProfile object
+    - metadata: Processing information
+    """
+    logger.info(
+        "Text-based property extraction request received",
+        llm_provider=llm_provider,
+        model_name=model_name,
+        text_length=len(text)
+    )
+
+    # Parse additional context if provided
+    context_data = None
+    if additional_context:
+        try:
+            context_data = json.loads(additional_context)
+        except json.JSONDecodeError:
+            raise HTTPException(
+                status_code=400,
+                detail="Invalid JSON in additional_context parameter"
+            )
+
+    try:
+        # Initialize extraction service with selected LLM provider
+        from ..services.llm_extraction_providers import create_llm_extractor
+
+        extractor = create_llm_extractor(
+            provider=llm_provider,
+            model_name=model_name
+        )
+
+        # Extract structured data
+        start_time = datetime.now()
+        structured_data = await extractor.extract(
+            ocr_text=text,
+            additional_context=context_data
+        )
+        processing_time = (datetime.now() - start_time).total_seconds()
+
+        logger.info(
+            "Text-based extraction completed successfully",
+            property_id=structured_data.property_id if hasattr(structured_data, 'property_id') else 'N/A',
+            processing_time=processing_time
+        )
+
+        return {
+            "structured_data": structured_data.model_dump(),
+            "metadata": {
+                "llm_provider": llm_provider,
+                "model_name": model_name,
+                "processing_time_seconds": processing_time,
+                "text_length": len(text),
+                "timestamp": datetime.now().isoformat()
+            }
+        }
+
+    except Exception as e:
+        logger.error("Text-based extraction failed", error=str(e))
+        raise HTTPException(
+            status_code=500,
+            detail=f"Extraction failed: {str(e)}"
+        )
+
+
 def _get_example_property_profile() -> Dict[str, Any]:
     """Generate an example AuctionPropertyProfile."""
     return {

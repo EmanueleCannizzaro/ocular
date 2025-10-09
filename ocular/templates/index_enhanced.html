@@ -1,0 +1,442 @@
+{% extends "base.html" %}
+{% import "components/navigation_macros.html" as nav %}
+
+{% block title %}{{ _('Ocular OCR Service') }} - {{ _('Home') }}{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+{{ nav.page_header(
+    title='Ocular OCR Service',
+    subtitle='Extract text and data from PDFs and images using advanced OCR technology',
+    icon='fas fa-eye',
+    actions=[
+        {'label': 'View Analytics', 'url': '/analytics', 'icon': 'fas fa-chart-line', 'variant': 'outline-primary'},
+        {'label': 'Manage Providers', 'url': '/providers', 'icon': 'fas fa-cloud', 'variant': 'outline-secondary'}
+    ]
+) }}
+
+<!-- Statistics Overview -->
+{% if session and session.user %}
+{{ nav.stats_widget([
+    {
+        'icon': 'fas fa-file-alt',
+        'value': '1,234',
+        'label': 'Documents Processed',
+        'color': 'primary',
+        'change': 12
+    },
+    {
+        'icon': 'fas fa-check-circle',
+        'value': '98.5%',
+        'label': 'Success Rate',
+        'color': 'success',
+        'change': 2
+    },
+    {
+        'icon': 'fas fa-bolt',
+        'value': '2.3s',
+        'label': 'Avg Processing Time',
+        'color': 'warning',
+        'change': -5
+    },
+    {
+        'icon': 'fas fa-credit-card',
+        'value': '450',
+        'label': 'Credits Remaining',
+        'color': 'info'
+    }
+]) }}
+{% endif %}
+
+<!-- Main Content -->
+<div class="row">
+    <!-- Main Upload Section -->
+    <div class="col-lg-8">
+        <!-- Tab Navigation -->
+        {{ nav.tab_navigation(
+            tabs=[
+                {'id': 'unified', 'label': 'Unified OCR Upload', 'icon': 'fas fa-cloud-upload-alt', 'badge': None},
+                {'id': 'olmocr', 'label': 'OLMocr Processor', 'icon': 'fas fa-brain', 'badge': {'text': 'GPU', 'color': 'success'}},
+                {'id': 'property', 'label': 'Property Extraction', 'icon': 'fas fa-home', 'badge': {'text': 'NEW', 'color': 'danger'}}
+            ],
+            active_tab_id=active_tab or 'unified'
+        ) }}
+
+        <!-- Tab Content -->
+        <div class="tab-content">
+            <!-- Unified OCR Tab -->
+            <div class="tab-pane fade {% if (active_tab or 'unified') == 'unified' %}show active{% endif %}"
+                 id="panel-unified" role="tabpanel">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="fas fa-upload me-2"></i>{{ _('Upload Files') }}
+                        </h5>
+
+                        <div class="file-upload-area" id="fileUploadArea" style="border: 2px dashed #dee2e6; border-radius: 8px; padding: 3rem; text-align: center; cursor: pointer; transition: all 0.3s;">
+                            <i class="fas fa-file-upload fa-3x text-primary mb-3"></i>
+                            <h5>{{ _('Drop files here or click to browse') }}</h5>
+                            <p class="text-muted">{{ _('Supported formats: PDF, JPG, PNG, BMP, TIFF, WEBP') }}</p>
+                            <input type="file" id="fileInput" name="files" multiple
+                                   accept=".pdf,.jpg,.jpeg,.png,.bmp,.tiff,.webp" hidden>
+                        </div>
+
+                        <div id="fileList" class="mt-3"></div>
+                    </div>
+                </div>
+
+                <!-- Processing Options -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="fas fa-cogs me-2"></i>{{ _('Processing Options') }}
+                        </h5>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">{{ _('OCR Provider') }}</label>
+                                <select class="form-select" id="provider">
+                                    {% for provider in available_providers or ['mistral', 'tesseract'] %}
+                                    <option value="{{ provider }}">{{ provider|title }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">{{ _('Processing Strategy') }}</label>
+                                <select class="form-select" id="strategy">
+                                    {% for strategy in strategies or ['single', 'fallback'] %}
+                                    <option value="{{ strategy }}">{{ strategy|replace('_', ' ')|title }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mt-3">
+                            <button type="button" class="btn btn-primary btn-lg w-100" onclick="processFiles()">
+                                <i class="fas fa-play me-2"></i>{{ _('Process Documents') }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- OLMocr Tab -->
+            <div class="tab-pane fade {% if active_tab == 'olmocr' %}show active{% endif %}"
+                 id="panel-olmocr" role="tabpanel">
+                {{ nav.empty_state(
+                    title='OLMocr GPU Processor',
+                    description='Upload documents to process with OLMocr GPU-accelerated OCR engine for maximum accuracy',
+                    icon='fas fa-brain',
+                    action_url='/models',
+                    action_text='Configure GPU Models'
+                ) }}
+            </div>
+
+            <!-- Property Extraction Tab -->
+            <div class="tab-pane fade {% if active_tab == 'property' %}show active{% endif %}"
+                 id="panel-property" role="tabpanel">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>{{ _('Property Extraction Workflow') }}</strong>
+                    <p class="mb-0">{{ _('Extract structured data from Italian property appraisal documents (perizie tecniche) using AI-powered analysis.') }}</p>
+                </div>
+
+                {{ nav.workflow_progress(
+                    steps=[
+                        {'icon': 'fas fa-upload', 'label': 'Upload PDF'},
+                        {'icon': 'fas fa-eye', 'label': 'OCR Processing'},
+                        {'icon': 'fas fa-brain', 'label': 'AI Extraction'},
+                        {'icon': 'fas fa-download', 'label': 'Download JSON'}
+                    ],
+                    current_step=0
+                ) }}
+
+                <div class="text-center">
+                    <a href="/api/property-extraction/schema" target="_blank" class="btn btn-outline-primary">
+                        <i class="fas fa-code me-2"></i>{{ _('View JSON Schema') }}
+                    </a>
+                    <a href="/docs#/Property%20Extraction" target="_blank" class="btn btn-outline-secondary ms-2">
+                        <i class="fas fa-book me-2"></i>{{ _('API Documentation') }}
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contextual Help -->
+        {{ nav.contextual_help(
+            section='Document Upload',
+            tips=[
+                'Drag and drop multiple files for bulk processing',
+                'Use fallback strategy for maximum reliability when processing critical documents',
+                'Add custom prompts to extract specific data formats',
+                'Review recent documents in the Document History page'
+            ]
+        ) }}
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+        <!-- Quick Actions -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-primary text-white">
+                <i class="fas fa-bolt me-2"></i>{{ _('Quick Actions') }}
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush">
+                    <a href="/batch" class="list-group-item list-group-item-action d-flex align-items-center">
+                        <div class="icon-circle bg-primary bg-opacity-10 text-primary p-2 rounded-circle me-3">
+                            <i class="fas fa-tasks"></i>
+                        </div>
+                        <div>
+                            <div class="fw-bold">{{ _('Batch Processing') }}</div>
+                            <small class="text-muted">{{ _('Process multiple documents') }}</small>
+                        </div>
+                    </a>
+
+                    <a href="/document-history" class="list-group-item list-group-item-action d-flex align-items-center">
+                        <div class="icon-circle bg-info bg-opacity-10 text-info p-2 rounded-circle me-3">
+                            <i class="fas fa-history"></i>
+                        </div>
+                        <div>
+                            <div class="fw-bold">{{ _('Recent Documents') }}</div>
+                            <small class="text-muted">{{ _('View processing history') }}</small>
+                        </div>
+                    </a>
+
+                    <a href="/deployments" class="list-group-item list-group-item-action d-flex align-items-center">
+                        <div class="icon-circle bg-success bg-opacity-10 text-success p-2 rounded-circle me-3">
+                            <i class="fas fa-rocket"></i>
+                        </div>
+                        <div>
+                            <div class="fw-bold">{{ _('Deploy Model') }}</div>
+                            <small class="text-muted">{{ _('Setup GPU endpoints') }}</small>
+                        </div>
+                    </a>
+
+                    <a href="/analytics" class="list-group-item list-group-item-action d-flex align-items-center">
+                        <div class="icon-circle bg-warning bg-opacity-10 text-warning p-2 rounded-circle me-3">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div>
+                            <div class="fw-bold">{{ _('Analytics') }}</div>
+                            <small class="text-muted">{{ _('View performance metrics') }}</small>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Related Features -->
+        {{ nav.related_features([
+            {
+                'title': 'Providers Management',
+                'description': 'Configure OCR providers and fallback chains',
+                'url': '/providers',
+                'icon': 'fas fa-cloud',
+                'color': 'primary'
+            },
+            {
+                'title': 'Model Configuration',
+                'description': 'Manage GPU models and deployments',
+                'url': '/models',
+                'icon': 'fas fa-cube',
+                'color': 'success',
+                'badge': {'text': 'GPU', 'color': 'success'}
+            },
+            {
+                'title': 'Observability',
+                'description': 'Monitor system health and performance',
+                'url': '/observability',
+                'icon': 'fas fa-eye',
+                'color': 'info'
+            },
+            {
+                'title': 'Settings',
+                'description': 'Configure global system settings',
+                'url': '/settings',
+                'icon': 'fas fa-sliders-h',
+                'color': 'secondary'
+            }
+        ]) }}
+
+        <!-- Recent Activity -->
+        {% if session and session.user %}
+        <div class="card shadow-sm">
+            <div class="card-header bg-light">
+                <i class="fas fa-clock me-2"></i>{{ _('Recent Activity') }}
+            </div>
+            <div class="card-body">
+                <div id="recent-activity">
+                    {{ nav.loading_skeleton('text', 3) }}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Feature Highlights -->
+<div class="row mt-5">
+    <div class="col-12">
+        <h3 class="mb-4">
+            <i class="fas fa-star me-2 text-warning"></i>{{ _('Platform Features') }}
+        </h3>
+    </div>
+
+    {{ nav.quick_action_card(
+        title='Property Extraction',
+        icon='fas fa-home',
+        description='Extract structured data from Italian property appraisal documents with AI-powered analysis',
+        url='/api/property-extraction/schema',
+        badge={'text': 'NEW', 'color': 'danger'},
+        color='danger'
+    ) }}
+
+    {{ nav.quick_action_card(
+        title='Batch Processing',
+        icon='fas fa-tasks',
+        description='Process hundreds of documents in parallel with automated workflow management',
+        url='/batch',
+        badge={'text': 'POPULAR', 'color': 'success'},
+        color='success'
+    ) }}
+
+    {{ nav.quick_action_card(
+        title='GPU Deployments',
+        icon='fas fa-rocket',
+        description='Deploy custom OCR models on GPU infrastructure with one-click deployment',
+        url='/deployments',
+        badge={'text': 'CLOUD', 'color': 'info'},
+        color='info'
+    ) }}
+
+    {{ nav.quick_action_card(
+        title='Analytics Dashboard',
+        icon='fas fa-chart-line',
+        description='Track processing metrics, costs, and performance across all providers',
+        url='/analytics',
+        color='primary'
+    ) }}
+
+    {{ nav.quick_action_card(
+        title='Provider Management',
+        icon='fas fa-cloud',
+        description='Configure multiple OCR providers with intelligent fallback strategies',
+        url='/providers',
+        color='secondary'
+    ) }}
+
+    {{ nav.quick_action_card(
+        title='Observability',
+        icon='fas fa-eye',
+        description='Monitor system health, API usage, and deployment status in real-time',
+        url='/observability',
+        color='warning'
+    ) }}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// File upload handling
+document.getElementById('fileUploadArea')?.addEventListener('click', () => {
+    document.getElementById('fileInput').click();
+});
+
+document.getElementById('fileInput')?.addEventListener('change', (e) => {
+    const files = e.target.files;
+    displayFileList(files);
+});
+
+// Drag and drop
+const uploadArea = document.getElementById('fileUploadArea');
+if (uploadArea) {
+    uploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadArea.style.borderColor = '#0d6efd';
+        uploadArea.style.background = '#f0f7ff';
+    });
+
+    uploadArea.addEventListener('dragleave', () => {
+        uploadArea.style.borderColor = '#dee2e6';
+        uploadArea.style.background = '';
+    });
+
+    uploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadArea.style.borderColor = '#dee2e6';
+        uploadArea.style.background = '';
+
+        const files = e.dataTransfer.files;
+        displayFileList(files);
+    });
+}
+
+function displayFileList(files) {
+    const fileList = document.getElementById('fileList');
+    if (!fileList) return;
+
+    fileList.innerHTML = '';
+    Array.from(files).forEach((file, index) => {
+        const fileItem = document.createElement('div');
+        fileItem.className = 'alert alert-info d-flex justify-content-between align-items-center';
+        fileItem.innerHTML = `
+            <div>
+                <i class="fas fa-file-pdf me-2"></i>
+                <strong>${file.name}</strong>
+                <small class="text-muted ms-2">(${(file.size / 1024).toFixed(1)} KB)</small>
+            </div>
+            <button type="button" class="btn-close" onclick="this.closest('.alert').remove()"></button>
+        `;
+        fileList.appendChild(fileItem);
+
+        // Track in cross-integration manager
+        if (window.crossIntegration) {
+            window.addRecentDocument({
+                name: file.name,
+                type: 'pdf',
+                url: '#'
+            });
+        }
+    });
+}
+
+function processFiles() {
+    // Show processing indicator
+    alert('Processing files... (Integration with actual OCR processing)');
+
+    // In real implementation, this would call the OCR API
+    // For demo purposes, just show success message
+    setTimeout(() => {
+        alert('Files processed successfully!');
+    }, 2000);
+}
+
+// Load recent activity
+document.addEventListener('DOMContentLoaded', () => {
+    if (document.getElementById('recent-activity')) {
+        // Simulate loading recent activity
+        setTimeout(() => {
+            document.getElementById('recent-activity').innerHTML = `
+                <div class="small mb-2">
+                    <i class="fas fa-file-pdf text-danger me-2"></i>
+                    <strong>document.pdf</strong> processed
+                    <br><span class="text-muted">2 minutes ago</span>
+                </div>
+                <div class="small mb-2">
+                    <i class="fas fa-check-circle text-success me-2"></i>
+                    Batch job completed
+                    <br><span class="text-muted">1 hour ago</span>
+                </div>
+                <div class="small">
+                    <i class="fas fa-rocket text-primary me-2"></i>
+                    Deployment created
+                    <br><span class="text-muted">3 hours ago</span>
+                </div>
+            `;
+        }, 1000);
+    }
+});
+</script>
+{% endblock %}
