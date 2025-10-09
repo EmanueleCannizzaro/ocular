@@ -4,7 +4,7 @@ i18n Middleware for FastAPI.
 Detects user's language preference and provides translation functions to templates.
 """
 
-from typing import Callable, Optional
+from typing import Callable
 from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.types import ASGIApp

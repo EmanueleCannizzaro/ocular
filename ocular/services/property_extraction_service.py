@@ -10,9 +10,8 @@ Workflow:
 3. Use Pydantic AI to convert unstructured text to AuctionPropertyProfile JSON
 """
 
-import asyncio
 import json
-from typing import Optional, Dict, Any, List
+from typing import Optional, Dict, Any
 from pathlib import Path
 from datetime import datetime
 
@@ -26,8 +25,7 @@ from ..providers.base import BaseOCRProvider
 from ..core.enums import ProviderType
 from .llm_extraction_providers import (
     create_llm_extractor,
-    LLMProvider,
-    RECOMMENDED_FREE_MODELS
+    LLMProvider
 )
 
 

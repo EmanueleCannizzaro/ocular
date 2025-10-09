@@ -6,9 +6,7 @@ import os
 import sys
 import logging
 import functools
-import asyncio
 from typing import Optional, Dict, Any, Callable
-from pathlib import Path
 from datetime import datetime
 
 try:
@@ -22,31 +20,31 @@ from .exceptions import OcularError
 
 class LogfireHandler(logging.Handler):
     """Custom logging handler that sends logs to Logfire."""
-    
+
     def __init__(self, level: int = logging.NOTSET):
         super().__init__(level)
         self.logfire_available = LOGFIRE_AVAILABLE
-        
+
     def emit(self, record: logging.LogRecord):
         """Emit a log record to Logfire."""
         if not self.logfire_available:
             return
-            
+
         try:
             # Format the record
             message = self.format(record)
-            
+
             # Convert log level to Logfire level
             level_mapping = {
                 logging.DEBUG: 'debug',
-                logging.INFO: 'info', 
+                logging.INFO: 'info',
                 logging.WARNING: 'warn',
                 logging.ERROR: 'error',
                 logging.CRITICAL: 'error'
             }
-            
+
             level = level_mapping.get(record.levelno, 'info')
-            
+
             # Extract additional context
             extra = {}
             if hasattr(record, 'provider'):
@@ -59,7 +57,7 @@ class LogfireHandler(logging.Handler):
                 extra['user_id'] = record.user_id
             if hasattr(record, 'request_id'):
                 extra['request_id'] = record.request_id
-            
+
             # Add standard fields
             extra.update({
                 'module': record.module,
@@ -67,7 +65,7 @@ class LogfireHandler(logging.Handler):
                 'line': record.lineno,
                 'timestamp': datetime.fromtimestamp(record.created).isoformat(),
             })
-            
+
             # Send to Logfire
             if level == 'debug':
                 logfire.debug(message, **extra)
@@ -77,7 +75,7 @@ class LogfireHandler(logging.Handler):
                 logfire.warn(message, **extra)
             elif level == 'error':
                 logfire.error(message, **extra)
-                
+
         except Exception as e:
             # Fallback to standard error output if Logfire fails
             print(f"Logfire logging error: {e}", file=sys.stderr)
@@ -85,22 +83,22 @@ class LogfireHandler(logging.Handler):
 
 class OcularLogger:
     """Enhanced logger for Ocular OCR system with Logfire integration."""
-    
+
     def __init__(self, name: str, level: str = "INFO"):
         self.name = name
         self.logger = logging.getLogger(name)
         self.logger.setLevel(getattr(logging, level.upper()))
-        
+
         # Prevent duplicate handlers
         if not self.logger.handlers:
             self._setup_handlers(level)
-    
+
     def _setup_handlers(self, level: str):
         """Set up logging handlers."""
         # Console handler
         console_handler = logging.StreamHandler(sys.stdout)
         console_handler.setLevel(getattr(logging, level.upper()))
-        
+
         # Enhanced formatter
         formatter = logging.Formatter(
             '%(asctime)s - %(name)s - %(levelname)s - %(funcName)s:%(lineno)d - %(message)s',
@@ -108,43 +106,43 @@ class OcularLogger:
         )
         console_handler.setFormatter(formatter)
         self.logger.addHandler(console_handler)
-        
+
         # Logfire handler
         if LOGFIRE_AVAILABLE:
             logfire_handler = LogfireHandler(getattr(logging, level.upper()))
             logfire_handler.setFormatter(formatter)
             self.logger.addHandler(logfire_handler)
-    
+
     def debug(self, message: str, **kwargs):
         """Log debug message."""
         self.logger.debug(message, extra=kwargs)
-    
+
     def info(self, message: str, **kwargs):
         """Log info message."""
         self.logger.info(message, extra=kwargs)
-    
+
     def warning(self, message: str, **kwargs):
         """Log warning message."""
         self.logger.warning(message, extra=kwargs)
-    
+
     def error(self, message: str, exc_info=None, **kwargs):
         """Log error message."""
         self.logger.error(message, exc_info=exc_info, extra=kwargs)
-    
+
     def critical(self, message: str, exc_info=None, **kwargs):
         """Log critical message."""
         self.logger.critical(message, exc_info=exc_info, extra=kwargs)
-    
+
     def log_ocr_request(self, file_path: str, provider: str, request_id: Optional[str] = None):
         """Log OCR processing request."""
         self.info(
-            f"Starting OCR processing",
+            "Starting OCR processing",
             file_path=file_path,
             provider=provider,
             request_id=request_id
         )
-    
-    def log_ocr_result(self, file_path: str, provider: str, success: bool, 
+
+    def log_ocr_result(self, file_path: str, provider: str, success: bool,
                        processing_time: Optional[float] = None, confidence: Optional[float] = None,
                        text_length: Optional[int] = None, request_id: Optional[str] = None):
         """Log OCR processing result."""
@@ -158,7 +156,7 @@ class OcularLogger:
             text_length=text_length,
             request_id=request_id
         )
-    
+
     def log_api_call(self, endpoint: str, method: str, status_code: Optional[int] = None,
                      response_time: Optional[float] = None, request_id: Optional[str] = None):
         """Log API call."""
@@ -170,7 +168,7 @@ class OcularLogger:
             response_time=response_time,
             request_id=request_id
         )
-    
+
     def log_error(self, error: Exception, context: Optional[Dict[str, Any]] = None,
                   request_id: Optional[str] = None):
         """Log error with full context."""
@@ -179,16 +177,16 @@ class OcularLogger:
             "error_message": str(error),
             "request_id": request_id
         }
-        
+
         if isinstance(error, OcularError):
             error_info.update({
                 "error_code": error.error_code,
                 "error_details": error.details
             })
-        
+
         if context:
             error_info.update(context)
-        
+
         self.error(
             f"Error occurred: {error}",
             exc_info=True,
@@ -217,16 +215,16 @@ def setup_logfire(
     if not LOGFIRE_AVAILABLE:
         print("Warning: Logfire not available. Install with: pip install logfire")
         return
-    
+
     try:
         # Get token from environment if not provided
         if not token:
             token = os.getenv("LOGFIRE_TOKEN")
-        
+
         if not token:
             print("Warning: No Logfire token provided. Set LOGFIRE_TOKEN environment variable.")
             return
-        
+
         # Configure Logfire
         logfire.configure(
             token=token,
@@ -237,9 +235,9 @@ def setup_logfire(
             send_to_logfire=True,
             console=False,  # We handle console logging separately
         )
-        
+
         print(f"Logfire configured for {service_name} v{service_version} in {environment}")
-        
+
     except Exception as e:
         print(f"Failed to configure Logfire: {e}")
 
@@ -250,7 +248,7 @@ def log_function_call(logger_name: Optional[str] = None):
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
             logger = get_logger(logger_name or func.__module__)
-            
+
             # Log function entry
             logger.debug(
                 f"Entering {func.__name__}",
@@ -259,12 +257,12 @@ def log_function_call(logger_name: Optional[str] = None):
                 args_count=len(args),
                 kwargs_keys=list(kwargs.keys())
             )
-            
+
             start_time = datetime.now()
-            
+
             try:
                 result = func(*args, **kwargs)
-                
+
                 # Log successful completion
                 execution_time = (datetime.now() - start_time).total_seconds()
                 logger.debug(
@@ -273,9 +271,9 @@ def log_function_call(logger_name: Optional[str] = None):
                     execution_time=execution_time,
                     success=True
                 )
-                
+
                 return result
-                
+
             except Exception as e:
                 # Log exception
                 execution_time = (datetime.now() - start_time).total_seconds()
@@ -288,7 +286,7 @@ def log_function_call(logger_name: Optional[str] = None):
                     exc_info=True
                 )
                 raise
-        
+
         return wrapper
     return decorator
 
@@ -299,7 +297,7 @@ def log_async_function_call(logger_name: Optional[str] = None):
         @functools.wraps(func)
         async def wrapper(*args, **kwargs):
             logger = get_logger(logger_name or func.__module__)
-            
+
             # Log function entry
             logger.debug(
                 f"Entering async {func.__name__}",
@@ -308,12 +306,12 @@ def log_async_function_call(logger_name: Optional[str] = None):
                 args_count=len(args),
                 kwargs_keys=list(kwargs.keys())
             )
-            
+
             start_time = datetime.now()
-            
+
             try:
                 result = await func(*args, **kwargs)
-                
+
                 # Log successful completion
                 execution_time = (datetime.now() - start_time).total_seconds()
                 logger.debug(
@@ -322,9 +320,9 @@ def log_async_function_call(logger_name: Optional[str] = None):
                     execution_time=execution_time,
                     success=True
                 )
-                
+
                 return result
-                
+
             except Exception as e:
                 # Log exception
                 execution_time = (datetime.now() - start_time).total_seconds()
@@ -337,7 +335,7 @@ def log_async_function_call(logger_name: Optional[str] = None):
                     exc_info=True
                 )
                 raise
-        
+
         return wrapper
     return decorator
 

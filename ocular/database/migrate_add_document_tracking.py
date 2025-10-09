@@ -66,12 +66,11 @@ def run_migration(database_url: str = None):
     """
     if database_url is None:
         # Default to SQLite database in project root
-        import os
         from pathlib import Path
         project_root = Path(__file__).parent.parent.parent
         database_url = f"sqlite:///{project_root}/ocular.db"
 
-    print(f"🔄 Running migration: Add ProcessedDocument table")
+    print("🔄 Running migration: Add ProcessedDocument table")
     print(f"📊 Database: {database_url}")
 
     # Create engine
@@ -99,12 +98,11 @@ def rollback_migration(database_url: str = None):
         database_url: Database connection string (optional)
     """
     if database_url is None:
-        import os
         from pathlib import Path
         project_root = Path(__file__).parent.parent.parent
         database_url = f"sqlite:///{project_root}/ocular.db"
 
-    print(f"⚠️  Rolling back migration: Remove ProcessedDocument table")
+    print("⚠️  Rolling back migration: Remove ProcessedDocument table")
     print(f"📊 Database: {database_url}")
 
     # Create engine

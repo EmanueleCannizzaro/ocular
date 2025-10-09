@@ -1,6 +1,6 @@
 
-from pydantic import BaseModel, Field, create_model
-from typing import Optional, Dict, Any, List
+from pydantic import BaseModel
+from typing import List
 
 
 class DocumentFileChunk(BaseModel):

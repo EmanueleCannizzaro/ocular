@@ -13,8 +13,7 @@ from fastapi import HTTPException, status
 
 from ocular.database.models import (
     Invoice, InvoiceStatus, PaymentMethod,
-    CostTracking, BudgetAlert, BudgetAlertType,
-    User, Deployment
+    CostTracking, BudgetAlert, BudgetAlertType
 )
 
 

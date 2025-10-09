@@ -1,42 +1,76 @@
+#!/bin/bash
 
 # --- CONFIGURAZIONE INIZIALE ---
-# 1. Dice a Hugging Face di usare /tmp per la sua cache
+# [cite_start]1. Dice a Hugging Face di usare /tmp per la sua cache [cite: 1]
 export HF_HOME="/tmp/huggingface_cache"
 
-# 1. Crea un file di configurazione Boto personalizzato in /tmp
+# [cite_start]2. Crea un file di configurazione Boto personalizzato in /tmp [cite: 1]
 cat <<EOF > /tmp/gsutil.boto
 [GSUtil]
 state_dir = /tmp/.gsutil_state
 parallel_composite_upload_threshold = 150M
 EOF
 
-# 2. Dice a gsutil di usare il file di configurazione temporaneo
+# [cite_start]3. Dice a gsutil di usare il file di configurazione temporaneo [cite: 1]
 export BOTO_CONFIG="/tmp/gsutil.boto"
 
-echo "gsutil è stato configurato per usare la cartella /tmp."
+echo "➡️ Ambiente configurato per usare la cartella /tmp."
 
+# --- DEFINIZIONE DEI MODELLI E DEL BUCKET ---
+GCS_BUCKET="gs://models-aecs4u"
+MODELS_TO_CHECK=(
+    "allenai/olmOCR-7B-0825"
+    "reducto/RolmOCR"
+    "NousResearch/Hermes-2-Pro-Mistral-7B"
+    "NousResearch/Hermes-2-Pro-Llama-3-8B"
+    "microsoft/Phi-3-mini-4k-instruct"
+)
 
-# 1. Installa la libreria di Hugging Face e scarica il modello in una cartella temporanea
-pip install --upgrade huggingface-hub
+# --- ESECUZIONE ---
+# [cite_start]Installa la libreria di Hugging Face una sola volta [cite: 2]
+echo "➡️ Installazione/aggiornamento di huggingface-hub..."
+pip install --upgrade -q huggingface-hub
 
-python -c "from huggingface_hub import snapshot_download; snapshot_download(repo_id='reducto/RolmOCR', local_dir='/tmp/temp_RolmOCR', local_dir_use_symlinks=False)"
+# Cicla su ogni modello definito nell'array
+for model_id in "${MODELS_TO_CHECK[@]}"; do
+    echo "--------------------------------------------------"
+    echo "🔎 Controllo del modello: ${model_id}"
 
-# 2. Carica il contenuto della cartella temporanea nel tuo bucket GCS
-# L'opzione -m accelera l'upload eseguendolo in parallelo.
-gsutil -m cp -r /tmp/temp_RolmOCR/* gs://models-aecs4u/reducto/RolmOCR/
+    # Costruisce il percorso di destinazione su GCS
+    gcs_path="${GCS_BUCKET}/${model_id}/"
 
-# 3. Pulisce la cartella temporanea per liberare spazio
-rm -rf /tmp/temp_RolmOCR /tmp/.gsutil_state /tmp/huggingface_cache
+    # Controlla se un file chiave del modello (es. config.json) esiste già in GCS
+    # gsutil -q stat ritorna un codice di successo (0) se il file esiste
+    if gsutil -q stat "${gcs_path}config.json"; then
+        echo "✅ Modello già presente in GCS. Salto."
+    else
+        echo "📥 Modello non trovato. Avvio del download da Hugging Face..."
 
+        # Crea una cartella temporanea sicura in /tmp
+        local_dir=$(mktemp -d -p /tmp "${model_id//\//_}-XXXXXX")
 
-# 2. Scarica il modello con un piccolo script Python
-python -c "from huggingface_hub import snapshot_download; snapshot_download(repo_id='allenai/olmOCR-7B-0825', local_dir='/tmp/temp_allenai', local_dir_use_symlinks=False)"
+        # [cite_start]Scarica il modello nella cartella temporanea [cite: 2]
+        python -c "from huggingface_hub import snapshot_download; snapshot_download(repo_id='${model_id}', local_dir='${local_dir}', local_dir_use_symlinks=False, resume_download=True)"
 
-# 3. Carica su GCS
-gsutil -m cp -r /tmp/temp_allenai/* gs://models-aecs4u/allenai/olmOCR-7B-0825/
+        if [ $? -eq 0 ]; then
+            echo "📤 Download completato. Avvio dell'upload su GCS..."
 
-# 4. Pulisci
-rm -rf /tmp/temp_allenai /tmp/.gsutil_state /tmp/huggingface_cache
+            # [cite_start]Carica il contenuto della cartella temporanea nel bucket GCS [cite: 3]
+            gsutil -m cp -r "${local_dir}/"* "${gcs_path}"
 
+            echo "🧹 Pulizia dei file temporanei per ${model_id}..."
+            rm -rf "${local_dir}"
+        else
+            echo "❌ Errore durante il download di ${model_id}. Salto l'upload."
+            # Pulisce comunque in caso di download parziale
+            rm -rf "${local_dir}"
+        fi
+    fi
+done
 
-echo "✅ Operazione completata con successo!"
+# --- PULIZIA FINALE ---
+echo "--------------------------------------------------"
+echo "🧹 Pulizia finale dei file di configurazione..."
+rm -rf /tmp/gsutil.boto /tmp/.gsutil_state /tmp/huggingface_cache
+
+echo "🎉 Operazione completata per tutti i modelli!"

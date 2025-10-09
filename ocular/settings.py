@@ -6,10 +6,9 @@ Loads configuration from ocular.json and .env files.
 
 from typing import Optional, List, Dict, Any, Union
 from pathlib import Path
-from pydantic import BaseModel, Field, field_validator, ConfigDict
+from pydantic import BaseModel, Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 import os
-import warnings
 import json
 
 

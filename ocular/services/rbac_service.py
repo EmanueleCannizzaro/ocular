@@ -4,13 +4,13 @@ Role-Based Access Control (RBAC) Service.
 Provides permission checking and access control functionality.
 """
 
-from typing import List, Optional, Callable
+from typing import List, Callable
 from functools import wraps
 from fastapi import HTTPException, status, Depends, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 
-from ocular.database.models import User, UserRole, APIKey
+from ocular.database.models import User, UserRole
 from ocular.database.session import get_db
 from ocular.services.auth_service import ClerkAuthService, APIKeyService
 

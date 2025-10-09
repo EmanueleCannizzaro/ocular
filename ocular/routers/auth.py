@@ -6,18 +6,17 @@ Provides endpoints for user management, API keys, and audit logs.
 
 from typing import List, Optional
 from datetime import datetime
-from fastapi import APIRouter, Depends, HTTPException, status, Request
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from pydantic import BaseModel, Field
 
 from ocular.database.session import get_db
 from ocular.database.models import User, UserRole, AuditAction
-from ocular.routers import templates
 from ocular.services.auth_service import (
-    UserService, APIKeyService, AuditLogService, ClerkAuthService
+    UserService, APIKeyService, AuditLogService
 )
 from ocular.services.rbac_service import (
-    RBACService, Permissions, AuthDependency, require_admin
+    RBACService, AuthDependency, require_admin
 )
 
 

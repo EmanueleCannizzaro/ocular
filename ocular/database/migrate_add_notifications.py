@@ -19,25 +19,24 @@ from ocular.database.models import Base, Notification
 def run_migration(database_url: str = None):
     """Run the migration to add Notification table."""
     if database_url is None:
-        import os
         from pathlib import Path
 
         # Default to project root database
         project_root = Path(__file__).parent.parent.parent
         database_url = f"sqlite:///{project_root}/ocular.db"
 
-    print(f"🔄 Running migration: Add Notification table")
+    print("🔄 Running migration: Add Notification table")
     print(f"📦 Database: {database_url}")
 
     # Create engine
     engine = create_engine(database_url)
 
     # Create only the Notification table
-    print(f"✨ Creating Notification table...")
+    print("✨ Creating Notification table...")
     Base.metadata.create_all(engine, tables=[Notification.__table__])
 
     print("✅ Migration completed successfully!")
-    print(f"📊 Notification table created")
+    print("📊 Notification table created")
 
     # Show example usage
     print("\n📝 Example Usage:")

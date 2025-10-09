@@ -7,11 +7,10 @@ Handles model version tracking, rollback, comparison, and A/B testing.
 from datetime import datetime, timedelta
 from typing import List, Optional, Dict, Any
 from sqlalchemy.orm import Session
-from sqlalchemy import and_, or_, desc
+from sqlalchemy import and_, desc
 
 from ocular.database.models import (
-    Model, ModelVersion, VersionDeployment, Deployment,
-    VersionStatus, DeploymentStatus
+    Model, ModelVersion, VersionDeployment, VersionStatus
 )
 
 

@@ -126,14 +126,14 @@ def deploy_endpoint():
         endpoint_id = endpoint_data.get("id")
 
         print_status("Deployment successful!", "success")
-        print(f"\nEndpoint Details:")
+        print("\nEndpoint Details:")
         print(f"  ID: {endpoint_id}")
         print(f"  Name: {endpoint_data.get('name')}")
         print(f"  Status: {endpoint_data.get('status')}")
-        print(f"\nEndpoint URL:")
+        print("\nEndpoint URL:")
         print(f"  https://api.runpod.ai/v2/{endpoint_id}/run")
-        print(f"\nManage endpoint:")
-        print(f"  https://console.runpod.io/serverless")
+        print("\nManage endpoint:")
+        print("  https://console.runpod.io/serverless")
 
         # Save endpoint ID
         endpoint_file = Path(__file__).parent / "endpoint_id.txt"

@@ -3,7 +3,7 @@ Settings management API endpoints.
 """
 from typing import Dict, Any, Optional
 from fastapi import APIRouter, HTTPException, Depends
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from datetime import datetime
 import json

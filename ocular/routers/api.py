@@ -24,10 +24,9 @@ from ocular.database.models import (
     DeploymentStatus,
     DeploymentType
 )
-from ocular.routers import templates
 from ocular.services.deployment_service import get_deployment_service
 from ocular.services.env_service import get_env_service
-from ocular.models import (
+from ocular.models.deployment_options import (
     DeploymentModelOption,
     DeploymentOptionsResponse,
     DeploymentProviderOption,
@@ -1177,7 +1176,7 @@ async def delete_deployment(
         db.commit()
         db.refresh(deployment)
 
-    except NotImplementedError as e:
+    except NotImplementedError:
         # If provider doesn't support delete, just mark as deleted locally
         deployment.status = DeploymentStatus.DELETED
         deployment.stopped_at = datetime.utcnow()

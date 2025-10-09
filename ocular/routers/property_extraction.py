@@ -5,7 +5,6 @@ FastAPI endpoints for extracting structured property auction data from PDFs.
 """
 
 from fastapi import APIRouter, File, UploadFile, Form, HTTPException, BackgroundTasks
-from fastapi.responses import JSONResponse
 from typing import Optional, Dict, Any
 from pathlib import Path
 import tempfile
@@ -13,7 +12,7 @@ import json
 from datetime import datetime
 
 from ..services.property_extraction_service import PropertyExtractionService
-from ..services.llm_extraction_providers import LLMProvider, RECOMMENDED_FREE_MODELS
+from ..services.llm_extraction_providers import RECOMMENDED_FREE_MODELS
 from ..models.property_assessment import AuctionPropertyProfile
 from ..core.logging import get_logger
 

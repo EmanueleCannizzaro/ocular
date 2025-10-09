@@ -245,7 +245,7 @@ def seed_database(update_existing: bool = False) -> None:
 
     print("\n📁 Loading configuration from ocular.json...")
     config = load_ocular_config()
-    print(f"✓ Configuration loaded")
+    print("✓ Configuration loaded")
     print(f"   Cloud Providers: {len(config.get('cloud_providers', []))}")
     print(f"   AI Models: {len(config.get('ai_models', []))}")
 

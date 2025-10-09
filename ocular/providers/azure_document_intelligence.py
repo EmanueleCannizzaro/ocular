@@ -3,7 +3,6 @@ Azure Document Intelligence OCR provider implementation.
 """
 
 import asyncio
-import json
 import time
 from typing import Optional, Dict, Any, List
 from pathlib import Path
@@ -13,10 +12,9 @@ from ..core.models import OCRResult
 from ..core.enums import ProviderType
 from ..core.exceptions import (
     OCRError, APIError, ConfigurationError, AuthenticationError,
-    RateLimitError, TimeoutError, ResourceExhaustedError
+    RateLimitError, TimeoutError
 )
 from ..core.logging import log_async_function_call
-from ..core.validation import text_validator, file_validator
 
 try:
     from azure.ai.documentintelligence import DocumentIntelligenceClient
@@ -33,44 +31,44 @@ except ImportError:
 
 class AzureDocumentIntelligenceProvider(BaseOCRProvider):
     """Azure Document Intelligence OCR provider."""
-    
+
     def __init__(self, config: Dict[str, Any]):
         super().__init__(config)
-        
+
         if not HAS_AZURE_DOC_INTEL:
             raise ConfigurationError(
                 "Azure Document Intelligence requires azure-ai-documentintelligence. "
                 "Install with: pip install azure-ai-documentintelligence",
                 config_key="azure_doc_intel"
             )
-        
+
         # Azure configuration
         self.endpoint = config.get("endpoint")
         self.api_key = config.get("api_key")
         self.api_version = config.get("api_version", "2024-02-29-preview")
-        
+
         # Document Intelligence specific settings
         self.model_id = config.get("model_id", "prebuilt-read")
         self.pages = config.get("pages")  # Specific pages to analyze
         self.locale = config.get("locale", "en-US")
         self.reading_order = config.get("reading_order", "natural")
-        
+
         # Processing settings
         self.timeout = config.get("timeout", 120)
         self.max_retries = config.get("max_retries", 3)
         self.poll_interval = config.get("poll_interval", 2)
-        
+
         # Client will be initialized lazily
         self._client = None
-        
+
     @property
     def provider_type(self) -> ProviderType:
         return ProviderType.AZURE_DOCUMENT_INTELLIGENCE
-    
+
     @property
     def provider_name(self) -> str:
         return "Azure Document Intelligence"
-    
+
     @log_async_function_call()
     async def _do_initialize(self) -> None:
         """Initialize Azure Document Intelligence client."""
@@ -80,13 +78,13 @@ class AzureDocumentIntelligenceProvider(BaseOCRProvider):
                     "Azure endpoint is required",
                     config_key="endpoint"
                 )
-                
+
             if not self.api_key:
                 raise ConfigurationError(
-                    "Azure API key is required", 
+                    "Azure API key is required",
                     config_key="api_key"
                 )
-            
+
             # Initialize client
             credential = AzureKeyCredential(self.api_key)
             self._client = DocumentIntelligenceClient(
@@ -94,17 +92,17 @@ class AzureDocumentIntelligenceProvider(BaseOCRProvider):
                 credential=credential,
                 api_version=self.api_version
             )
-            
+
             self.logger.info(
-                f"Initialized Azure Document Intelligence client",
+                "Initialized Azure Document Intelligence client",
                 endpoint=self.endpoint,
                 model_id=self.model_id,
                 api_version=self.api_version
             )
-            
+
             # Test the client
             await self._test_client()
-            
+
         except ClientAuthenticationError as e:
             raise AuthenticationError(
                 f"Azure authentication failed: {e}",
@@ -116,7 +114,7 @@ class AzureDocumentIntelligenceProvider(BaseOCRProvider):
                 f"Azure Document Intelligence initialization failed: {e}",
                 config_key="azure_doc_intel"
             )
-    
+
     async def _test_client(self) -> None:
         """Test Azure Document Intelligence client connectivity."""
         try:
@@ -125,13 +123,13 @@ class AzureDocumentIntelligenceProvider(BaseOCRProvider):
                 try:
                     list(self._client.list_document_models())
                     return True
-                except Exception as e:
+                except Exception:
                     # If we can't list models, try a simple operation info call
                     return False
-            
+
             await asyncio.to_thread(_test_api)
             self.logger.info("Azure Document Intelligence API connectivity test successful")
-            
+
         except ClientAuthenticationError:
             raise AuthenticationError(
                 "Azure Document Intelligence authentication failed",
@@ -139,7 +137,7 @@ class AzureDocumentIntelligenceProvider(BaseOCRProvider):
             )
         except Exception as e:
             raise ConfigurationError(f"Azure Document Intelligence API test failed: {e}")
-    
+
     @log_async_function_call()
     async def is_available(self) -> bool:
         """Check if Azure Document Intelligence is available."""
@@ -151,40 +149,40 @@ class AzureDocumentIntelligenceProvider(BaseOCRProvider):
         except Exception as e:
             self.logger.warning(f"Azure Document Intelligence availability check failed: {e}")
             return False
-    
+
     @log_async_function_call()
     async def _extract_text_impl(
-        self, 
-        file_path: Path, 
+        self,
+        file_path: Path,
         prompt: Optional[str] = None,
         **kwargs
     ) -> OCRResult:
         """Extract text using Azure Document Intelligence."""
-        
+
         self.logger.info(
             f"Starting Azure Document Intelligence OCR for {file_path.name}",
             file_size=file_path.stat().st_size,
             model_id=self.model_id
         )
-        
+
         try:
             # Read document
             document_bytes = await self._read_file(file_path)
-            
+
             # Choose model based on requirements
             model_id = kwargs.get("model_id", self.model_id)
-            
+
             # Start analysis
             poller = await self._start_analysis(document_bytes, model_id, **kwargs)
-            
+
             # Wait for completion
             result = await self._wait_for_completion(poller)
-            
+
             # Extract text and metadata
             extracted_text = self._extract_text_from_result(result)
             confidence = self._calculate_confidence_from_result(result)
             language = self._detect_language_from_result(result)
-            
+
             return OCRResult(
                 text=extracted_text,
                 confidence=confidence,
@@ -197,7 +195,7 @@ class AzureDocumentIntelligenceProvider(BaseOCRProvider):
                     "reading_order": self.reading_order
                 }
             )
-            
+
         except ClientAuthenticationError:
             raise AuthenticationError(
                 "Azure Document Intelligence authentication failed",
@@ -225,42 +223,42 @@ class AzureDocumentIntelligenceProvider(BaseOCRProvider):
                 exc_info=True
             )
             raise
-    
+
     async def _start_analysis(
-        self, 
-        document_bytes: bytes, 
-        model_id: str, 
+        self,
+        document_bytes: bytes,
+        model_id: str,
         **kwargs
     ) -> Any:
         """Start document analysis and return poller."""
-        
+
         def _begin_analyze():
             analyze_request = AnalyzeDocumentRequest(
                 bytes_source=document_bytes
             )
-            
+
             # Additional parameters
             analyze_params = {
                 "pages": kwargs.get("pages", self.pages),
                 "locale": kwargs.get("locale", self.locale),
                 "string_index_type": "textElements"
             }
-            
+
             # Remove None values
             analyze_params = {k: v for k, v in analyze_params.items() if v is not None}
-            
+
             return self._client.begin_analyze_document(
                 model_id=model_id,
                 analyze_request=analyze_request,
                 **analyze_params
             )
-        
+
         return await asyncio.to_thread(_begin_analyze)
-    
+
     async def _wait_for_completion(self, poller: Any) -> Any:
         """Wait for analysis completion with timeout."""
         start_time = time.time()
-        
+
         while not poller.done():
             if time.time() - start_time > self.timeout:
                 try:
@@ -272,48 +270,48 @@ class AzureDocumentIntelligenceProvider(BaseOCRProvider):
                     timeout_seconds=self.timeout,
                     operation="document_analysis"
                 )
-            
+
             await asyncio.sleep(self.poll_interval)
-        
+
         def _get_result():
             return poller.result()
-        
+
         return await asyncio.to_thread(_get_result)
-    
+
     def _extract_text_from_result(self, result: Any) -> str:
         """Extract text from Azure Document Intelligence result."""
         if not hasattr(result, 'content'):
             return ""
-        
+
         return result.content
-    
+
     def _calculate_confidence_from_result(self, result: Any) -> float:
         """Calculate confidence from Azure Document Intelligence result."""
         if not hasattr(result, 'pages'):
             return 0.8  # Default confidence
-        
+
         total_confidence = 0.0
         word_count = 0
-        
+
         for page in result.pages:
             if hasattr(page, 'words'):
                 for word in page.words:
                     if hasattr(word, 'confidence'):
                         total_confidence += word.confidence
                         word_count += 1
-        
+
         if word_count == 0:
             return 0.8
-        
+
         return total_confidence / word_count
-    
+
     def _detect_language_from_result(self, result: Any) -> str:
         """Detect language from Azure Document Intelligence result."""
         if hasattr(result, 'languages') and result.languages:
             return result.languages[0].locale
-        
+
         return self.locale
-    
+
     async def _extract_structured_data_impl(
         self,
         file_path: Path,
@@ -322,17 +320,17 @@ class AzureDocumentIntelligenceProvider(BaseOCRProvider):
         **kwargs
     ) -> Dict[str, Any]:
         """Extract structured data using Azure Document Intelligence."""
-        
+
         # Read document
         document_bytes = await self._read_file(file_path)
-        
+
         # Use layout model for structured extraction
         model_id = kwargs.get("model_id", "prebuilt-layout")
-        
+
         # Start analysis
         poller = await self._start_analysis(document_bytes, model_id, **kwargs)
         result = await self._wait_for_completion(poller)
-        
+
         # Extract structured information
         structured_data = {
             "content": result.content,
@@ -343,7 +341,7 @@ class AzureDocumentIntelligenceProvider(BaseOCRProvider):
             "words": [],
             "confidence": self._calculate_confidence_from_result(result)
         }
-        
+
         # Extract page information
         if hasattr(result, 'pages'):
             for page_idx, page in enumerate(result.pages):
@@ -355,7 +353,7 @@ class AzureDocumentIntelligenceProvider(BaseOCRProvider):
                     "unit": page.unit if hasattr(page, 'unit') else None
                 }
                 structured_data["pages"].append(page_info)
-                
+
                 # Extract lines
                 if hasattr(page, 'lines'):
                     for line in page.lines:
@@ -364,7 +362,7 @@ class AzureDocumentIntelligenceProvider(BaseOCRProvider):
                             "bounding_box": self._extract_polygon(line.polygon) if hasattr(line, 'polygon') else None
                         }
                         structured_data["lines"].append(line_info)
-                
+
                 # Extract words
                 if hasattr(page, 'words'):
                     for word in page.words:
@@ -374,7 +372,7 @@ class AzureDocumentIntelligenceProvider(BaseOCRProvider):
                             "bounding_box": self._extract_polygon(word.polygon) if hasattr(word, 'polygon') else None
                         }
                         structured_data["words"].append(word_info)
-        
+
         # Extract tables
         if hasattr(result, 'tables'):
             for table in result.tables:
@@ -383,7 +381,7 @@ class AzureDocumentIntelligenceProvider(BaseOCRProvider):
                     "column_count": table.column_count if hasattr(table, 'column_count') else 0,
                     "cells": []
                 }
-                
+
                 if hasattr(table, 'cells'):
                     for cell in table.cells:
                         cell_info = {
@@ -394,9 +392,9 @@ class AzureDocumentIntelligenceProvider(BaseOCRProvider):
                             "column_span": cell.column_span if hasattr(cell, 'column_span') else 1
                         }
                         table_info["cells"].append(cell_info)
-                
+
                 structured_data["tables"].append(table_info)
-        
+
         # Extract paragraphs
         if hasattr(result, 'paragraphs'):
             for paragraph in result.paragraphs:
@@ -404,7 +402,7 @@ class AzureDocumentIntelligenceProvider(BaseOCRProvider):
                     "content": paragraph.content,
                     "bounding_regions": []
                 }
-                
+
                 if hasattr(paragraph, 'bounding_regions'):
                     for region in paragraph.bounding_regions:
                         region_info = {
@@ -412,58 +410,58 @@ class AzureDocumentIntelligenceProvider(BaseOCRProvider):
                             "polygon": self._extract_polygon(region.polygon) if hasattr(region, 'polygon') else None
                         }
                         para_info["bounding_regions"].append(region_info)
-                
+
                 structured_data["paragraphs"].append(para_info)
-        
+
         return structured_data
-    
+
     def _extract_polygon(self, polygon: Any) -> List[Dict[str, float]]:
         """Extract polygon coordinates."""
         if not polygon:
             return []
-        
+
         points = []
         for point in polygon:
             if hasattr(point, 'x') and hasattr(point, 'y'):
                 points.append({"x": point.x, "y": point.y})
-        
+
         return points
-    
+
     async def _read_file(self, file_path: Path) -> bytes:
         """Read file as bytes."""
         try:
             def _read_file_sync():
                 with open(file_path, 'rb') as f:
                     return f.read()
-            
+
             return await asyncio.to_thread(_read_file_sync)
         except Exception as e:
             raise OCRError(f"Failed to read file: {e}", provider=self.provider_name)
-    
+
     def validate_config(self) -> bool:
         """Validate Azure Document Intelligence provider configuration."""
         # Check endpoint
         if not self.endpoint or not self.endpoint.startswith('https://'):
             return False
-        
+
         # Check API key
         if not self.api_key or len(self.api_key.strip()) < 10:
             return False
-        
+
         # Check timeout
         if self.timeout <= 0 or self.timeout > 600:
             return False
-        
+
         # Check model ID
         if not self.model_id:
             return False
-        
+
         return True
-    
+
     def get_supported_formats(self) -> List[str]:
         """Get supported formats for Azure Document Intelligence."""
         return ['.jpg', '.jpeg', '.png', '.bmp', '.tiff', '.pdf']
-    
+
     async def cleanup(self) -> None:
         """Clean up Azure Document Intelligence resources."""
         # Azure client handles cleanup automatically
@@ -473,12 +471,12 @@ class AzureDocumentIntelligenceProvider(BaseOCRProvider):
         """Calculate confidence based on text quality metrics."""
         if not text:
             return 0.0
-        
+
         # Azure Document Intelligence has high accuracy
         confidence = 0.9
-        
+
         # Adjust based on text characteristics
         if len(text) < 10:
             confidence -= 0.1
-        
+
         return max(0.0, min(1.0, confidence))

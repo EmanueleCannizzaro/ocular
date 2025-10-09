@@ -12,9 +12,8 @@ from pydantic import BaseModel, Field
 
 from ocular.database.session import get_db
 from ocular.database.models import (
-    User, InvoiceStatus, PaymentMethod, BudgetAlertType
+    User, InvoiceStatus, BudgetAlertType
 )
-from ocular.routers import templates
 from ocular.services.billing_service import (
     InvoiceService, CostTrackingService, BudgetAlertService, StripeService
 )

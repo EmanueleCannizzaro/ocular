@@ -6,7 +6,6 @@ Integrates with RunPod Serverless API to deploy OCR models.
 
 import os
 import httpx
-import asyncio
 from typing import Dict, Any, Optional
 from datetime import datetime
 

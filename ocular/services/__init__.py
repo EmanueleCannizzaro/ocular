@@ -10,7 +10,7 @@ from .validation_service import ValidationService
 
 __all__ = [
     "OCRService",
-    "DocumentService", 
+    "DocumentService",
     "ProcessingService",
     "CacheService",
     "ValidationService",

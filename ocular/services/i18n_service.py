@@ -5,7 +5,6 @@ Provides translation support using Babel and Gettext with DeepL API integration.
 """
 
 import gettext
-import os
 from pathlib import Path
 from typing import Dict, Optional, Callable
 from functools import lru_cache

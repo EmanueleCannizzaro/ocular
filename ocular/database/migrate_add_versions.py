@@ -7,7 +7,7 @@ Run this script once to migrate existing databases.
 
 from sqlalchemy import inspect
 from ocular.database.session import engine
-from ocular.database.models import Base, ModelVersion, VersionDeployment
+from ocular.database.models import ModelVersion, VersionDeployment
 
 def table_exists(table_name: str) -> bool:
     """Check if a table exists in the database."""

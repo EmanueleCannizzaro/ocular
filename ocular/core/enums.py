@@ -8,7 +8,7 @@ from enum import Enum
 class ProviderType(Enum):
     """Available OCR providers."""
     MISTRAL = "mistral"
-    OLM_OCR = "olm_ocr" 
+    OLM_OCR = "olm_ocr"
     ROLM_OCR = "rolm_ocr"
     GOOGLE_VISION = "google_vision"
     AWS_TEXTRACT = "aws_textract"

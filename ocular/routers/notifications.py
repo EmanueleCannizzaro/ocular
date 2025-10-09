@@ -5,12 +5,11 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
-from sqlalchemy import and_, or_
+from sqlalchemy import or_
 from datetime import datetime
 
 from ocular.database.session import get_db
 from ocular.database.models import Notification
-from ocular.routers import templates
 
 
 router = APIRouter()

@@ -6,7 +6,7 @@ models, and system performance.
 """
 
 from datetime import datetime, timedelta
-from typing import Dict, List, Any, Optional
+from typing import Dict, Any, Optional
 from sqlalchemy import func, and_, case
 from sqlalchemy.orm import Session
 

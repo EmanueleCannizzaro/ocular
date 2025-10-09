@@ -24,7 +24,7 @@ def _load_env_on_import():
     """Load environment variables on package import."""
     try:
         from dotenv import load_dotenv
-        
+
         # Look for .env file in current directory and parent directories
         current_dir = Path.cwd()
         env_paths = [
@@ -32,7 +32,7 @@ def _load_env_on_import():
             current_dir.parent / '.env',
             Path(__file__).parent.parent / '.env'
         ]
-        
+
         for env_path in env_paths:
             if env_path.exists():
                 load_dotenv(env_path)
@@ -40,7 +40,7 @@ def _load_env_on_import():
         else:
             # Try loading from default locations
             load_dotenv()
-            
+
     except ImportError:
         # dotenv not available, skip
         pass
@@ -52,7 +52,7 @@ __version__ = "0.1.0"
 __all__ = [
     "MistralOCRClient",
     "DocumentProcessor",
-    "PydanticOCRClient", 
+    "PydanticOCRClient",
     "UnifiedDocumentProcessor",
     "ProcessingStrategy",
     "ProviderType",

@@ -33,13 +33,12 @@ print(f"MISTRAL_API_KEY loaded: {'Yes' if mistral_key else 'No'}")
 from fastapi import FastAPI, File, UploadFile, Form, Request, HTTPException, Depends
 from fastapi.security import HTTPBearer
 from fastapi.templating import Jinja2Templates
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 
 from ocular import UnifiedDocumentProcessor, ProcessingStrategy, ProviderType
 from ocular.providers.settings import OcularSettings
-from ocular.exceptions import DocumentProcessingError, ConfigurationError
+from ocular.exceptions import ConfigurationError
 import base64
 import httpx
 from PIL import Image
@@ -101,25 +100,25 @@ async def get_session(request: Request):
     """
     if not clerk:
         raise HTTPException(
-            status_code=503, 
+            status_code=503,
             detail="Authentication service not available. CLERK_SECRET_KEY not configured."
         )
-    
+
     auth_header = request.headers.get("Authorization")
     if not auth_header or not auth_header.startswith("Bearer "):
         raise HTTPException(status_code=401, detail="Not authenticated")
-    
+
     token = auth_header.split(" ")[1]
-    
+
     try:
         # Use authenticate_request method for token verification
         auth_result = clerk.authenticate_request(
             bearer_token=token
         )
-        
+
         if not auth_result or not hasattr(auth_result, 'session_id'):
             raise HTTPException(status_code=401, detail="Invalid session")
-            
+
         return auth_result
     except Exception as e:
         raise HTTPException(status_code=401, detail=f"Authentication failed: {str(e)}")
@@ -130,13 +129,13 @@ async def get_optional_session(request: Request):
     """
     if not clerk:
         return None
-    
+
     auth_header = request.headers.get("Authorization")
     if not auth_header or not auth_header.startswith("Bearer "):
         return None
-    
+
     token = auth_header.split(" ")[1]
-    
+
     try:
         auth_result = clerk.authenticate_request(
             bearer_token=token
@@ -149,7 +148,7 @@ async def check_payment_status(user_id: str) -> dict:
     """Check if user has valid payment or subscription."""
     if not stripe.api_key:
         return {"has_payment": True, "type": "free"}  # Allow free usage when Stripe not configured
-    
+
     try:
         # Check for active subscriptions
         customers = stripe.Customer.list(email=user_id, limit=1)
@@ -160,7 +159,7 @@ async def check_payment_status(user_id: str) -> dict:
                 status='active',
                 limit=10
             )
-            
+
             if subscriptions.data:
                 return {
                     "has_payment": True,
@@ -168,16 +167,16 @@ async def check_payment_status(user_id: str) -> dict:
                     "subscription_id": subscriptions.data[0].id,
                     "status": subscriptions.data[0].status
                 }
-        
+
         # Check for recent successful payment intents (last 24 hours)
         import time
         recent_payments = stripe.PaymentIntent.list(
             created={'gte': int(time.time()) - 86400},  # 24 hours ago
             limit=50
         )
-        
+
         for payment in recent_payments.data:
-            if (payment.status == 'succeeded' and 
+            if (payment.status == 'succeeded' and
                 payment.metadata.get('user_id') == user_id):
                 return {
                     "has_payment": True,
@@ -185,9 +184,9 @@ async def check_payment_status(user_id: str) -> dict:
                     "payment_intent_id": payment.id,
                     "amount": payment.amount
                 }
-        
+
         return {"has_payment": False, "type": "none"}
-        
+
     except Exception as e:
         print(f"Payment status check failed: {e}")
         return {"has_payment": False, "type": "error"}
@@ -199,15 +198,15 @@ async def require_payment(auth_result = Depends(get_session)):
     user_id = getattr(auth_result, 'user_id', None) if auth_result else None
     if not user_id:
         raise HTTPException(status_code=401, detail="Authentication required")
-    
+
     payment_status = await check_payment_status(user_id)
-    
+
     if not payment_status["has_payment"]:
         raise HTTPException(
-            status_code=402, 
+            status_code=402,
             detail="Payment required. Please purchase credits or subscribe to use this service."
         )
-    
+
     return {"auth_result": auth_result, "payment_status": payment_status}
 
 class ProcessingRequest(BaseModel):
@@ -448,34 +447,34 @@ olmocr_client = OLMocrClient()
 async def startup_event():
     """Initialize the OCR processor on startup."""
     global processor
-    
+
     # Report Clerk authentication status
     if clerk:
         print("✅ Clerk authentication enabled")
     else:
         print("⚠️ Clerk authentication disabled - protected endpoints will return 503")
-        
+
     try:
         print("Initializing OCR processor...")
-        
+
         # Create config
         config = OcularSettings()
         print(f"Config created with Mistral API key: {'Set' if config.providers.mistral_api_key else 'Not set'}")
-        
+
         # Create processor
         processor = UnifiedDocumentProcessor(config)
         print("Processor created successfully")
-        
+
         # Get available providers (this will trigger lazy initialization)
         await processor._ensure_providers_initialized()
         available_providers = processor.get_available_providers()
         print(f"Available OCR providers: {available_providers}")
-        
+
         if not available_providers:
             print("⚠️  WARNING: No OCR providers are available! Check your configuration.")
         else:
             print(f"✅ {len(available_providers)} OCR provider(s) ready")
-            
+
     except ConfigurationError as e:
         print(f"❌ Configuration Error: {e}")
         print("Check your .env file and ensure all required environment variables are set.")
@@ -497,7 +496,7 @@ async def debug_info():
             available_providers = processor.get_available_providers()
         except Exception as e:
             print(f"Error getting provider info: {e}")
-    
+
     return {
         "message": "Ocular OCR Service",
         "status": "running",
@@ -541,7 +540,7 @@ async def home(request: Request):
     try:
         available_providers = []
         provider_stats = {}
-        
+
         if processor:
             try:
                 await processor._ensure_providers_initialized()
@@ -549,7 +548,7 @@ async def home(request: Request):
                 provider_stats = processor.get_provider_stats()
             except Exception as e:
                 print(f"Error getting provider info: {e}")
-        
+
         return templates.TemplateResponse("index.html", {
             "request": request,
             "available_providers": available_providers,
@@ -588,7 +587,7 @@ async def health_check():
             available_providers = processor.get_available_providers()
         except Exception as e:
             print(f"Error in health check: {e}")
-    
+
     return {
         "status": "healthy",
         "processor_available": processor is not None,
@@ -607,18 +606,18 @@ async def process_files(
     """Process uploaded files with OCR."""
     if not processor:
         raise HTTPException(
-            status_code=500, 
+            status_code=500,
             detail="OCR processor not available. Check configuration."
         )
-    
+
     if not files:
         raise HTTPException(status_code=400, detail="No files provided")
-    
+
     # Parse providers
     provider_list = [p.strip() for p in providers.split(",") if p.strip()]
     if not provider_list:
         provider_list = ["mistral"]
-    
+
     # Convert to ProviderType enums
     try:
         ocr_providers = []
@@ -632,61 +631,61 @@ async def process_files(
             "tesseract": ProviderType.TESSERACT,
             "azure_document_intelligence": ProviderType.AZURE_DOCUMENT_INTELLIGENCE,
         }
-        
+
         for p in provider_list:
             if p in provider_mapping:
                 ocr_providers.append(provider_mapping[p])
             else:
                 print(f"Warning: Unknown provider '{p}', skipping")
-                
+
         # Default to Mistral if no valid providers found
         if not ocr_providers:
             ocr_providers = [ProviderType.MISTRAL]
-            
+
     except Exception as e:
         print(f"Error converting providers: {e}")
         ocr_providers = [ProviderType.MISTRAL]
-    
+
     # Parse strategy
     try:
         processing_strategy = ProcessingStrategy(strategy)
     except ValueError:
         processing_strategy = ProcessingStrategy.FALLBACK
-    
+
     results = []
     errors = []
     total_start_time = asyncio.get_event_loop().time()
-    
+
     # Create temporary directory for uploaded files
     with tempfile.TemporaryDirectory() as temp_dir:
         temp_path = Path(temp_dir)
         file_paths = []
-        
+
         # Save uploaded files
         for file in files:
             if not file.filename:
                 continue
-                
+
             # Generate unique filename
             file_id = str(uuid.uuid4())
             file_extension = Path(file.filename).suffix
             temp_file_path = temp_path / f"{file_id}{file_extension}"
-            
+
             try:
                 # Save file
                 content = await file.read()
                 with open(temp_file_path, "wb") as f:
                     f.write(content)
-                
+
                 file_paths.append({
                     "path": temp_file_path,
                     "original_name": file.filename,
                     "size": len(content)
                 })
-                
+
             except Exception as e:
                 errors.append(f"Failed to save {file.filename}: {str(e)}")
-        
+
         # Process files
         for file_info in file_paths:
             try:
@@ -696,19 +695,19 @@ async def process_files(
                     providers=ocr_providers,
                     prompt=prompt
                 )
-                
+
                 # Convert to serializable format
                 result_dict = result.to_dict()
                 result_dict["original_filename"] = file_info["original_name"]
                 result_dict["file_size"] = file_info["size"]
-                
+
                 results.append(result_dict)
-                
+
             except Exception as e:
                 errors.append(f"Failed to process {file_info['original_name']}: {str(e)}")
-    
+
     total_processing_time = asyncio.get_event_loop().time() - total_start_time
-    
+
     return ProcessingResponse(
         success=len(results) > 0,
         results=results,
@@ -734,12 +733,12 @@ async def batch_process_files(
     """Batch process multiple files with individual settings."""
     if not processor:
         raise HTTPException(status_code=500, detail="OCR processor not available")
-    
+
     try:
         batch_request = json.loads(request_data)
     except json.JSONDecodeError:
         raise HTTPException(status_code=400, detail="Invalid JSON in request data")
-    
+
     # Implementation for batch processing with individual settings per file
     # This would allow different strategies/providers for different files
     return {"message": "Batch processing endpoint - implementation pending"}
@@ -750,14 +749,14 @@ async def get_providers():
     """Get information about available OCR providers."""
     if not processor:
         return {"providers": [], "error": "Processor not available"}
-    
+
     try:
         await processor._ensure_providers_initialized()
         available_providers = processor.get_available_providers()
         provider_stats = processor.get_provider_stats()
     except Exception as e:
         return {"providers": [], "error": f"Provider initialization failed: {e}"}
-    
+
     return {
         "available_providers": available_providers,
         "provider_stats": provider_stats
@@ -777,11 +776,11 @@ async def test_auth(auth_result = Depends(get_session)):
     """Test protected endpoint that requires authentication."""
     user_id = None
     session_id = None
-    
+
     if auth_result:
         user_id = getattr(auth_result, 'user_id', None)
         session_id = getattr(auth_result, 'session_id', None)
-    
+
     return {
         "message": "Authentication successful",
         "user_id": user_id,
@@ -806,17 +805,17 @@ async def create_payment_intent(
     """Create a Stripe payment intent for OCR processing."""
     if not stripe.api_key:
         raise HTTPException(
-            status_code=503, 
+            status_code=503,
             detail="Payment service not available. Stripe not configured."
         )
-    
+
     try:
         # Add user ID to metadata
         user_id = getattr(auth_result, 'user_id', None) if auth_result else None
         metadata = request.metadata or {}
         if user_id:
             metadata['user_id'] = user_id
-        
+
         # Create payment intent
         intent = stripe.PaymentIntent.create(
             amount=request.amount,
@@ -827,13 +826,13 @@ async def create_payment_intent(
                 'enabled': True,
             },
         )
-        
+
         return PaymentIntentResponse(
             client_secret=intent.client_secret,
             payment_intent_id=intent.id,
             publishable_key=stripe_publishable_key
         )
-        
+
     except stripe.error.StripeError as e:
         raise HTTPException(status_code=400, detail=f"Stripe error: {str(e)}")
     except Exception as e:
@@ -847,21 +846,21 @@ async def create_subscription(
     """Create a Stripe subscription for unlimited OCR processing."""
     if not stripe.api_key:
         raise HTTPException(
-            status_code=503, 
+            status_code=503,
             detail="Payment service not available. Stripe not configured."
         )
-    
+
     user_id = getattr(auth_result, 'user_id', None) if auth_result else None
     if not user_id:
         raise HTTPException(status_code=400, detail="User ID required for subscriptions")
-    
+
     try:
         # Check if customer already exists
         customers = stripe.Customer.list(
             email=user_id,  # Assuming user_id is email, adjust as needed
             limit=1
         )
-        
+
         if customers.data:
             customer = customers.data[0]
         else:
@@ -870,7 +869,7 @@ async def create_subscription(
                 email=user_id,
                 metadata={'user_id': user_id}
             )
-        
+
         # Create subscription
         subscription = stripe.Subscription.create(
             customer=customer.id,
@@ -879,14 +878,14 @@ async def create_subscription(
             payment_settings={'payment_method_types': ['card']},
             expand=['latest_invoice.payment_intent'],
         )
-        
+
         return {
             "subscription_id": subscription.id,
             "client_secret": subscription.latest_invoice.payment_intent.client_secret,
             "customer_id": customer.id,
             "publishable_key": stripe_publishable_key
         }
-        
+
     except stripe.error.StripeError as e:
         raise HTTPException(status_code=400, detail=f"Stripe error: {str(e)}")
     except Exception as e:
@@ -897,13 +896,13 @@ async def stripe_webhook(request: Request):
     """Handle Stripe webhook events."""
     if not stripe.api_key or not stripe_webhook_secret:
         raise HTTPException(status_code=503, detail="Webhook service not configured")
-    
+
     payload = await request.body()
     sig_header = request.headers.get('stripe-signature')
-    
+
     if not sig_header:
         raise HTTPException(status_code=400, detail="Missing Stripe signature")
-    
+
     try:
         # Verify webhook signature
         event = stripe.Webhook.construct_event(
@@ -915,31 +914,31 @@ async def stripe_webhook(request: Request):
     except stripe.error.SignatureVerificationError:
         # Invalid signature
         raise HTTPException(status_code=400, detail="Invalid signature")
-    
+
     # Handle the event
     if event['type'] == 'payment_intent.succeeded':
         payment_intent = event['data']['object']
         print(f"Payment succeeded for intent: {payment_intent['id']}")
         # Add your payment success logic here
-        
+
     elif event['type'] == 'payment_intent.payment_failed':
         payment_intent = event['data']['object']
         print(f"Payment failed for intent: {payment_intent['id']}")
         # Add your payment failure logic here
-        
+
     elif event['type'] == 'invoice.payment_succeeded':
         invoice = event['data']['object']
         print(f"Subscription payment succeeded: {invoice['id']}")
         # Add your subscription success logic here
-        
+
     elif event['type'] == 'customer.subscription.deleted':
         subscription = event['data']['object']
         print(f"Subscription cancelled: {subscription['id']}")
         # Add your subscription cancellation logic here
-    
+
     else:
         print(f"Unhandled event type: {event['type']}")
-    
+
     return {"status": "success"}
 
 @app.get("/payments/config")
@@ -1087,7 +1086,7 @@ if __name__ == "__main__":
     import uvicorn
     uvicorn.run(
         "app.ocular_app:app",
-        host="0.0.0.0", 
+        host="0.0.0.0",
         port=8001,
         reload=True,
         log_level="info"

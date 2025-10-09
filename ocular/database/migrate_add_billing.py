@@ -11,7 +11,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from sqlalchemy import create_engine
-from ocular.database.models import Base, Invoice, CostTracking, BudgetAlert
+from ocular.database.models import Invoice, CostTracking, BudgetAlert
 from ocular.database.session import get_database_url
 
 

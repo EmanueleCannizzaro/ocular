@@ -7,7 +7,6 @@ Simple script to test your deployed OLMocr endpoint
 import os
 import sys
 import base64
-import json
 import time
 from pathlib import Path
 from dotenv import load_dotenv
@@ -55,7 +54,7 @@ def test_endpoint(endpoint_id: str, image_path: Path = None, prompt: str = None)
                 break
 
     if image_path is None or not image_path.exists():
-        print(f"Error: Test image not found")
+        print("Error: Test image not found")
         print("Please provide a valid image path:")
         print(f"  python {sys.argv[0]} <endpoint_id> <image_path>")
         sys.exit(1)

@@ -9,10 +9,10 @@ class UnstructuredToJSONParser:
         self.client = openai.OpenAI(
             api_key=api_key or os.getenv('OPENAI_API_KEY')
         )
-    
+
     def parse_to_json(self, unstructured_text: str, schema_hint: str = "") -> Dict[str, Any]:
         """Convert unstructured text to JSON using OpenAI"""
-        
+
         # Create the prompt
         prompt = f"""
         Convert the following unstructured text into valid JSON format.
@@ -32,7 +32,7 @@ class UnstructuredToJSONParser:
         
         JSON:
         """
-        
+
         try:
             response = self.client.chat.completions.create(
                 model="gpt-4",  # or "gpt-3.5-turbo" for cheaper option
@@ -43,9 +43,9 @@ class UnstructuredToJSONParser:
                 temperature=0.1,  # Low temperature for consistent output
                 max_tokens=1000
             )
-            
+
             json_string = response.choices[0].message.content.strip()
-            
+
             # Remove potential code block markers
             if json_string.startswith('```json'):
                 json_string = json_string[7:]
@@ -53,11 +53,11 @@ class UnstructuredToJSONParser:
                 json_string = json_string[3:]
             if json_string.endswith('```'):
                 json_string = json_string[:-3]
-            
+
             # Parse and validate JSON
             parsed_json = json.loads(json_string.strip())
             return parsed_json
-            
+
         except json.JSONDecodeError as e:
             raise ValueError(f"Failed to parse AI response as JSON: {e}")
         except Exception as e:
@@ -67,7 +67,7 @@ class UnstructuredToJSONParser:
 def main():
     # Initialize parser
     parser = UnstructuredToJSONParser()
-    
+
     # Example 1: Personal information
     text1 = """
     Hi there! My name is Sarah Johnson and I'm 28 years old. 
@@ -76,7 +76,7 @@ def main():
     I live in San Francisco, California. I graduated from Stanford University in 2018.
     My hobbies include hiking, photography, and playing guitar.
     """
-    
+
     schema_hint1 = """
     Expected structure:
     - personal_info: name, age, occupation, company
@@ -85,12 +85,12 @@ def main():
     - education: university, graduation_year
     - hobbies: array of interests
     """
-    
+
     result1 = parser.parse_to_json(text1, schema_hint1)
     print("Example 1 - Personal Info:")
     print(json.dumps(result1, indent=2))
     print("\n" + "="*50 + "\n")
-    
+
     # Example 2: Product review
     text2 = """
     Product Review: iPhone 14 Pro
@@ -101,7 +101,7 @@ def main():
     Would I recommend? Yes, but only for users who need the pro features
     Reviewer: Mike Chen, verified purchase
     """
-    
+
     result2 = parser.parse_to_json(text2)
     print("Example 2 - Product Review:")
     print(json.dumps(result2, indent=2))

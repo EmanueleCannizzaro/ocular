@@ -19,25 +19,24 @@ from ocular.database.models import Base, Settings
 def run_migration(database_url: str = None):
     """Run the migration to add Settings table."""
     if database_url is None:
-        import os
         from pathlib import Path
 
         # Default to project root database
         project_root = Path(__file__).parent.parent.parent
         database_url = f"sqlite:///{project_root}/ocular.db"
 
-    print(f"🔄 Running migration: Add Settings table")
+    print("🔄 Running migration: Add Settings table")
     print(f"📦 Database: {database_url}")
 
     # Create engine
     engine = create_engine(database_url)
 
     # Create only the Settings table
-    print(f"✨ Creating Settings table...")
+    print("✨ Creating Settings table...")
     Base.metadata.create_all(engine, tables=[Settings.__table__])
 
     print("✅ Migration completed successfully!")
-    print(f"📊 Settings table created")
+    print("📊 Settings table created")
 
     # Show example usage
     print("\n📝 Example Usage:")

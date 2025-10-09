@@ -3,18 +3,14 @@ Mistral AI OCR client implementation.
 """
 
 import base64
-import asyncio
-from typing import Optional, Dict, Any, List
+from typing import Optional, Dict, Any
 from dotenv import load_dotenv
 import json
 import os
 from pathlib import Path
-from io import BytesIO
 
 from mistralai import Mistral #, DocumentFileChunk
 from mistralai.extra import response_format_from_pydantic_model
-from PIL import Image
-import pypdf
 
 from ocular.config import OcularConfig
 from ocular.exceptions import OCRError, APIError, DocumentProcessingError
@@ -23,7 +19,7 @@ from ocular.models.services import RootModel
 
 class MistralOCRClient:
     """Client for performing OCR using Mistral AI vision models."""
-    
+
     def __init__(self, config: Optional[OcularConfig] = None):
         """Initialize the Mistral OCR client."""
         self.config = config or OcularConfig.from_env()
@@ -59,12 +55,12 @@ class MistralOCRClient:
             raise FileNotFoundError("schema.json not found. Please ensure the file exists in the script's directory.")
         except Exception as e:
             raise RuntimeError(f"An error occurred while loading the schema: {e}")
-        
+
 
     def _encode_file(self, file_content: bytes) -> str:
         """Encode image data as base64."""
         return base64.b64encode(file_content).decode('utf-8')
-    
+
     def _validate_file_size(self, file_path: Path) -> None:
         """Validate file size doesn't exceed limit."""
         file_size_mb = file_path.stat().st_size / (1024 * 1024)
@@ -72,58 +68,58 @@ class MistralOCRClient:
             raise DocumentProcessingError(
                 f"File size ({file_size_mb:.2f}MB) exceeds limit of {self.config.max_file_size_mb}MB"
             )
-    
+
     # def _pdf_to_images(self, pdf_path: Path) -> List[bytes]:
     #     """Convert PDF pages to images."""
     #     try:
     #         images = []
     #         with open(pdf_path, 'rb') as file:
     #             pdf_reader = pypdf.PdfReader(file)
-                
+
     #             for page_num in range(len(pdf_reader.pages)):
     #                 page = pdf_reader.pages[page_num]
-                    
+
     #                 # Convert page to image using PDF rendering
     #                 # Note: This is a simplified approach. For production,
     #                 # consider using pdf2image or similar libraries
-                    
+
     #                 # For now, we'll extract text and create a simple image
     #                 # In a real implementation, you'd want proper PDF-to-image conversion
     #                 text = page.extract_text()
-                    
+
     #                 # Create a simple image with the text (placeholder)
     #                 img = Image.new('RGB', (800, 600), color='white')
-                    
+
     #                 # Convert to bytes
     #                 img_bytes = BytesIO()
     #                 img.save(img_bytes, format='PNG')
     #                 images.append(img_bytes.getvalue())
-                    
+
     #         return images
     #     except Exception as e:
     #         raise DocumentProcessingError(f"Failed to process PDF: {str(e)}")
-    
+
     # async def extract_text_from_image(
-    #     self, 
-    #     image_path: Path, 
+    #     self,
+    #     image_path: Path,
     #     prompt: Optional[str] = None
     # ) -> str:
     #     """Extract text from an image using Mistral AI vision model."""
     #     try:
     #         self._validate_file_size(image_path)
-            
+
     #         with open(image_path, 'rb') as file:
     #             image_data = file.read()
-            
+
     #         encoded_content = self._encode_file(image_data)
-            
+
     #         default_prompt = (
     #             "Extract all text from this image. "
     #             "Maintain the original structure and formatting as much as possible. "
     #             "If the image contains tables, preserve the table structure. "
     #             "Return only the extracted text without any additional commentary."
     #         )
-            
+
     #         messages = [
     #             {
     #                 "role": "user",
@@ -139,48 +135,48 @@ class MistralOCRClient:
     #                 ]
     #             }
     #         ]
-            
+
     #         response = await asyncio.to_thread(
     #             self.client.chat.complete,
     #             model=self.config.mistral_model,
     #             messages=messages,
     #             max_tokens=4000
     #         )
-            
+
     #         return response.choices[0].message.content.strip()
-            
+
     #     except Exception as e:
     #         if "api" in str(e).lower():
     #             raise APIError(f"Mistral API error: {str(e)}")
     #         else:
     #             raise OCRError(f"OCR processing failed: {str(e)}")
-    
+
     # async def extract_text_from_pdf(
-    #     self, 
-    #     pdf_path: Path, 
+    #     self,
+    #     pdf_path: Path,
     #     prompt: Optional[str] = None
     # ) -> List[str]:
     #     """Extract text from each page of a PDF."""
     #     try:
     #         self._validate_file_size(pdf_path)
-            
+
     #         image_pages = self._pdf_to_images(pdf_path)
     #         results = []
-            
+
     #         for i, image_data in enumerate(image_pages):
     #             encoded_content = self._encode_file(image_data)
-                
+
     #             page_prompt = (
     #                 f"Extract all text from page {i+1} of this PDF. "
     #                 + (prompt or "Maintain original formatting and structure.")
     #             )
-                
+
     #             messages = [
     #                 {
     #                     "role": "user",
     #                     "content": [
     #                         {
-    #                             "type": "text", 
+    #                             "type": "text",
     #                             "text": page_prompt
     #                         },
     #                         {
@@ -190,42 +186,42 @@ class MistralOCRClient:
     #                     ]
     #                 }
     #             ]
-                
+
     #             response = await asyncio.to_thread(
     #                 self.client.chat.complete,
     #                 model=self.config.mistral_model,
     #                 messages=messages,
     #                 max_tokens=4000
     #             )
-                
+
     #             results.append(response.choices[0].message.content.strip())
-                
+
     #         return results
-            
+
     #     except Exception as e:
     #         if "api" in str(e).lower():
     #             raise APIError(f"Mistral API error: {str(e)}")
     #         else:
     #             raise OCRError(f"PDF OCR processing failed: {str(e)}")
-    
+
     async def extract_structured_data(
-        self, 
-        file_path: Path, 
+        self,
+        file_path: Path,
         schema: Dict[str, Any],
         prompt: Optional[str] = None
     ) -> Dict[str, Any]:
         """Extract structured data from an image based on a provided schema."""
         self._validate_file_size(file_path)
-        
+
         try:
             with open(file_path, 'rb') as file:
                 file_content = file.read()
         except FileNotFoundError:
             raise FileNotFoundError(f"File not found at {file_path}. Please check the path.")
-        
+
         try:
             encoded_content = self._encode_file(file_content)
-    
+
             # 5. Create a DocumentFileChunk from the base64 content
             # You must provide the correct MIME type for the file.
             # document_file_chunk = DocumentFileChunk(
@@ -254,7 +250,7 @@ class MistralOCRClient:
             except Exception as e:
                 print(f"\n❌ An error occurred during OCR processing: {e}")
                 raise APIError(f"Mistral API error: {str(e)}")
-                
+
         except Exception as e:
             if "api" in str(e).lower():
                 raise APIError(f"Mistral API error: {str(e)}")

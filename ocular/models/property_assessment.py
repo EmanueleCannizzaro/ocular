@@ -46,7 +46,7 @@ class AuctionDetails(BaseModel):
     minimum_bid: float = Field(..., description="L'offerta minima accettabile ('impoOffertaMinima').")
     minimum_bid_increase: Optional[float] = Field(description="L'incremento minimo per il rilancio ('impoOffertaAumento').")
     required_deposit_rule: str = Field(..., description="La regola per il calcolo della cauzione ('depoCauzionale'), es. '20% prezzo offerto'.")
-    
+
 class AppraisalSummary(BaseModel):
     """Contiene i dettagli principali della perizia tecnica."""
     court: str = Field(..., description="Il tribunale di competenza (es. 'TRIBUNALE DI SPOLETO').")
@@ -87,12 +87,12 @@ class AuctionPropertyProfile(BaseModel):
     """
     sale_id: int = Field(..., description="L'ID univoco della vendita dal file JSON ('idVendita').")
     lot_number: str = Field(..., description="Il numero di lotto specifico ('codLotto').")
-    
+
     appraisal_summary: AppraisalSummary
     auction_details: AuctionDetails
     risk_assessment: RiskAssessment
     valuation_details: ValuationDetails
-    
+
     assets: List[PropertyAsset] = Field(..., description="Un elenco di tutti i beni che compongono il lotto.")
     occupancy_status: str = Field(..., description="Lo stato di occupazione dell'immobile (es. 'Libero', 'Occupato dal debitore').")
     publication_websites: List[PublicationWebsite] = Field(..., description="Un elenco dei siti web dove l'asta è pubblicata.")

@@ -17,7 +17,7 @@ __all__ = [
     "ProviderFactory",
     "ProviderManager",
     "MistralProvider",
-    "OLMProvider", 
+    "OLMProvider",
     "RoLMProvider",
     "GoogleVisionProvider",
     "AWSTextractProvider",

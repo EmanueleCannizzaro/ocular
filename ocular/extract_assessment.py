@@ -1,15 +1,8 @@
 import instructor
 from openai import OpenAI
-from pydantic import BaseModel, Field
-from typing import List, Literal, Optional
 
 from ocular.models.property_assessment import (
-    AppraisalSummary, 
-    AuctionDetails, AuctionPropertyProfile, 
-    CadastralData, 
-    Person,  
-    PropertyAsset, PublicationWebsite, 
-    RiskAssessment, ValuationDetails, 
+    AuctionPropertyProfile,
 )
 
 

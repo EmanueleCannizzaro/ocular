@@ -7,10 +7,8 @@ from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
-from ocular.database.models import ProcessedDocument
 from ocular.database.session import get_db
-from ocular.routers import templates
-from ocular.services.document_tracking_service import DocumentTrackingService, get_document_tracking_service
+from ocular.services.document_tracking_service import get_document_tracking_service
 
 
 # Initialize router
@@ -224,7 +222,7 @@ async def cleanup_old_records(
     count = service.cleanup_old_records(days=days)
 
     return {
-        "message": f"Cleanup completed",
+        "message": "Cleanup completed",
         "records_deleted": count,
         "days_threshold": days
     }

@@ -6,10 +6,9 @@ scaling policies, health checks, and advanced GPU configurations.
 """
 
 from typing import Dict, Any, List, Optional
-from datetime import datetime
 from sqlalchemy.orm import Session
 
-from ocular.database.models import Deployment, DeploymentStatus
+from ocular.database.models import Deployment
 
 
 class ScalingPolicy:

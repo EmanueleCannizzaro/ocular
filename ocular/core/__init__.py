@@ -9,7 +9,7 @@ from .enums import ProviderType, ProcessingStrategy, DocumentType
 
 __all__ = [
     "OCRProvider",
-    "DocumentProcessor", 
+    "DocumentProcessor",
     "ResultProcessor",
     "OCRResult",
     "ProcessingRequest",

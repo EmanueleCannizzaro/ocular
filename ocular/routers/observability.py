@@ -3,11 +3,10 @@ Observability API endpoints for logs, traces, metrics, and alerts.
 """
 
 from datetime import datetime, timedelta
-from typing import Optional, List, Dict, Any
+from typing import Optional, Dict
 from fastapi import APIRouter, HTTPException, Query
 
 from ocular.models.observability import (
-    LogQueryRequest,
     LogQueryResponse,
     LogStatisticsResponse,
     TraceQueryResponse,
@@ -21,17 +20,11 @@ from ocular.models.observability import (
     ErrorSummaryResponse,
     DashboardSummaryResponse,
 )
-from ocular.routers import templates
 from ocular.services.observability_service import (
     get_observability_service,
     LogLevel,
     AlertSeverity,
     MetricType,
-    LogEntry,
-    TraceSpan,
-    PerformanceProfile,
-    CustomMetric,
-    Alert,
 )
 
 

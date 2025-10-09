@@ -2,12 +2,10 @@
 Batch OCR Processing API endpoints
 """
 
-from datetime import datetime
 from typing import List, Optional
 from fastapi import APIRouter, HTTPException, File, UploadFile, Form
 from pydantic import BaseModel
 
-from ocular.routers import templates
 from ocular.services.batch_processing_service import (
     get_batch_processing_service,
     JobStatus,

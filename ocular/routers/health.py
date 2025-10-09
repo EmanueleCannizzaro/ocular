@@ -2,14 +2,11 @@
 Health and debug endpoints router for Ocular OCR application.
 """
 
-import os
 import platform
-from typing import Dict, Any
 
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
 
-from ocular.routers import templates
 from ocular.settings import get_settings
 from ocular.unified_processor import UnifiedDocumentProcessor
 

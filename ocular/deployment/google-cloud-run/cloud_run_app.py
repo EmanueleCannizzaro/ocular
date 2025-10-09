@@ -4,23 +4,20 @@ Optimized for GPU instances with OpenAI-compatible API
 """
 
 import os
-import asyncio
 import base64
 import io
-import json
 import time
 import logging
-from typing import Dict, List, Any, Optional, Union
+from typing import Dict, List, Any, Union
 from contextlib import asynccontextmanager
 
 import uvicorn
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form, Request
-from fastapi.responses import JSONResponse, HTMLResponse
+from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel, Field
 from PIL import Image
-import requests
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -64,7 +61,6 @@ async def load_model():
 
     try:
         import vllm
-        from vllm import LLM, SamplingParams
         from transformers import AutoTokenizer
 
         model_name = os.getenv("MODEL_NAME", "allenai/olmOCR-7B-0225-preview")

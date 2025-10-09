@@ -4,7 +4,7 @@ Template helper utilities for Ocular OCR application.
 Provides helper functions for use in Jinja2 templates.
 """
 
-from typing import Dict, Any, Callable
+from typing import Dict, Any
 from fastapi import Request
 from fastapi.templating import Jinja2Templates
 

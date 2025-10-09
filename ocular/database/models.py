@@ -9,7 +9,6 @@ Database Structure:
 
 from datetime import datetime
 from enum import Enum as PyEnum
-from typing import Optional
 
 from sqlalchemy import (
     Column, Integer, String, Float, DateTime, Enum, Boolean, Text, JSON, ForeignKey

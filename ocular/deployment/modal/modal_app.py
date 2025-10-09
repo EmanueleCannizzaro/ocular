@@ -4,8 +4,7 @@ Deploys OLMocr with vLLM on Modal's serverless GPU platform
 """
 
 import modal
-import os
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any
 
 # Modal app configuration
 app = modal.App("olmocr-vllm-modal")
@@ -95,7 +94,6 @@ class VLLMModel:
     ) -> Dict[str, Any]:
         """Generate response using the loaded model"""
         from vllm import SamplingParams
-        import json
         import base64
         from PIL import Image
         import io

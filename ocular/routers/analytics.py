@@ -7,10 +7,9 @@ Provides endpoints for deployment analytics, cost tracking, and performance metr
 from typing import Optional
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 from ocular.database.session import get_db
-from ocular.routers import templates
 from ocular.services.analytics_service import get_analytics_service
 
 

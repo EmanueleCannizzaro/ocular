@@ -6,11 +6,9 @@ from dotenv import load_dotenv
 # Core imports
 from fastapi import FastAPI, Request, HTTPException, Depends
 from fastapi.security import HTTPBearer
-from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-import os
 from pathlib import Path
 # Create a custom TemplateResponse that adds translation context
 from starlette.responses import Response

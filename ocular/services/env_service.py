@@ -2,7 +2,6 @@
 Service for managing .env file updates from the settings interface.
 """
 
-import os
 import re
 from pathlib import Path
 from typing import Dict, Optional, List

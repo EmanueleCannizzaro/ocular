@@ -3,13 +3,10 @@ Replicate Prediction Handler for OLMocr with vLLM
 This file handles predictions for the Replicate platform deployment
 """
 
-import os
 import base64
 import io
-import json
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any
 from PIL import Image
-import requests
 from cog import BasePredictor, Input, Path
 
 # Import vLLM components

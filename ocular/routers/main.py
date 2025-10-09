@@ -17,7 +17,7 @@ from typing import Any, Dict, List, Optional
 import uuid
 
 from ocular.core.enums import ProcessingStrategy, ProviderType
-from ocular.core.exceptions import ConfigurationError, DocumentProcessingError
+from ocular.core.exceptions import DocumentProcessingError
 from ocular.routers import templates
 from ocular.settings import get_olmocr_settings, get_settings
 from ocular.unified_processor import UnifiedDocumentProcessor

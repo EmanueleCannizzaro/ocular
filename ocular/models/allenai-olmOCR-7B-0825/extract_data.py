@@ -78,7 +78,7 @@ def upload_to_s3(bucket, local_path, s3_prefix):
 def main():
     """Main function to run the data extraction."""
     os.makedirs(LOCAL_MODEL_PATH, exist_ok=True)
-    
+
     # Check if model exists locally; if not, try S3; if not, download from Hugging Face
     if not os.path.exists(os.path.join(LOCAL_MODEL_PATH, "config.json")):
         print(f"Model not found locally. Attempting to download from S3 bucket '{S3_BUCKET_NAME}'...")
@@ -86,14 +86,14 @@ def main():
             print("Model not found in S3. Downloading from Hugging Face Hub...")
             model = Qwen2VLForConditionalGeneration.from_pretrained(MODEL_ID, torch_dtype=torch.bfloat16)
             processor = AutoProcessor.from_pretrained(PROCESSOR_ID)
-            
+
             print(f"Saving model to {LOCAL_MODEL_PATH}...")
             model.save_pretrained(LOCAL_MODEL_PATH)
             processor.save_pretrained(LOCAL_MODEL_PATH)
-            
+
             print("Uploading model to S3 for future runs...")
             upload_to_s3(S3_BUCKET_NAME, LOCAL_MODEL_PATH, S3_MODEL_PREFIX)
-    
+
     print("Loading model from local cache...")
     model = Qwen2VLForConditionalGeneration.from_pretrained(LOCAL_MODEL_PATH, torch_dtype=torch.bfloat16).eval()
     processor = AutoProcessor.from_pretrained(LOCAL_MODEL_PATH)

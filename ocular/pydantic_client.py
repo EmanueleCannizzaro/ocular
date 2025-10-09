@@ -22,7 +22,7 @@ class OCRResult(BaseModel):
     extracted_text: str
     confidence_score: Optional[float] = None
     language: Optional[str] = None
-    
+
 
 class StructuredData(BaseModel):
     """Base class for structured data extraction."""
@@ -40,17 +40,17 @@ class InvoiceData(StructuredData):
 
 class PydanticOCRClient:
     """OCR client using PydanticAI with Mistral AI vision models."""
-    
+
     def __init__(self, config: Optional[OcularConfig] = None):
         """Initialize the PydanticAI OCR client."""
         self.config = config or OcularConfig.from_env()
-        
+
         # Initialize Mistral model
         self.model = MistralModel(
             model_name=self.config.mistral_model,
             api_key=self.config.mistral_api_key
         )
-        
+
         # Create OCR agent
         self.ocr_agent = Agent(
             self.model,
@@ -61,8 +61,8 @@ class PydanticOCRClient:
                 "when possible and identify the primary language of the text."
             )
         )
-        
-        # Create structured data agent  
+
+        # Create structured data agent
         self.structured_agent = Agent(
             self.model,
             system_prompt=(
@@ -71,11 +71,11 @@ class PydanticOCRClient:
                 "ensure all extracted data is accurate."
             )
         )
-    
+
     def _encode_image(self, image_data: bytes) -> str:
         """Encode image data as base64."""
         return base64.b64encode(image_data).decode('utf-8')
-    
+
     def _validate_file_size(self, file_path: Path) -> None:
         """Validate file size doesn't exceed limit."""
         file_size_mb = file_path.stat().st_size / (1024 * 1024)
@@ -83,46 +83,46 @@ class PydanticOCRClient:
             raise DocumentProcessingError(
                 f"File size ({file_size_mb:.2f}MB) exceeds limit of {self.config.max_file_size_mb}MB"
             )
-    
+
     def _pdf_to_images(self, pdf_path: Path) -> List[bytes]:
         """Convert PDF pages to images."""
         try:
             images = []
             with open(pdf_path, 'rb') as file:
                 pdf_reader = pypdf.PdfReader(file)
-                
+
                 for page_num in range(len(pdf_reader.pages)):
                     # Create placeholder image for PDF page
                     # In production, use pdf2image library
                     img = Image.new('RGB', (800, 600), color='white')
-                    
+
                     img_bytes = BytesIO()
                     img.save(img_bytes, format='PNG')
                     images.append(img_bytes.getvalue())
-                    
+
             return images
         except Exception as e:
             raise DocumentProcessingError(f"Failed to process PDF: {str(e)}")
-    
+
     async def extract_text_from_image(
-        self, 
-        image_path: Path, 
+        self,
+        image_path: Path,
         prompt: Optional[str] = None
     ) -> OCRResult:
         """Extract text from an image using PydanticAI."""
         try:
             self._validate_file_size(image_path)
-            
+
             with open(image_path, 'rb') as file:
                 image_data = file.read()
-            
+
             base64_image = self._encode_image(image_data)
-            
+
             user_prompt = (
-                prompt or 
+                prompt or
                 "Extract all text from this image. Maintain original structure and formatting."
             )
-            
+
             # Create message with image
             messages = [
                 {
@@ -136,43 +136,43 @@ class PydanticOCRClient:
                     ]
                 }
             ]
-            
+
             result = await self.ocr_agent.run(
                 user_prompt,
                 message_history=messages
             )
-            
+
             return result.data
-            
+
         except Exception as e:
             if "api" in str(e).lower():
                 raise APIError(f"Mistral API error: {str(e)}")
             else:
                 raise OCRError(f"OCR processing failed: {str(e)}")
-    
+
     async def extract_text_from_pdf(
-        self, 
-        pdf_path: Path, 
+        self,
+        pdf_path: Path,
         prompt: Optional[str] = None
     ) -> List[OCRResult]:
         """Extract text from each page of a PDF."""
         try:
             self._validate_file_size(pdf_path)
-            
+
             image_pages = self._pdf_to_images(pdf_path)
             results = []
-            
+
             for i, image_data in enumerate(image_pages):
                 base64_image = self._encode_image(image_data)
-                
+
                 page_prompt = (
                     f"Extract text from page {i+1} of this PDF. "
                     + (prompt or "Maintain original formatting.")
                 )
-                
+
                 messages = [
                     {
-                        "role": "user", 
+                        "role": "user",
                         "content": [
                             {"type": "text", "text": page_prompt},
                             {
@@ -182,32 +182,32 @@ class PydanticOCRClient:
                         ]
                     }
                 ]
-                
+
                 result = await self.ocr_agent.run(
                     page_prompt,
                     message_history=messages
                 )
-                
+
                 results.append(result.data)
-                
+
             return results
-            
+
         except Exception as e:
             if "api" in str(e).lower():
                 raise APIError(f"Mistral API error: {str(e)}")
             else:
                 raise OCRError(f"PDF OCR processing failed: {str(e)}")
-    
+
     async def extract_structured_data(
-        self, 
-        image_path: Path, 
+        self,
+        image_path: Path,
         result_type: type[BaseModel],
         prompt: Optional[str] = None
     ) -> BaseModel:
         """Extract structured data using PydanticAI with custom result type."""
         try:
             self._validate_file_size(image_path)
-            
+
             # Create agent with custom result type
             structured_agent = Agent(
                 self.model,
@@ -217,17 +217,17 @@ class PydanticOCRClient:
                     "Be precise and ensure all data is accurate. Return structured data only."
                 )
             )
-            
+
             with open(image_path, 'rb') as file:
                 image_data = file.read()
-            
+
             base64_image = self._encode_image(image_data)
-            
+
             user_prompt = (
-                prompt or 
+                prompt or
                 f"Extract data according to the {result_type.__name__} schema from this image."
             )
-            
+
             messages = [
                 {
                     "role": "user",
@@ -240,22 +240,22 @@ class PydanticOCRClient:
                     ]
                 }
             ]
-            
+
             result = await structured_agent.run(
                 user_prompt,
                 message_history=messages
             )
-            
+
             return result.data
-                
+
         except Exception as e:
             if "api" in str(e).lower():
                 raise APIError(f"Mistral API error: {str(e)}")
             else:
                 raise OCRError(f"Structured data extraction failed: {str(e)}")
-    
+
     async def extract_invoice_data(
-        self, 
+        self,
         image_path: Path,
         prompt: Optional[str] = None
     ) -> InvoiceData:

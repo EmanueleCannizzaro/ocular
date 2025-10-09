@@ -21,7 +21,7 @@ from abc import ABC, abstractmethod
 from pydantic import ValidationError
 
 from ..core.logging import get_logger
-from ..core.exceptions import OCRError, ValidationError as OcularValidationError
+from ..core.exceptions import ValidationError as OcularValidationError
 from ..models.property_assessment import AuctionPropertyProfile
 
 

@@ -5,18 +5,17 @@ Provides endpoints for managing deployment settings including environment variab
 scaling policies, health checks, and resource limits.
 """
 
-from typing import Dict, Any, List, Optional
-from fastapi import APIRouter, Depends, HTTPException, status
+from typing import Dict, Any
+from fastapi import APIRouter, Depends, HTTPException
 
 from sqlalchemy.orm import Session
 
 from ocular.database.session import get_db
 from ocular.models.deployments import (
-    EnvironmentVariablesRequest, ScalingPolicyRequest, HealthCheckRequest, 
-    ResourceLimitsRequest, DockerConfigRequest, NetworkConfigRequest, 
+    EnvironmentVariablesRequest, ScalingPolicyRequest, HealthCheckRequest,
+    ResourceLimitsRequest, DockerConfigRequest, NetworkConfigRequest,
     GPUConfigRequest
 )
-from ocular.routers import templates
 from ocular.services.deployment_config_service import (
     DeploymentConfigService,
     ScalingPolicy,

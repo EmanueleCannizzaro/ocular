@@ -9,10 +9,10 @@ from datetime import datetime
 
 class OcularError(Exception):
     """Base exception for Ocular package with enhanced error tracking."""
-    
+
     def __init__(
-        self, 
-        message: str, 
+        self,
+        message: str,
         error_code: Optional[str] = None,
         details: Optional[Dict[str, Any]] = None,
         error_id: Optional[str] = None,
@@ -25,14 +25,14 @@ class OcularError(Exception):
         self.error_id = error_id or str(uuid.uuid4())
         self.timestamp = datetime.now().isoformat()
         self.retryable = retryable
-        
+
         # Add standard error details
         self.details.update({
             "error_id": self.error_id,
             "timestamp": self.timestamp,
             "retryable": self.retryable
         })
-    
+
     def to_dict(self) -> Dict[str, Any]:
         """Convert exception to dictionary for logging/serialization."""
         return {
@@ -48,11 +48,11 @@ class OcularError(Exception):
 
 class ConfigurationError(OcularError):
     """Raised when configuration is invalid."""
-    
+
     def __init__(self, message: str, config_key: Optional[str] = None, **kwargs):
         details = {"config_key": config_key} if config_key else {}
         super().__init__(
-            message, 
+            message,
             error_code="CONFIG_ERROR",
             details=details,
             retryable=False,  # Config errors typically not retryable
@@ -62,7 +62,7 @@ class ConfigurationError(OcularError):
 
 class ValidationError(OcularError):
     """Raised when input validation fails."""
-    
+
     def __init__(self, message: str, field: Optional[str] = None, value: Any = None, **kwargs):
         # Sanitize value to avoid logging sensitive data
         safe_value = str(value)[:100] + "..." if value and len(str(value)) > 100 else value
@@ -78,7 +78,7 @@ class ValidationError(OcularError):
 
 class OCRError(OcularError):
     """Raised when OCR processing fails."""
-    
+
     def __init__(self, message: str, provider: Optional[str] = None, file_path: Optional[str] = None, **kwargs):
         details = {}
         if provider:
@@ -87,7 +87,7 @@ class OCRError(OcularError):
             details["file_path"] = file_path
         super().__init__(
             message,
-            error_code="OCR_ERROR", 
+            error_code="OCR_ERROR",
             details=details,
             retryable=True,  # OCR errors might be retryable
             **kwargs
@@ -96,10 +96,10 @@ class OCRError(OcularError):
 
 class APIError(OcularError):
     """Raised when API calls fail."""
-    
+
     def __init__(
-        self, 
-        message: str, 
+        self,
+        message: str,
         status_code: Optional[int] = None,
         response_body: Optional[str] = None,
         endpoint: Optional[str] = None,
@@ -107,10 +107,10 @@ class APIError(OcularError):
     ):
         # Determine if error is retryable based on status code
         retryable = status_code in [429, 500, 502, 503, 504] if status_code else True
-        
+
         # Truncate response body to avoid logging huge responses
         safe_response = response_body[:500] + "..." if response_body and len(response_body) > 500 else response_body
-        
+
         details = {
             "status_code": status_code,
             "response_body": safe_response,
@@ -127,7 +127,7 @@ class APIError(OcularError):
 
 class DocumentProcessingError(OcularError):
     """Raised when document processing fails."""
-    
+
     def __init__(self, message: str, document_path: Optional[str] = None, file_size: Optional[int] = None, **kwargs):
         details = {}
         if document_path:
@@ -145,7 +145,7 @@ class DocumentProcessingError(OcularError):
 
 class ProviderError(OcularError):
     """Raised when provider operations fail."""
-    
+
     def __init__(self, message: str, provider_type: Optional[str] = None, operation: Optional[str] = None, **kwargs):
         details = {}
         if provider_type:
@@ -163,7 +163,7 @@ class ProviderError(OcularError):
 
 class TimeoutError(OcularError):
     """Raised when operations timeout."""
-    
+
     def __init__(self, message: str, timeout_seconds: Optional[float] = None, operation: Optional[str] = None, **kwargs):
         details = {}
         if timeout_seconds:
@@ -181,7 +181,7 @@ class TimeoutError(OcularError):
 
 class RateLimitError(OcularError):
     """Raised when rate limits are exceeded."""
-    
+
     def __init__(self, message: str, retry_after: Optional[int] = None, provider: Optional[str] = None, **kwargs):
         details = {}
         if retry_after:
@@ -199,7 +199,7 @@ class RateLimitError(OcularError):
 
 class AuthenticationError(OcularError):
     """Raised when authentication fails."""
-    
+
     def __init__(self, message: str, provider: Optional[str] = None, **kwargs):
         details = {"provider": provider} if provider else {}
         super().__init__(
@@ -213,7 +213,7 @@ class AuthenticationError(OcularError):
 
 class ResourceExhaustedError(OcularError):
     """Raised when system resources are exhausted."""
-    
+
     def __init__(self, message: str, resource_type: Optional[str] = None, current_usage: Optional[str] = None, **kwargs):
         details = {}
         if resource_type:
@@ -231,7 +231,7 @@ class ResourceExhaustedError(OcularError):
 
 class SecurityError(OcularError):
     """Raised when security violations are detected."""
-    
+
     def __init__(self, message: str, violation_type: Optional[str] = None, **kwargs):
         details = {"violation_type": violation_type} if violation_type else {}
         super().__init__(

@@ -5,7 +5,7 @@ Provides deployment capabilities for Lambda Labs GPU cloud.
 """
 
 import httpx
-from typing import Dict, Any, Optional, List
+from typing import Dict, Any, List
 from .base import BaseDeploymentProvider, DeploymentConfig, DeploymentResult
 
 
