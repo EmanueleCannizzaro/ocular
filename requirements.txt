@@ -275,7 +275,7 @@ python-dotenv==1.1.1
     #   ocular (pyproject.toml)
     #   pydantic-settings
     #   uvicorn
-python-jose==3.3.0
+python-jose==3.4.0
 python-multipart==0.0.20
     # via
     #   ocular (pyproject.toml)
