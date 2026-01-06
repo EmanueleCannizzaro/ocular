@@ -4,7 +4,7 @@ ag-ui-protocol==0.1.8
     # via pydantic-ai-slim
 aiohappyeyeballs==2.6.1
     # via aiohttp
-aiohttp==3.12.15
+aiohttp==3.13.3
     # via
     #   ocular (pyproject.toml)
     #   huggingface-hub
