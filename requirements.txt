@@ -262,7 +262,7 @@ pydantic-settings==2.10.1
     #   mcp
 pygments==2.19.2
     # via rich
-pypdf==6.0.0
+pypdf==6.7.1
     # via ocular (pyproject.toml)
 pyperclip==1.9.0
     # via pydantic-ai-slim
